@@ -1,4 +1,4 @@
-namespace Sail.Compass.Informers;
+﻿namespace Sail.Compass.Extensions;
 
 public static class ResourceEventExtensions
 {

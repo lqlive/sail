@@ -1,26 +1,21 @@
+﻿using Grpc.Core;
+using Sail.Api.V1;
 using System.Reactive.Linq;
 using Google.Protobuf.WellKnownTypes;
-using Grpc.Core;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using Sail.Api.V1;
+using Sail.Compass.Extensions;
 
-namespace Sail.Compass.Informers;
-
-public class V1RouteResourceInformer(
-    IHostApplicationLifetime hostApplicationLifetime,
-    RouteService.RouteServiceClient client,
-    ILogger<V1RouteResourceInformer> logger) : ResourceInformer<Route>(hostApplicationLifetime, logger)
+namespace Sail.Compass.Watchers;
+internal sealed class ClusterWatcher(ClusterService.ClusterServiceClient client): ResourceWatcher<Cluster>
 {
-    protected override IObservable<ResourceEvent<Route>> GetObservable(bool watch)
+    protected override IObservable<ResourceEvent<Cluster>> GetObservable(bool watch)
     {
         var result = watch ? Watch() : List();
         return result;
     }
 
-    private IObservable<ResourceEvent<Route>> List()
+    private IObservable<ResourceEvent<Cluster>> List()
     {
-        return Observable.Create<ResourceEvent<Route>>((observer, cancellationToken) =>
+        return Observable.Create<ResourceEvent<Cluster>>((observer, cancellationToken) =>
         {
             var list = client.List(new Empty(), cancellationToken: cancellationToken);
             foreach (var item in list.Items)
@@ -35,10 +30,9 @@ public class V1RouteResourceInformer(
             return Task.CompletedTask;
         });
     }
-
-    private IObservable<ResourceEvent<Route>> Watch()
+    private IObservable<ResourceEvent<Cluster>> Watch()
     {
-        return Observable.Create<ResourceEvent<Route>>(async (observer, cancellationToken) =>
+        return Observable.Create<ResourceEvent<Cluster>>(async (observer, cancellationToken) =>
         {
             var result = client.Watch(new Empty(), cancellationToken: cancellationToken);
             var watch = result.ResponseStream;
@@ -51,8 +45,8 @@ public class V1RouteResourceInformer(
                     Api.V1.EventType.Delete => EventType.Deleted,
                     _ => EventType.Unknown,
                 };
-                
-                var resource = current.Route.ToResourceEvent(eventType);
+
+                var resource = current.Cluster.ToResourceEvent(eventType);
                 observer.OnNext(resource!);
             }
         });
