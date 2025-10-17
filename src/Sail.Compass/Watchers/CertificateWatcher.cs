@@ -1,21 +1,22 @@
-﻿using Grpc.Core;
+using Grpc.Core;
 using Sail.Api.V1;
 using System.Reactive.Linq;
 using Google.Protobuf.WellKnownTypes;
 using Sail.Compass.Extensions;
 
 namespace Sail.Compass.Watchers;
-internal sealed class ClusterWatcher(ClusterService.ClusterServiceClient client): ResourceWatcher<Cluster>
+
+internal sealed class CertificateWatcher(CertificateService.CertificateServiceClient client) : ResourceWatcher<Certificate>
 {
-    public override IObservable<ResourceEvent<Cluster>> GetObservable(bool watch)
+    public override IObservable<ResourceEvent<Certificate>> GetObservable(bool watch)
     {
         var result = watch ? Watch() : List();
         return result;
     }
 
-    private IObservable<ResourceEvent<Cluster>> List()
+    private IObservable<ResourceEvent<Certificate>> List()
     {
-        return Observable.Create<ResourceEvent<Cluster>>((observer, cancellationToken) =>
+        return Observable.Create<ResourceEvent<Certificate>>((observer, cancellationToken) =>
         {
             var list = client.List(new Empty(), cancellationToken: cancellationToken);
             foreach (var item in list.Items)
@@ -30,9 +31,10 @@ internal sealed class ClusterWatcher(ClusterService.ClusterServiceClient client)
             return Task.CompletedTask;
         });
     }
-    private IObservable<ResourceEvent<Cluster>> Watch()
+
+    private IObservable<ResourceEvent<Certificate>> Watch()
     {
-        return Observable.Create<ResourceEvent<Cluster>>(async (observer, cancellationToken) =>
+        return Observable.Create<ResourceEvent<Certificate>>(async (observer, cancellationToken) =>
         {
             var result = client.Watch(new Empty(), cancellationToken: cancellationToken);
             var watch = result.ResponseStream;
@@ -46,7 +48,7 @@ internal sealed class ClusterWatcher(ClusterService.ClusterServiceClient client)
                     _ => EventType.Unknown,
                 };
 
-                var resource = current.Cluster.ToResourceEvent(eventType);
+                var resource = current.Certificate.ToResourceEvent(eventType);
                 observer.OnNext(resource!);
             }
         });

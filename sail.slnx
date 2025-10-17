@@ -1,14 +1,14 @@
-﻿<Solution>
+<Solution>
   <Folder Name="/samples/">
-    <Project Path="samples\ApiSample\ApiSample.csproj" Type="Classic C#" />
-    <Project Path="samples\SampleServer\SampleServer.csproj" Type="Classic C#" />
-    <Project Path="samples\YarpSample\YarpSample.csproj" Type="Classic C#" />
-    <Project Path="samples\YarpServiceDiscovery\YarpServiceDiscovery.csproj" Type="Classic C#" />
+    <Project Path="samples\ApiSample\ApiSample.csproj" />
+    <Project Path="samples\SampleServer\SampleServer.csproj" />
+    <Project Path="samples\YarpSample\YarpSample.csproj" />
+    <Project Path="samples\YarpServiceDiscovery\YarpServiceDiscovery.csproj" />
   </Folder>
   <Folder Name="/shared/">
-    <Project Path="shared\Sail.ServiceDiscovery.Consul\Sail.ServiceDiscovery.Consul.csproj" Type="Classic C#" />
-    <Project Path="shared\ServiceDefaults\ServiceDefaults.csproj" Type="Classic C#" />
-    <Project Path="shared\Yarp.Extensions.Resilience\Yarp.Extensions.Resilience.csproj" Type="Classic C#" />
+    <Project Path="shared\Sail.ServiceDiscovery.Consul\Sail.ServiceDiscovery.Consul.csproj" />
+    <Project Path="shared\ServiceDefaults\ServiceDefaults.csproj" />
+    <Project Path="shared\Yarp.Extensions.Resilience\Yarp.Extensions.Resilience.csproj" />
   </Folder>
   <Folder Name="/Solution Items/">
     <File Path="Directory.Packages.props" />
@@ -17,14 +17,13 @@
     <File Path="Directory.Build.targets" />
   </Folder>
   <Folder Name="/src/">
-    <Project Path="src\Sail.Compass\Sail.Compass.csproj" Type="Classic C#" />
-    <Project Path="src\Sail.Core\Sail.Core.csproj" Type="Classic C#" />
-    <Project Path="src\Sail.Dashboard\Sail.Dashboard.csproj" Type="Classic C#" />
-    <Project Path="src\Sail.Proxy\Sail.Proxy.csproj" Type="Classic C#" />
-    <Project Path="src\Sail.Storage.MongoDB\Sail.Storage.MongoDB.csproj" Type="Classic C#" />
-    <Project Path="src\Sail\Sail.csproj" Type="Classic C#" />
+    <Project Path="src\Sail.Compass\Sail.Compass.csproj" />
+    <Project Path="src\Sail.Core\Sail.Core.csproj" />
+    <Project Path="src\Sail.Proxy\Sail.Proxy.csproj" />
+    <Project Path="src\Sail.Storage.MongoDB\Sail.Storage.MongoDB.csproj" />
+    <Project Path="src\Sail\Sail.csproj" />
   </Folder>
   <Folder Name="/tests/">
-    <Project Path="tests\Sail.FunctionalTests\Sail.FunctionalTests.csproj" Type="Classic C#" />
+    <Project Path="tests\Sail.FunctionalTests\Sail.FunctionalTests.csproj" />
   </Folder>
 </Solution>

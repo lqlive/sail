@@ -26,7 +26,6 @@ public class SailContext
     {
         RegisterClassMaps();
     }
-
     public IMongoCollection<Cluster> Clusters => _database.GetCollection<Cluster>(ClusterTableName);
     public IMongoCollection<Route> Routes => _database.GetCollection<Route>(RouteTableName);
     public IMongoCollection<Certificate> Certificates => _database.GetCollection<Certificate>(CertificateTableName);

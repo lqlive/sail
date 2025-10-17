@@ -5,10 +5,8 @@ using Sail.Models.Clusters;
 using Sail.Storage.MongoDB;
 
 namespace Sail.Services;
-
 public class ClusterService(SailContext context)
 {
-    
     public async Task<ClusterResponse> GetAsync(Guid id, CancellationToken cancellationToken = default)
     {
         var filter = Builders<Cluster>.Filter.Where(x => x.Id == id);
