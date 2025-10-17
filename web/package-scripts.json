@@ -1,0 +1,10 @@
+{
+  "scripts": {
+    "setup": "npm install && echo '\n✅ Dependencies installed successfully!\nRun: npm run dev'",
+    "dev:open": "npm run dev -- --open",
+    "build:analyze": "npm run build && echo '\nBuild complete! Check dist/ folder'",
+    "clean": "rm -rf node_modules dist && npm install",
+    "type-check": "tsc --noEmit"
+  }
+}
+

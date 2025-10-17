@@ -7,15 +7,12 @@ internal sealed class DataSourceConfigProvider : IProxyConfigProvider, IDisposab
 {
     private readonly Subject<ConfigurationSnapshot>  _subscription  = new();
     private ConfigurationSnapshot? _snapshot;
-
     public IProxyConfig GetConfig()
     {
         if (_snapshot is null)
         {
             _subscription.Subscribe(
-                onNext: value => _snapshot = value,
-                onError: error => Console.WriteLine(error.Message),
-                onCompleted: () => Console.WriteLine("Completed"));
+                onNext: value => _snapshot = value);
         }
 
         return _snapshot;

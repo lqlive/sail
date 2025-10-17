@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-
 using Sail.Compass.Hosting;
 
 namespace Sail.Compass.DataSources;
@@ -10,17 +9,16 @@ public sealed class GrpcConfigurationSource : BackgroundHostedService, IConfigur
     private readonly Lock _sync = new();
     private readonly SemaphoreSlim _ready = new(0);
     private readonly SemaphoreSlim _start = new(0);
-
+ 
     public GrpcConfigurationSource(IHostApplicationLifetime hostApplicationLifetime, ILogger logger) 
         : base(hostApplicationLifetime, logger)
     {
     }
-
     public string Name => "GrpcSource";
 
-    public override Task RunAsync(CancellationToken cancellationToken)
+    public override async Task RunAsync(CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        await _start.WaitAsync(cancellationToken).ConfigureAwait(false);
     }
 
     public ValueTask DisposeAsync()
