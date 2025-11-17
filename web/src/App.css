@@ -2,7 +2,7 @@
   @apply min-h-screen bg-white;
 }
 
-/* 自定义滚动条样式 */
+/* Custom scrollbar styles */
 *::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -21,7 +21,7 @@
   background: #9ca3af;
 }
 
-/* 动画效果 */
+/* Animation effects */
 .fade-in {
   animation: fadeIn 0.3s ease-in-out;
 }

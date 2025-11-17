@@ -9,8 +9,15 @@ internal sealed class ClusterWatcher(ClusterService.ClusterServiceClient client)
 {
     public override IObservable<ResourceEvent<Cluster>> GetObservable(bool watch)
     {
-        var result = watch ? Watch() : List();
-        return result;
+        if (!watch)
+        {
+            return List();
+        }
+        
+        return Observable.Concat(
+            List(),
+            Watch()
+        );
     }
 
     private IObservable<ResourceEvent<Cluster>> List()

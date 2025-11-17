@@ -34,6 +34,13 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
 
+  const isActive = (href: string) => {
+    if (href === '/') {
+      return location.pathname === '/';
+    }
+    return location.pathname.startsWith(href);
+  };
+
 
   return (
     <div className="min-h-screen bg-white">
@@ -57,7 +64,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                     to={item.href}
                     className={classNames(
                       'text-sm font-normal transition-colors duration-100',
-                      location.pathname === item.href
+                      isActive(item.href)
                         ? 'text-gray-900'
                         : 'text-gray-500 hover:text-gray-900'
                     )}
@@ -104,7 +111,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                   to={item.href}
                   className={classNames(
                     'block px-3 py-3 text-sm font-normal rounded-md transition-colors duration-100',
-                    location.pathname === item.href
+                    isActive(item.href)
                       ? 'bg-gray-100 text-gray-900'
                       : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                   )}

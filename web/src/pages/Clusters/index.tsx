@@ -7,58 +7,59 @@ import {
   ServerStackIcon,
 } from '@heroicons/react/24/outline';
 import type { Cluster } from '../../types/gateway';
-
-const mockClusters: Cluster[] = [
-  {
-    id: 'cluster-1',
-    name: 'Backend API',
-    loadBalancingPolicy: 'RoundRobin',
-    healthCheckEnabled: true,
-    sessionAffinityEnabled: false,
-    destinations: [
-      { id: 'd1', address: 'https://api1.example.com:443', health: 'healthy' },
-      { id: 'd2', address: 'https://api2.example.com:443', health: 'healthy' },
-    ],
-    createdAt: '2024-01-15T10:00:00Z',
-    updatedAt: '2024-01-15T10:00:00Z',
-  },
-  {
-    id: 'cluster-2',
-    name: 'Web Servers',
-    loadBalancingPolicy: 'LeastRequests',
-    healthCheckEnabled: true,
-    sessionAffinityEnabled: true,
-    destinations: [
-      { id: 'd3', address: 'https://web1.example.com:443', health: 'healthy' },
-      { id: 'd4', address: 'https://web2.example.com:443', health: 'unhealthy' },
-      { id: 'd5', address: 'https://web3.example.com:443', health: 'healthy' },
-    ],
-    createdAt: '2024-01-14T09:00:00Z',
-    updatedAt: '2024-01-14T09:00:00Z',
-  },
-];
+import { ClusterService } from '../../services/clusterService';
 
 const Clusters: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [clusters, setClusters] = useState<Cluster[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
+  const [error, setError] = useState<string | null>(null);
+
+  const loadClusters = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const data = await ClusterService.getClusters(searchTerm);
+      setClusters(data);
+    } catch (err) {
+      console.error('Failed to load clusters:', err);
+      setError('Failed to load clusters');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    setLoading(true);
-    setTimeout(() => {
-      setClusters(mockClusters);
-      setLoading(false);
-    }, 500);
+    loadClusters();
   }, []);
 
-  const filteredClusters = clusters.filter(cluster =>
-    cluster.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (searchTerm !== '') {
+        loadClusters();
+      }
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
 
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center h-64">
+        <p className="text-red-600 mb-4">{error}</p>
+        <button
+          onClick={loadClusters}
+          className="px-4 py-2 bg-gray-900 text-white rounded-md hover:bg-gray-800"
+        >
+          Retry
+        </button>
       </div>
     );
   }
@@ -94,8 +95,21 @@ const Clusters: React.FC = () => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        {filteredClusters.map((cluster) => {
-          const healthyCount = cluster.destinations.filter(d => d.health === 'healthy').length;
+        {clusters.length === 0 ? (
+          <div className="col-span-2 text-center py-12 text-gray-500">
+            <ServerStackIcon className="h-12 w-12 mx-auto mb-4 text-gray-400" />
+            <p>No clusters yet</p>
+            <Link
+              to="/clusters/new"
+              className="inline-block mt-4 text-sm text-gray-900 hover:underline"
+            >
+              Create your first cluster
+            </Link>
+          </div>
+        ) : (
+          clusters.map((cluster) => {
+            const healthyCount = cluster.destinations?.filter(d => d.health === 'healthy').length || 0;
+            const healthCheckEnabled = !!(cluster.healthCheck?.active?.enabled || cluster.healthCheck?.passive?.enabled);
           return (
             <Link
               key={cluster.id}
@@ -114,18 +128,18 @@ const Clusters: React.FC = () => {
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Destinations</span>
-                  <span className="font-medium">{cluster.destinations.length}</span>
+                  <span className="font-medium">{cluster.destinations?.length || 0}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Healthy</span>
-                  <span className={`font-medium ${healthyCount === cluster.destinations.length ? 'text-green-600' : 'text-yellow-600'}`}>
-                    {healthyCount}/{cluster.destinations.length}
+                  <span className={`font-medium ${healthyCount === (cluster.destinations?.length || 0) ? 'text-green-600' : 'text-yellow-600'}`}>
+                    {healthyCount}/{cluster.destinations?.length || 0}
                   </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Health Check</span>
                   <span className="font-medium">
-                    {cluster.healthCheckEnabled ? (
+                    {healthCheckEnabled ? (
                       <CheckCircleIcon className="h-4 w-4 text-green-600 inline" />
                     ) : (
                       'Disabled'
@@ -135,7 +149,8 @@ const Clusters: React.FC = () => {
               </div>
             </Link>
           );
-        })}
+        })
+        )}
       </div>
     </div>
   );

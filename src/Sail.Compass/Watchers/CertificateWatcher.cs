@@ -10,8 +10,15 @@ internal sealed class CertificateWatcher(CertificateService.CertificateServiceCl
 {
     public override IObservable<ResourceEvent<Certificate>> GetObservable(bool watch)
     {
-        var result = watch ? Watch() : List();
-        return result;
+        if (!watch)
+        {
+            return List();
+        }
+        
+        return Observable.Concat(
+            List(),
+            Watch()
+        );
     }
 
     private IObservable<ResourceEvent<Certificate>> List()

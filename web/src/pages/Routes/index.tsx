@@ -7,66 +7,46 @@ import {
   XCircleIcon,
 } from '@heroicons/react/24/outline';
 import type { Route } from '../../types/gateway';
-
-const mockRoutes: Route[] = [
-  {
-    id: '1',
-    name: 'API Gateway',
-    clusterId: 'cluster-1',
-    order: 1,
-    path: '/api/{**catch-all}',
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    hosts: ['api.example.com'],
-    enabled: true,
-    authorizationPolicy: 'default',
-    rateLimiterPolicy: 'standard',
-    createdAt: '2024-01-15T10:00:00Z',
-    updatedAt: '2024-01-15T10:00:00Z',
-  },
-  {
-    id: '2',
-    name: 'Web Application',
-    clusterId: 'cluster-2',
-    order: 2,
-    path: '/{**catch-all}',
-    methods: ['GET'],
-    hosts: ['www.example.com', 'example.com'],
-    enabled: true,
-    createdAt: '2024-01-14T09:00:00Z',
-    updatedAt: '2024-01-14T09:00:00Z',
-  },
-  {
-    id: '3',
-    name: 'Admin Portal',
-    clusterId: 'cluster-3',
-    order: 3,
-    path: '/admin/{**catch-all}',
-    methods: ['GET', 'POST'],
-    hosts: ['admin.example.com'],
-    enabled: false,
-    authorizationPolicy: 'admin-only',
-    createdAt: '2024-01-13T08:00:00Z',
-    updatedAt: '2024-01-16T14:30:00Z',
-  },
-];
+import { RouteService } from '../../services/routeService';
 
 const Routes: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [routes, setRoutes] = useState<Route[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState<'all' | 'active' | 'inactive'>('all');
+  const [error, setError] = useState<string | null>(null);
+
+  const loadRoutes = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const data = await RouteService.getRoutes(searchTerm);
+      setRoutes(data);
+    } catch (err) {
+      console.error('Failed to load routes:', err);
+      setError('Failed to load routes');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    setLoading(true);
-    setTimeout(() => {
-      setRoutes(mockRoutes);
-      setLoading(false);
-    }, 500);
+    loadRoutes();
   }, []);
 
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (searchTerm !== '') {
+        loadRoutes();
+      }
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
+
   const filteredRoutes = routes.filter(route => {
+    const path = route.match?.path || route.path || '';
     const matchesSearch = route.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         route.path.toLowerCase().includes(searchTerm.toLowerCase());
+                         path.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = filterStatus === 'all' ||
                          (filterStatus === 'active' && route.enabled) ||
                          (filterStatus === 'inactive' && !route.enabled);
@@ -77,6 +57,20 @@ const Routes: React.FC = () => {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center h-64">
+        <p className="text-red-600 mb-4">{error}</p>
+        <button
+          onClick={loadRoutes}
+          className="px-4 py-2 bg-gray-900 text-white rounded-md hover:bg-gray-800"
+        >
+          Retry
+        </button>
       </div>
     );
   }
@@ -125,38 +119,60 @@ const Routes: React.FC = () => {
       </div>
 
       <div className="space-y-3">
-        {filteredRoutes.map((route) => (
-          <Link
-            key={route.id}
-            to={`/routes/${route.id}/edit`}
-            className="block bg-white border border-gray-200 rounded-lg p-4 hover:border-gray-300 transition-colors"
-          >
-            <div className="flex items-center space-x-2 mb-1.5">
-              <h3 className="text-sm font-medium text-gray-900">{route.name}</h3>
-              {route.enabled ? (
-                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs bg-green-100 text-green-800">
-                  <CheckCircleIcon className="h-3 w-3 mr-1" />
-                  Active
-                </span>
-              ) : (
-                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs bg-gray-100 text-gray-800">
-                  <XCircleIcon className="h-3 w-3 mr-1" />
-                  Inactive
-                </span>
-              )}
-            </div>
-            <p className="text-xs text-gray-600 mb-2 font-mono">{route.path}</p>
-            <div className="flex items-center space-x-3 text-xs text-gray-500">
-              {route.methods && route.methods.length > 0 && (
-                <span>Methods: {route.methods.join(', ')}</span>
-              )}
-              {route.hosts && route.hosts.length > 0 && (
-                <span>Hosts: {route.hosts.join(', ')}</span>
-              )}
-              <span>Order: {route.order}</span>
-            </div>
-          </Link>
-        ))}
+        {routes.length === 0 ? (
+          <div className="text-center py-12 text-gray-500">
+            <PlusIcon className="h-12 w-12 mx-auto mb-4 text-gray-400" />
+            <p>No routes yet</p>
+            <Link
+              to="/routes/new"
+              className="inline-block mt-4 text-sm text-gray-900 hover:underline"
+            >
+              Create your first route
+            </Link>
+          </div>
+        ) : filteredRoutes.length === 0 ? (
+          <div className="text-center py-12 text-gray-500">
+            <p>No matching routes</p>
+          </div>
+        ) : (
+          filteredRoutes.map((route) => {
+            const path = route.match?.path || route.path || '';
+            const methods = route.match?.methods || route.methods || [];
+            const hosts = route.match?.hosts || route.hosts || [];
+            return (
+              <Link
+                key={route.id}
+                to={`/routes/${route.id}/edit`}
+                className="block bg-white border border-gray-200 rounded-lg p-4 hover:border-gray-300 transition-colors"
+              >
+                <div className="flex items-center space-x-2 mb-1.5">
+                  <h3 className="text-sm font-medium text-gray-900">{route.name}</h3>
+                  {route.enabled ? (
+                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs bg-green-100 text-green-800">
+                      <CheckCircleIcon className="h-3 w-3 mr-1" />
+                      Active
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs bg-gray-100 text-gray-800">
+                      <XCircleIcon className="h-3 w-3 mr-1" />
+                      Inactive
+                    </span>
+                  )}
+                </div>
+                <p className="text-xs text-gray-600 mb-2 font-mono">{path}</p>
+                <div className="flex items-center space-x-3 text-xs text-gray-500">
+                  {methods.length > 0 && (
+                    <span>Methods: {methods.join(', ')}</span>
+                  )}
+                  {hosts.length > 0 && (
+                    <span>Hosts: {hosts.join(', ')}</span>
+                  )}
+                  <span>Order: {route.order}</span>
+                </div>
+              </Link>
+            );
+          })
+        )}
       </div>
     </div>
   );

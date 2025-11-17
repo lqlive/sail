@@ -1,0 +1,45 @@
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
+
+using Sail.Api.V1;
+using Sail.Compass.ConfigProvider;
+using Sail.Compass.Watchers;
+using Sail.Core.Options;
+using Yarp.ReverseProxy.Configuration;
+
+
+namespace Sail.Compass.Management;
+
+public static class ServiceCollectionExtensions
+{
+    private static IServiceCollection AddResourceGrpcClient(this IServiceCollection services)
+    {
+        services.AddGrpcClient<ClusterService.ClusterServiceClient>((sp, o) =>
+        {
+            var receiverOptions = sp.GetRequiredService<IOptions<ReceiverOptions>>().Value;
+            o.Address = new Uri("http://localhost:8000");
+        });
+        services.AddGrpcClient<RouteService.RouteServiceClient>((sp, o) =>
+        {
+            var receiverOptions = sp.GetRequiredService<IOptions<ReceiverOptions>>().Value;
+            o.Address = new Uri("http://localhost:8000");
+        });
+
+        return services;
+    }
+    public static IReverseProxyBuilder LoadFromMessages(this IReverseProxyBuilder builder)
+    {
+        ArgumentNullException.ThrowIfNull(builder);
+
+        builder.Services.AddResourceGrpcClient();
+
+        builder.Services.AddSingleton<ResourceWatcher<Cluster>, ClusterWatcher>();
+        builder.Services.AddSingleton<ResourceWatcher<Route>,RouteWatcher>();
+
+        builder.Services.AddSingleton<DataSourceConfigProvider>();
+        builder.Services.AddSingleton<IProxyConfigProvider>(sp => 
+            sp.GetRequiredService<DataSourceConfigProvider>());
+        
+        return builder;
+    }
+}

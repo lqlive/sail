@@ -10,8 +10,15 @@ internal sealed class RouteWatcher(RouteService.RouteServiceClient client) : Res
 {
     public override IObservable<ResourceEvent<Route>> GetObservable(bool watch)
     {
-        var result = watch ? Watch() : List();
-        return result;
+        if (!watch)
+        {
+            return List();
+        }
+        
+        return Observable.Concat(
+            List(),
+            Watch()
+        );
     }
 
     private IObservable<ResourceEvent<Route>> List()
