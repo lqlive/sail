@@ -8,10 +8,15 @@ export default defineConfig({
     port: 3000,
     proxy: {
       '/api': {
-        target: 'http://localhost:8000',
+        target: 'http://localhost:5169',
         changeOrigin: true,
-      },
-    },
+        secure: false,
+        // Don't rewrite the path - keep /api prefix
+      }
+    }
   },
+  build: {
+    outDir: 'dist',
+    sourcemap: true
+  }
 })
-
