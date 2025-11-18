@@ -12,7 +12,7 @@ namespace Sail.Compass.ConfigProvider;
 
 internal sealed class ProxyConfigProvider : IProxyConfigProvider, IDisposable
 {
-    private readonly object _lockObject = new();
+    private readonly Lock _lockObject = new();
     private readonly CompositeDisposable _subscriptions = new();
     private ProxyConfigSnapshot? _snapshot;
     private CancellationTokenSource? _changeToken;

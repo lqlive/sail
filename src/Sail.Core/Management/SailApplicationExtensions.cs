@@ -12,11 +12,12 @@ public static class SailApplicationExtensions
         return app;
     }
 
-    private static void AddConfiguration(this IServiceCollection services)
+    private static IServiceCollection AddConfiguration(this IServiceCollection services)
     {
-        services.AddOptions<DatabaseOptions>().BindConfiguration(nameof(DatabaseOptions.Name));
-        services.AddOptions<CertificateOptions>().BindConfiguration(nameof(CertificateOptions.Name));
-        services.AddOptions<ConsulOptions>().BindConfiguration(nameof(ConsulOptions.Name));
-        services.AddOptions<ReceiverOptions>().BindConfiguration(nameof(ReceiverOptions.Name));
+        services.AddOptions<DatabaseOptions>().BindConfiguration(DatabaseOptions.Name);
+        services.AddOptions<CertificateOptions>().BindConfiguration(CertificateOptions.Name);
+        services.AddOptions<ConsulOptions>().BindConfiguration(ConsulOptions.Name);
+        services.AddOptions<ReceiverOptions>().BindConfiguration(ReceiverOptions.Name);
+        return services;
     }
 }
