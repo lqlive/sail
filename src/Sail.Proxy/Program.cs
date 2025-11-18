@@ -9,7 +9,9 @@ builder.WebHost.UseCertificateSelector();
 
 builder.Services.AddSailCore();
 builder.Services.AddServerCertificateSelector();
-builder.Services.AddReverseProxy().LoadFromMessages();
+builder.Services.AddReverseProxy()
+    .LoadFromMessages();
+ 
 builder.Services.AddConsul(o =>
 {
     o.Address = new Uri("http://127.0.0.1:8500");

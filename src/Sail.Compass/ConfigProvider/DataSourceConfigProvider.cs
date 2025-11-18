@@ -1,7 +1,6 @@
 ﻿using System.Globalization;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
-using System.Reactive.Subjects;
 using Microsoft.Extensions.Primitives;
 using Sail.Api.V1;
 using Sail.Compass.Watchers;
@@ -13,27 +12,33 @@ namespace Sail.Compass.ConfigProvider;
 
 internal sealed class DataSourceConfigProvider : IProxyConfigProvider, IDisposable
 {
-    private readonly BehaviorSubject<ConfigurationSnapshot> _configSubject;
+    private readonly object _lockObject = new();
     private readonly CompositeDisposable _subscriptions = new();
+    private ConfigurationSnapshot? _snapshot;
+    private CancellationTokenSource? _changeToken;
     private bool _disposed;
 
     public DataSourceConfigProvider(
         ResourceWatcher<Route> routeWatcher,
         ResourceWatcher<Cluster> clusterWatcher)
     {
-        _configSubject = new BehaviorSubject<ConfigurationSnapshot>(CreateEmptySnapshot());
-
         var routes = CreateRouteStream(routeWatcher);
         var clusters = CreateClusterStream(clusterWatcher);
 
-        var subscription = Observable.CombineLatest(routes, clusters, UpdateSnapshot)
-            .Catch<ConfigurationSnapshot, Exception>(ex => Observable.Return(_configSubject.Value))
-            .Subscribe(_configSubject.OnNext, _configSubject.OnError);
+        var subscription = routes
+            .CombineLatest(clusters, (r, c) => (Routes: r, Clusters: c))
+            .Subscribe(x => UpdateSnapshot(x.Routes, x.Clusters));
         
         _subscriptions.Add(subscription);
     }
 
-    public IProxyConfig GetConfig() => _configSubject.Value;
+    public IProxyConfig GetConfig()
+    {
+        lock (_lockObject)
+        {
+            return _snapshot ?? new ConfigurationSnapshot();
+        }
+    }
 
     private IObservable<Dictionary<string, Route>> CreateRouteStream(
         ResourceWatcher<Route> watcher)
@@ -95,32 +100,38 @@ internal sealed class DataSourceConfigProvider : IProxyConfigProvider, IDisposab
             .StartWith(new Dictionary<string, Cluster>(StringComparer.OrdinalIgnoreCase));
     }
 
-    private ConfigurationSnapshot UpdateSnapshot(
+    private void UpdateSnapshot(
         Dictionary<string, Route> routes,
         Dictionary<string, Cluster> clusters)
     {
-        var snapshot = CreateEmptySnapshot();
-        
-        foreach (var cluster in clusters.Values)
+        lock (_lockObject)
         {
-            snapshot.Clusters.Add(ConvertCluster(cluster));
-        }
-        
-        foreach (var route in routes.Values)
-        {
-            snapshot.Routes.Add(ConvertRoute(route));
-        }
+            var newSnapshot = new ConfigurationSnapshot();
+            
+            foreach (var cluster in clusters.Values)
+            {
+                newSnapshot.Clusters.Add(ConvertCluster(cluster));
+            }
+            
+            foreach (var route in routes.Values)
+            {
+                newSnapshot.Routes.Add(ConvertRoute(route));
+            }
 
-        return snapshot;
-    }
+            var oldToken = _changeToken;
+            _changeToken = new CancellationTokenSource();
+            newSnapshot.ChangeToken = new CancellationChangeToken(_changeToken.Token);
+            
+            _snapshot = newSnapshot;
 
-    private static ConfigurationSnapshot CreateEmptySnapshot()
-    {
-        var cts = new CancellationTokenSource();
-        return new ConfigurationSnapshot
-        {
-            ChangeToken = new CancellationChangeToken(cts.Token)
-        };
+            try
+            {
+                oldToken?.Cancel(throwOnFirstException: false);
+            }
+            catch
+            {
+            }
+        }
     }
 
     private static ClusterConfig ConvertCluster(Cluster cluster)
@@ -217,7 +228,7 @@ internal sealed class DataSourceConfigProvider : IProxyConfigProvider, IDisposab
         if (!_disposed)
         {
             _subscriptions?.Dispose();
-            _configSubject?.Dispose();
+            _changeToken?.Dispose();
             _disposed = true;
         }
     }
