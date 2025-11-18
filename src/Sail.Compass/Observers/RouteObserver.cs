@@ -1,12 +1,12 @@
-﻿using Grpc.Core;
+using Grpc.Core;
 using Sail.Api.V1;
 using System.Reactive.Linq;
 using Google.Protobuf.WellKnownTypes;
 using Sail.Compass.Extensions;
 
-namespace Sail.Compass.Watchers;
+namespace Sail.Compass.Observers;
 
-internal sealed class RouteWatcher(RouteService.RouteServiceClient client) : ResourceWatcher<Route>
+internal sealed class RouteObserver(RouteService.RouteServiceClient client) : ResourceObserver<Route>
 {
     public override IObservable<ResourceEvent<Route>> GetObservable(bool watch)
     {
@@ -61,3 +61,4 @@ internal sealed class RouteWatcher(RouteService.RouteServiceClient client) : Res
         });
     }
 }
+

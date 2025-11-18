@@ -9,11 +9,9 @@ import ClustersPage from './pages/Clusters';
 import ClusterDetail from './pages/Clusters/ClusterDetail';
 import ClusterEdit from './pages/Clusters/ClusterEdit';
 import CertificatesPage from './pages/Certificates';
+import CertificateEdit from './pages/Certificates/CertificateEdit';
 import Settings from './pages/Settings';
 import './App.css';
-
-
-
 
 const AppContent: React.FC = () => {
   return (
@@ -30,6 +28,8 @@ const AppContent: React.FC = () => {
           <Route path="/clusters/:id/edit" element={<ClusterEdit />} />
           <Route path="/clusters/:id" element={<ClusterDetail />} />
           <Route path="/certificates" element={<CertificatesPage />} />
+          <Route path="/certificates/new" element={<CertificateEdit />} />
+          <Route path="/certificates/:id" element={<CertificateEdit />} />
           <Route path="/settings" element={<Settings />} />
         </Routes>
       </Layout>

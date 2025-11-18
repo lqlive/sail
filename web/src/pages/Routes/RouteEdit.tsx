@@ -153,28 +153,28 @@ const RouteEdit: React.FC = () => {
         Back to Routes
       </Link>
 
-      <div className="mb-6">
-        <h1 className="text-2xl font-medium text-gray-900">
+      <div className="mb-4">
+        <h1 className="text-lg font-medium text-gray-900">
           {isEdit ? 'Edit Route' : 'Create Route'}
         </h1>
-        <p className="text-sm text-gray-600 mt-1">
+        <p className="text-xs text-gray-600 mt-1">
           Define route capabilities and specifications
         </p>
       </div>
 
       {error && (
-        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-md">
-          <p className="text-sm text-red-600">{error}</p>
+        <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md">
+          <p className="text-xs text-red-600">{error}</p>
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form onSubmit={handleSubmit} className="space-y-4">
         {/* Basic Configuration */}
-        <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-6">
-          <h2 className="text-base font-semibold text-gray-900 mb-4">Basic Configuration</h2>
-          <div className="space-y-4">
+        <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-4">
+          <h2 className="text-sm font-semibold text-gray-900 mb-3">Basic Configuration</h2>
+          <div className="space-y-3">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-xs font-medium text-gray-700 mb-1">
                 Route Name <span className="text-red-500">*</span>
               </label>
               <input
@@ -182,20 +182,20 @@ const RouteEdit: React.FC = () => {
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 placeholder="e.g., API Gateway Route"
-                className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-gray-900 focus:border-gray-900 text-sm"
+                className="block w-full px-2.5 py-1.5 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-gray-900 focus:border-gray-900 text-sm"
                 required
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-xs font-medium text-gray-700 mb-1">
                   Target Cluster <span className="text-red-500">*</span>
                 </label>
                 <select
                   value={formData.clusterId}
                   onChange={(e) => setFormData({ ...formData, clusterId: e.target.value })}
-                  className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-gray-900 focus:border-gray-900 text-sm"
+                  className="block w-full px-2.5 py-1.5 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-gray-900 focus:border-gray-900 text-sm"
                   required
                 >
                   <option value="">Select a cluster</option>
@@ -208,7 +208,7 @@ const RouteEdit: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-xs font-medium text-gray-700 mb-1">
                   Order
                 </label>
                 <input
@@ -216,7 +216,7 @@ const RouteEdit: React.FC = () => {
                   value={formData.order}
                   onChange={(e) => setFormData({ ...formData, order: parseInt(e.target.value) || 0 })}
                   min="0"
-                  className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-gray-900 focus:border-gray-900 text-sm"
+                  className="block w-full px-2.5 py-1.5 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-gray-900 focus:border-gray-900 text-sm"
                 />
                 <p className="mt-1 text-xs text-gray-500">Lower values have higher priority</p>
               </div>
@@ -228,9 +228,9 @@ const RouteEdit: React.FC = () => {
                 id="enabled"
                 checked={formData.enabled}
                 onChange={(e) => setFormData({ ...formData, enabled: e.target.checked })}
-                className="h-4 w-4 text-gray-900 focus:ring-gray-900 border-gray-300 rounded"
+                className="h-3.5 w-3.5 text-gray-900 focus:ring-gray-900 border-gray-300 rounded"
               />
-              <label htmlFor="enabled" className="ml-2 block text-sm text-gray-700">
+              <label htmlFor="enabled" className="ml-2 block text-xs text-gray-700">
                 Enable this route immediately
               </label>
             </div>
@@ -238,11 +238,11 @@ const RouteEdit: React.FC = () => {
         </div>
 
         {/* Matching Rules */}
-        <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-6">
-          <h2 className="text-base font-semibold text-gray-900 mb-4">Matching Rules</h2>
-          <div className="space-y-4">
+        <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-4">
+          <h2 className="text-sm font-semibold text-gray-900 mb-3">Matching Rules</h2>
+          <div className="space-y-3">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-xs font-medium text-gray-700 mb-1">
                 Path Pattern <span className="text-red-500">*</span>
               </label>
               <input
@@ -250,28 +250,28 @@ const RouteEdit: React.FC = () => {
                 value={formData.path}
                 onChange={(e) => setFormData({ ...formData, path: e.target.value })}
                 placeholder="/api/{**catch-all}"
-                className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-gray-900 focus:border-gray-900 text-sm font-mono"
+                className="block w-full px-2.5 py-1.5 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-gray-900 focus:border-gray-900 text-sm font-mono"
                 required
               />
               <p className="mt-1 text-xs text-gray-500">Use {`{**catch-all}`} for wildcard matching</p>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-xs font-medium text-gray-700 mb-1">
                 HTTP Methods
               </label>
               {formData.methods.length > 0 && (
-                <div className="flex flex-wrap gap-2 mb-2">
+                <div className="flex flex-wrap gap-1.5 mb-2">
                   {formData.methods.map((method) => (
                     <span
                       key={method}
-                      className="inline-flex items-center px-3 py-1 rounded-md text-xs font-medium bg-blue-100 text-blue-800"
+                      className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-blue-100 text-blue-800"
                     >
                       {method}
                       <button
                         type="button"
                         onClick={() => removeMethod(method)}
-                        className="ml-2 inline-flex items-center hover:text-blue-900"
+                        className="ml-1.5 inline-flex items-center hover:text-blue-900"
                       >
                         <XMarkIcon className="h-3 w-3" />
                       </button>
@@ -286,35 +286,35 @@ const RouteEdit: React.FC = () => {
                   onChange={(e) => setMethodInput(e.target.value.toUpperCase())}
                   onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addMethod())}
                   placeholder="GET, POST, PUT, DELETE..."
-                  className="block flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-gray-900 focus:border-gray-900"
+                  className="block flex-1 px-2.5 py-1.5 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-gray-900 focus:border-gray-900"
                 />
                 <button
                   type="button"
                   onClick={addMethod}
-                  className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 inline-flex items-center"
+                  className="px-3 py-1.5 border border-gray-300 rounded-md text-xs font-medium text-gray-700 bg-white hover:bg-gray-50 inline-flex items-center"
                 >
-                  <PlusIcon className="h-4 w-4" />
+                  <PlusIcon className="h-3.5 w-3.5" />
                 </button>
               </div>
               <p className="mt-1 text-xs text-gray-500">Leave empty to match all methods</p>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-xs font-medium text-gray-700 mb-1">
                 Host Names
               </label>
               {formData.hosts.length > 0 && (
-                <div className="flex flex-wrap gap-2 mb-2">
+                <div className="flex flex-wrap gap-1.5 mb-2">
                   {formData.hosts.map((host) => (
                     <span
                       key={host}
-                      className="inline-flex items-center px-3 py-1 rounded-md text-xs font-medium bg-purple-100 text-purple-800"
+                      className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-purple-100 text-purple-800"
                     >
                       {host}
                       <button
                         type="button"
                         onClick={() => removeHost(host)}
-                        className="ml-2 inline-flex items-center hover:text-purple-900"
+                        className="ml-1.5 inline-flex items-center hover:text-purple-900"
                       >
                         <XMarkIcon className="h-3 w-3" />
                       </button>
@@ -329,14 +329,14 @@ const RouteEdit: React.FC = () => {
                   onChange={(e) => setHostInput(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addHost())}
                   placeholder="api.example.com"
-                  className="block flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-gray-900 focus:border-gray-900"
+                  className="block flex-1 px-2.5 py-1.5 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-gray-900 focus:border-gray-900"
                 />
                 <button
                   type="button"
                   onClick={addHost}
-                  className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 inline-flex items-center"
+                  className="px-3 py-1.5 border border-gray-300 rounded-md text-xs font-medium text-gray-700 bg-white hover:bg-gray-50 inline-flex items-center"
                 >
-                  <PlusIcon className="h-4 w-4" />
+                  <PlusIcon className="h-3.5 w-3.5" />
                 </button>
               </div>
               <p className="mt-1 text-xs text-gray-500">Leave empty to match all hosts</p>
@@ -345,12 +345,12 @@ const RouteEdit: React.FC = () => {
         </div>
 
         {/* Policies */}
-        <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-6">
-          <h2 className="text-base font-semibold text-gray-900 mb-4">Policies & Limits</h2>
-          <div className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
+        <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-4">
+          <h2 className="text-sm font-semibold text-gray-900 mb-3">Policies & Limits</h2>
+          <div className="space-y-3">
+            <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-xs font-medium text-gray-700 mb-1">
                   Authorization Policy
                 </label>
                 <input
@@ -358,12 +358,12 @@ const RouteEdit: React.FC = () => {
                   value={formData.authorizationPolicy}
                   onChange={(e) => setFormData({ ...formData, authorizationPolicy: e.target.value })}
                   placeholder="e.g., default, admin-only"
-                  className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-gray-900 focus:border-gray-900 text-sm"
+                  className="block w-full px-2.5 py-1.5 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-gray-900 focus:border-gray-900 text-sm"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-xs font-medium text-gray-700 mb-1">
                   Rate Limiter Policy
                 </label>
                 <input
@@ -371,12 +371,12 @@ const RouteEdit: React.FC = () => {
                   value={formData.rateLimiterPolicy}
                   onChange={(e) => setFormData({ ...formData, rateLimiterPolicy: e.target.value })}
                   placeholder="e.g., standard, strict"
-                  className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-gray-900 focus:border-gray-900 text-sm"
+                  className="block w-full px-2.5 py-1.5 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-gray-900 focus:border-gray-900 text-sm"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-xs font-medium text-gray-700 mb-1">
                   CORS Policy
                 </label>
                 <input
@@ -384,12 +384,12 @@ const RouteEdit: React.FC = () => {
                   value={formData.corsPolicy}
                   onChange={(e) => setFormData({ ...formData, corsPolicy: e.target.value })}
                   placeholder="e.g., allow-all, strict"
-                  className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-gray-900 focus:border-gray-900 text-sm"
+                  className="block w-full px-2.5 py-1.5 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-gray-900 focus:border-gray-900 text-sm"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-xs font-medium text-gray-700 mb-1">
                   Timeout
                 </label>
                 <input
@@ -397,14 +397,14 @@ const RouteEdit: React.FC = () => {
                   value={formData.timeout}
                   onChange={(e) => setFormData({ ...formData, timeout: e.target.value })}
                   placeholder="e.g., 00:00:30"
-                  className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-gray-900 focus:border-gray-900 text-sm"
+                  className="block w-full px-2.5 py-1.5 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-gray-900 focus:border-gray-900 text-sm"
                 />
                 <p className="mt-1 text-xs text-gray-500">Format: HH:mm:ss</p>
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-xs font-medium text-gray-700 mb-1">
                 Max Request Body Size (bytes)
               </label>
               <input
@@ -413,7 +413,7 @@ const RouteEdit: React.FC = () => {
                 onChange={(e) => setFormData({ ...formData, maxRequestBodySize: e.target.value })}
                 placeholder="e.g., 10485760 (10MB)"
                 min="-1"
-                className="block w-full max-w-xs px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-gray-900 focus:border-gray-900 text-sm"
+                className="block w-full max-w-xs px-2.5 py-1.5 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-gray-900 focus:border-gray-900 text-sm"
               />
               <p className="mt-1 text-xs text-gray-500">Use -1 for unlimited</p>
             </div>
@@ -421,26 +421,26 @@ const RouteEdit: React.FC = () => {
         </div>
 
         {/* Actions */}
-        <div className="flex justify-end space-x-3 pt-2">
+        <div className="flex justify-end space-x-2">
           <Link
             to="/routes"
-            className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
+            className="px-3 py-1.5 border border-gray-300 rounded-md text-xs font-medium text-gray-700 bg-white hover:bg-gray-50"
           >
             Cancel
           </Link>
           <button
             type="submit"
             disabled={saving}
-            className="inline-flex items-center px-6 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-gray-900 hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="inline-flex items-center px-4 py-1.5 border border-transparent rounded-md shadow-sm text-xs font-medium text-white bg-gray-900 hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {saving ? (
               <>
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                <div className="animate-spin rounded-full h-3.5 w-3.5 border-b-2 border-white mr-2"></div>
                 Saving...
               </>
             ) : (
               <>
-                <CheckIcon className="h-4 w-4 mr-2" />
+                <CheckIcon className="h-3.5 w-3.5 mr-2" />
                 {isEdit ? 'Update Route' : 'Create Route'}
               </>
             )}

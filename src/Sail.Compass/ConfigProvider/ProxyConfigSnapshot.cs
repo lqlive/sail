@@ -1,9 +1,9 @@
-﻿using Microsoft.Extensions.Primitives;
+using Microsoft.Extensions.Primitives;
 using Yarp.ReverseProxy.Configuration;
 
 namespace Sail.Compass.ConfigProvider;
 
-internal sealed class ConfigurationSnapshot : IProxyConfig
+internal sealed class ProxyConfigSnapshot : IProxyConfig
 {
     public List<RouteConfig> Routes { get; internal set; } = new List<RouteConfig>();
 
@@ -15,3 +15,4 @@ internal sealed class ConfigurationSnapshot : IProxyConfig
 
     public IChangeToken ChangeToken { get; internal set; } = default!;
 }
+

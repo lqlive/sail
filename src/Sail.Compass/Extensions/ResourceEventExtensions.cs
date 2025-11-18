@@ -1,4 +1,4 @@
-﻿using Sail.Compass.Watchers;
+﻿using Sail.Compass.Observers;
 
 namespace Sail.Compass.Extensions;
 

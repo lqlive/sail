@@ -4,9 +4,9 @@ using System.Reactive.Linq;
 using Google.Protobuf.WellKnownTypes;
 using Sail.Compass.Extensions;
 
-namespace Sail.Compass.Watchers;
+namespace Sail.Compass.Observers;
 
-internal sealed class CertificateWatcher(CertificateService.CertificateServiceClient client) : ResourceWatcher<Certificate>
+internal sealed class CertificateObserver(CertificateService.CertificateServiceClient client) : ResourceObserver<Certificate>
 {
     public override IObservable<ResourceEvent<Certificate>> GetObservable(bool watch)
     {
@@ -61,3 +61,4 @@ internal sealed class CertificateWatcher(CertificateService.CertificateServiceCl
         });
     }
 }
+

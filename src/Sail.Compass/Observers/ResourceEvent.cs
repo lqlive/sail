@@ -1,4 +1,4 @@
-﻿namespace Sail.Compass.Watchers;
+namespace Sail.Compass.Observers;
 public readonly struct ResourceEvent<TResource>(EventType eventType, TResource value, TResource oldValue = default!)
 {
     public EventType EventType { get; } = eventType;
@@ -14,3 +14,4 @@ public enum EventType
     Deleted = 3,
     List = 4
 }
+

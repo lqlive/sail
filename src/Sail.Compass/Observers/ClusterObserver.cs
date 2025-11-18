@@ -1,11 +1,11 @@
-﻿using Grpc.Core;
+using Grpc.Core;
 using Sail.Api.V1;
 using System.Reactive.Linq;
 using Google.Protobuf.WellKnownTypes;
 using Sail.Compass.Extensions;
 
-namespace Sail.Compass.Watchers;
-internal sealed class ClusterWatcher(ClusterService.ClusterServiceClient client): ResourceWatcher<Cluster>
+namespace Sail.Compass.Observers;
+internal sealed class ClusterObserver(ClusterService.ClusterServiceClient client): ResourceObserver<Cluster>
 {
     public override IObservable<ResourceEvent<Cluster>> GetObservable(bool watch)
     {
@@ -59,3 +59,4 @@ internal sealed class ClusterWatcher(ClusterService.ClusterServiceClient client)
         });
     }
 }
+

@@ -90,16 +90,21 @@ export interface Destination {
   host?: string;
 }
 
-export interface Certificate {
+export interface SNI {
   id: string;
   name: string;
-  subject: string;
-  issuer: string;
-  notBefore: string;
-  notAfter: string;
-  thumbprint: string;
-  enabled: boolean;
+  hostName: string;
   createdAt: string;
+  updatedAt: string;
+}
+
+export interface Certificate {
+  id: string;
+  cert?: string;
+  key?: string;
+  snis?: SNI[];
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface GatewayStats {
