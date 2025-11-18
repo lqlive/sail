@@ -3,7 +3,7 @@ using Microsoft.Extensions.Options;
 
 using Sail.Api.V1;
 using Sail.Compass.ConfigProvider;
-using Sail.Compass.Watchers;
+using Sail.Compass.Observers;
 using Sail.Core.Options;
 using Yarp.ReverseProxy.Configuration;
 
@@ -33,8 +33,8 @@ public static class ServiceCollectionExtensions
 
         builder.Services.AddResourceGrpcClient();
 
-        builder.Services.AddSingleton<ResourceWatcher<Cluster>, ClusterWatcher>();
-        builder.Services.AddSingleton<ResourceWatcher<Route>,RouteWatcher>();
+        builder.Services.AddSingleton<ResourceObserver<Cluster>, ClusterObserver>();
+        builder.Services.AddSingleton<ResourceObserver<Route>, RouteObserver>();
 
         builder.Services.AddSingleton<DataSourceConfigProvider>();
         builder.Services.AddSingleton<IProxyConfigProvider>(sp => 

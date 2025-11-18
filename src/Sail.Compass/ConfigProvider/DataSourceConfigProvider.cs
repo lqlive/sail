@@ -3,9 +3,9 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using Microsoft.Extensions.Primitives;
 using Sail.Api.V1;
-using Sail.Compass.Watchers;
+using Sail.Compass.Observers;
 using Yarp.ReverseProxy.Configuration;
-using WatcherEventType = Sail.Compass.Watchers.EventType;
+using ObserverEventType = Sail.Compass.Observers.EventType;
 using YarpRouteMatch = Yarp.ReverseProxy.Configuration.RouteMatch;
 
 namespace Sail.Compass.ConfigProvider;
@@ -19,11 +19,11 @@ internal sealed class DataSourceConfigProvider : IProxyConfigProvider, IDisposab
     private bool _disposed;
 
     public DataSourceConfigProvider(
-        ResourceWatcher<Route> routeWatcher,
-        ResourceWatcher<Cluster> clusterWatcher)
+        ResourceObserver<Route> routeObserver,
+        ResourceObserver<Cluster> clusterObserver)
     {
-        var routes = CreateRouteStream(routeWatcher);
-        var clusters = CreateClusterStream(clusterWatcher);
+        var routes = CreateRouteStream(routeObserver);
+        var clusters = CreateClusterStream(clusterObserver);
 
         var subscription = routes
             .CombineLatest(clusters, (r, c) => (Routes: r, Clusters: c))
@@ -41,9 +41,9 @@ internal sealed class DataSourceConfigProvider : IProxyConfigProvider, IDisposab
     }
 
     private IObservable<Dictionary<string, Route>> CreateRouteStream(
-        ResourceWatcher<Route> watcher)
+        ResourceObserver<Route> observer)
     {
-        return watcher
+        return observer
             .GetObservable(watch: true)
             .Scan(
                 seed: new Dictionary<string, Route>(StringComparer.OrdinalIgnoreCase),
@@ -54,12 +54,12 @@ internal sealed class DataSourceConfigProvider : IProxyConfigProvider, IDisposab
                     
                     switch (@event.EventType)
                     {
-                        case WatcherEventType.List:
-                        case WatcherEventType.Created:
-                        case WatcherEventType.Updated:
+                        case ObserverEventType.List:
+                        case ObserverEventType.Created:
+                        case ObserverEventType.Updated:
                             newKeys[key] = @event.Value;
                             break;
-                        case WatcherEventType.Deleted:
+                        case ObserverEventType.Deleted:
                             newKeys.Remove(key);
                             break;
                     }
@@ -71,9 +71,9 @@ internal sealed class DataSourceConfigProvider : IProxyConfigProvider, IDisposab
     }
 
     private IObservable<Dictionary<string, Cluster>> CreateClusterStream(
-        ResourceWatcher<Cluster> watcher)
+        ResourceObserver<Cluster> observer)
     {
-        return watcher
+        return observer
             .GetObservable(watch: true)
             .Scan(
                 seed: new Dictionary<string, Cluster>(StringComparer.OrdinalIgnoreCase),
@@ -84,12 +84,12 @@ internal sealed class DataSourceConfigProvider : IProxyConfigProvider, IDisposab
                     
                     switch (@event.EventType)
                     {
-                        case WatcherEventType.List:
-                        case WatcherEventType.Created:
-                        case WatcherEventType.Updated:
+                        case ObserverEventType.List:
+                        case ObserverEventType.Created:
+                        case ObserverEventType.Updated:
                             newKeys[key] = @event.Value;
                             break;
-                        case WatcherEventType.Deleted:
+                        case ObserverEventType.Deleted:
                             newKeys.Remove(key);
                             break;
                     }
