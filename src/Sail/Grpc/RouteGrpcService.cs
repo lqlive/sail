@@ -121,7 +121,7 @@ public class RouteGrpcService(SailContext dbContext, IRouteStore routeStore) : R
         {
             result.Properties[item.Key] = item.Value;
         }
-
+        
         return result;
     }
 }

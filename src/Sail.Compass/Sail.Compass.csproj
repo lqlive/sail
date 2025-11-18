@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <TargetFramework>net9.0</TargetFramework>
@@ -12,10 +12,10 @@
     
     <ItemGroup>
         <PackageReference Include="Grpc.Core" />
-        <PackageReference Include="Google.Protobuf"/>
+        <PackageReference Include="Google.Protobuf" />
         <PackageReference Include="Grpc.Tools" />
-        <PackageReference Include="Grpc.AspNetCore.Server.ClientFactory"/>
-        <PackageReference Include="System.Reactive"/>
+        <PackageReference Include="Grpc.AspNetCore.Server.ClientFactory" />
+        <PackageReference Include="System.Reactive" />
     </ItemGroup>
     <ItemGroup>
         <Protobuf Include="$(RepoRoot)\shared\protos\*.proto" Link="Protos\%(RecursiveDir)%(Filename)%(Extension)">

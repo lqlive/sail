@@ -2,10 +2,10 @@ namespace Sail.Core.Entities;
 
 public class ActiveHealthCheck
 {
-    public bool? Enabled { get; set; }
-    public TimeSpan? Interval { get; set; }
-    public TimeSpan? Timeout { get; set; }
-    public string? Policy { get; set; }
-    public string? Path { get; set; }
-    public string? Query { get; set; }
+    public bool? Enabled { get; init; }
+    public TimeSpan? Interval { get; init; }
+    public TimeSpan? Timeout { get; init; }
+    public string? Policy { get; init; }
+    public string? Path { get; init; }
+    public string? Query { get; init; }
 }

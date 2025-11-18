@@ -9,7 +9,6 @@ builder.Services.AddSingleton<IForwarderHttpClientFactory, CustomForwarderHttpCl
 builder.Services.AddReverseProxy()
     .LoadFromConfig(builder.Configuration.GetSection("ReverseProxy"));
 
-
 var app = builder.Build();
 app.MapReverseProxy();
 

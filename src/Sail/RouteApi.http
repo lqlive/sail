@@ -7,7 +7,6 @@
 GET {{baseUrl}}/api/routes?api-version={{apiVersion}}
 Accept: application/json
 
-
 ### Create the route
 POST {{baseUrl}}/api/routes?api-version={{apiVersion}}
 Content-Type: application/json

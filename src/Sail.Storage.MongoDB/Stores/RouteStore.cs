@@ -1,6 +1,6 @@
-using MongoDB.Driver;
 using Sail.Core.Entities;
 using Sail.Core.Stores;
+using MongoDB.Driver;
 
 namespace Sail.Storage.MongoDB.Stores;
 
