@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import {
   Cog6ToothIcon,
-  PuzzlePieceIcon,
-  LinkIcon,
-  DocumentArrowDownIcon,
-  PlayIcon,
+  BoltIcon,
+  HeartIcon,
+  DocumentTextIcon,
+  ShieldCheckIcon,
 } from '@heroicons/react/24/outline';
 
-type TabId = 'system' | 'runners' | 'integrations' | 'plugins' | 'backup';
+type TabId = 'general' | 'performance' | 'health' | 'logging' | 'security';
 
 interface Tab {
   id: TabId;
@@ -16,32 +16,47 @@ interface Tab {
 }
 
 const Settings: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<TabId>('system');
+  const [activeTab, setActiveTab] = useState<TabId>('general');
   const [settings, setSettings] = useState({
-    system: {
-      maxConcurrentBuilds: '10',
-      defaultTimeout: '30',
-      retentionDays: '30',
-      enableBuildCache: true,
+    general: {
+      gatewayName: 'Sail Gateway',
+      httpPort: '80',
+      httpsPort: '443',
+      adminPort: '8100',
+      logLevel: 'Information',
     },
-    runners: {
-      dockerEnabled: true,
-      maxRunners: '5',
-      defaultImage: 'node:18',
+    performance: {
+      maxConnections: '10000',
+      requestTimeout: '30',
+      responseBufferSize: '65536',
+      enableCompression: true,
     },
-    integrations: {
-      slackWebhook: '',
-      emailServer: '',
-      githubToken: '',
+    health: {
+      enableHealthCheck: true,
+      healthCheckInterval: '30',
+      unhealthyThreshold: '3',
+      healthCheckPath: '/health',
+    },
+    logging: {
+      logLevel: 'Information',
+      logFormat: 'json',
+      enableRequestLogging: true,
+      enableResponseLogging: false,
+    },
+    security: {
+      enableCors: true,
+      allowedOrigins: '*',
+      enableHttpsRedirect: false,
+      minTlsVersion: '1.2',
     },
   });
 
   const tabs: Tab[] = [
-    { id: 'system', name: 'System', icon: Cog6ToothIcon },
-    { id: 'runners', name: 'Runners', icon: PlayIcon },
-    { id: 'integrations', name: 'Integrations', icon: LinkIcon },
-    { id: 'plugins', name: 'Plugins', icon: PuzzlePieceIcon },
-    { id: 'backup', name: 'Backup', icon: DocumentArrowDownIcon },
+    { id: 'general', name: 'General', icon: Cog6ToothIcon },
+    { id: 'performance', name: 'Performance', icon: BoltIcon },
+    { id: 'health', name: 'Health Check', icon: HeartIcon },
+    { id: 'logging', name: 'Logging', icon: DocumentTextIcon },
+    { id: 'security', name: 'Security', icon: ShieldCheckIcon },
   ];
 
   const handleSettingChange = (category: string, key: string, value: any) => {
@@ -63,8 +78,8 @@ const Settings: React.FC = () => {
     <div className="fade-in">
       {/* Page Title */}
       <div className="section-header">
-        <h1 className="text-xl font-medium text-gray-900">System Settings</h1>
-        <p className="text-sm text-gray-600">Configure CI/CD system settings and integrations</p>
+        <h1 className="text-xl font-medium text-gray-900">Gateway Settings</h1>
+        <p className="text-sm text-gray-600">Configure gateway behavior, performance, and security</p>
       </div>
 
       <div className="flex flex-col lg:flex-row gap-6">
@@ -96,337 +111,384 @@ const Settings: React.FC = () => {
         {/* Main Content */}
         <div className="flex-1">
           <div className="card">
-            {/* System Settings */}
-            {activeTab === 'system' && (
+            {/* General Settings */}
+            {activeTab === 'general' && (
               <div>
-                <h2 className="text-xl font-semibold text-gray-900 mb-6">System Configuration</h2>
+                <h2 className="text-xl font-semibold text-gray-900 mb-6">General Configuration</h2>
                 <div className="space-y-6">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Max Concurrent Builds
-                    </label>
-                    <input
-                      type="number"
-                      value={settings.system.maxConcurrentBuilds}
-                      onChange={(e) => handleSettingChange('system', 'maxConcurrentBuilds', e.target.value)}
-                      className="minimal-input max-w-xs"
-                      min="1"
-                      max="50"
-                    />
-                    <p className="mt-1 text-sm text-gray-500">
-                      Maximum number of builds that can run simultaneously
-                    </p>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Default Build Timeout (minutes)
-                    </label>
-                    <input
-                      type="number"
-                      value={settings.system.defaultTimeout}
-                      onChange={(e) => handleSettingChange('system', 'defaultTimeout', e.target.value)}
-                      className="minimal-input max-w-xs"
-                      min="1"
-                      max="600"
-                    />
-                    <p className="mt-1 text-sm text-gray-500">
-                      Default timeout for build jobs
-                    </p>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Build History Retention (days)
-                    </label>
-                    <input
-                      type="number"
-                      value={settings.system.retentionDays}
-                      onChange={(e) => handleSettingChange('system', 'retentionDays', e.target.value)}
-                      className="minimal-input max-w-xs"
-                      min="1"
-                      max="365"
-                    />
-                    <p className="mt-1 text-sm text-gray-500">
-                      How long to keep build logs and artifacts
-                    </p>
-                  </div>
-
-                  <div>
-                    <label className="flex items-center">
-                      <input
-                        type="checkbox"
-                        checked={settings.system.enableBuildCache}
-                        onChange={(e) => handleSettingChange('system', 'enableBuildCache', e.target.checked)}
-                        className="mr-3"
-                      />
-                      <div>
-                        <div className="text-sm font-medium text-gray-900">Enable Build Cache</div>
-                        <div className="text-sm text-gray-500">Cache dependencies and build artifacts to speed up builds</div>
-                      </div>
-                    </label>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Runners Settings */}
-            {activeTab === 'runners' && (
-              <div>
-                <h2 className="text-xl font-semibold text-gray-900 mb-6">Build Runners</h2>
-                <div className="space-y-6">
-                  <div>
-                    <label className="flex items-center">
-                      <input
-                        type="checkbox"
-                        checked={settings.runners.dockerEnabled}
-                        onChange={(e) => handleSettingChange('runners', 'dockerEnabled', e.target.checked)}
-                        className="mr-3"
-                      />
-                      <div>
-                        <div className="text-sm font-medium text-gray-900">Enable Docker Runners</div>
-                        <div className="text-sm text-gray-500">Allow builds to run in Docker containers</div>
-                      </div>
-                    </label>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Maximum Runners
-                    </label>
-                    <input
-                      type="number"
-                      value={settings.runners.maxRunners}
-                      onChange={(e) => handleSettingChange('runners', 'maxRunners', e.target.value)}
-                      className="minimal-input max-w-xs"
-                      min="1"
-                      max="20"
-                    />
-                    <p className="mt-1 text-sm text-gray-500">
-                      Maximum number of concurrent runners
-                    </p>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Default Docker Image
+                      Gateway Name
                     </label>
                     <input
                       type="text"
-                      value={settings.runners.defaultImage}
-                      onChange={(e) => handleSettingChange('runners', 'defaultImage', e.target.value)}
+                      value={settings.general.gatewayName}
+                      onChange={(e) => handleSettingChange('general', 'gatewayName', e.target.value)}
                       className="minimal-input max-w-md"
-                      placeholder="node:18"
+                      placeholder="Sail Gateway"
                     />
                     <p className="mt-1 text-sm text-gray-500">
-                      Default Docker image for builds
+                      Display name for this gateway instance
                     </p>
                   </div>
 
-                  <div className="pt-4 border-t border-gray-200">
-                    <h3 className="text-lg font-medium text-gray-900 mb-4">Active Runners</h3>
-                    <div className="space-y-3">
-                      <div className="flex items-center justify-between p-3 border border-gray-200 rounded-lg">
-                        <div>
-                          <div className="text-sm font-medium text-gray-900">Runner #1</div>
-                          <div className="text-sm text-gray-500">Docker • Running • node:18</div>
-                        </div>
-                        <span className="text-xs text-green-600 font-medium">Active</span>
-                      </div>
-                      <div className="flex items-center justify-between p-3 border border-gray-200 rounded-lg">
-                        <div>
-                          <div className="text-sm font-medium text-gray-900">Runner #2</div>
-                          <div className="text-sm text-gray-500">Docker • Idle • python:3.11</div>
-                        </div>
-                        <span className="text-xs text-gray-500 font-medium">Idle</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Integrations Settings */}
-            {activeTab === 'integrations' && (
-              <div>
-                <h2 className="text-xl font-semibold text-gray-900 mb-6">External Integrations</h2>
-                <div className="space-y-8">
-                  <div>
-                    <h3 className="text-lg font-medium text-gray-900 mb-4">Slack Integration</h3>
-                    <div className="space-y-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Webhook URL
-                        </label>
-                        <input
-                          type="url"
-                          value={settings.integrations.slackWebhook}
-                          onChange={(e) => handleSettingChange('integrations', 'slackWebhook', e.target.value)}
-                          className="minimal-input"
-                          placeholder="https://hooks.slack.com/services/..."
-                        />
-                      </div>
-                      <button className="btn-secondary text-sm">Test Connection</button>
-                    </div>
-                  </div>
-
-                  <div className="pt-6 border-t border-gray-200">
-                    <h3 className="text-lg font-medium text-gray-900 mb-4">Email Server</h3>
-                    <div className="space-y-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          SMTP Server
-                        </label>
-                        <input
-                          type="text"
-                          value={settings.integrations.emailServer}
-                          onChange={(e) => handleSettingChange('integrations', 'emailServer', e.target.value)}
-                          className="minimal-input"
-                          placeholder="smtp.gmail.com:587"
-                        />
-                      </div>
-                      <button className="btn-secondary text-sm">Test Email</button>
-                    </div>
-                  </div>
-
-                  <div className="pt-6 border-t border-gray-200">
-                    <h3 className="text-lg font-medium text-gray-900 mb-4">GitHub Integration</h3>
-                    <div className="space-y-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Personal Access Token
-                        </label>
-                        <input
-                          type="password"
-                          value={settings.integrations.githubToken}
-                          onChange={(e) => handleSettingChange('integrations', 'githubToken', e.target.value)}
-                          className="minimal-input"
-                          placeholder="ghp_..."
-                        />
-                      </div>
-                      <button className="btn-secondary text-sm">Verify Token</button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Plugins Settings */}
-            {activeTab === 'plugins' && (
-              <div>
-                <h2 className="text-xl font-semibold text-gray-900 mb-6">Plugin Management</h2>
-                <div className="space-y-6">
-                  <div>
-                    <h3 className="text-lg font-medium text-gray-900 mb-4">Installed Plugins</h3>
-                    <div className="space-y-3">
-                      <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                        <div>
-                          <div className="text-sm font-medium text-gray-900">Docker Build Plugin</div>
-                          <div className="text-sm text-gray-500">Build and push Docker images • v1.2.3</div>
-                        </div>
-                        <div className="flex space-x-2">
-                          <button className="btn-secondary text-sm">Configure</button>
-                          <button className="btn-danger text-sm">Disable</button>
-                        </div>
-                      </div>
-                      <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                        <div>
-                          <div className="text-sm font-medium text-gray-900">Slack Notifications</div>
-                          <div className="text-sm text-gray-500">Send build notifications to Slack • v2.1.0</div>
-                        </div>
-                        <div className="flex space-x-2">
-                          <button className="btn-secondary text-sm">Configure</button>
-                          <button className="btn-danger text-sm">Disable</button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="pt-6 border-t border-gray-200">
-                    <h3 className="text-lg font-medium text-gray-900 mb-4">Available Plugins</h3>
-                    <div className="space-y-3">
-                      <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                        <div>
-                          <div className="text-sm font-medium text-gray-900">AWS Deploy</div>
-                          <div className="text-sm text-gray-500">Deploy applications to AWS services</div>
-                        </div>
-                        <button className="btn-primary text-sm">Install</button>
-                      </div>
-                      <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                        <div>
-                          <div className="text-sm font-medium text-gray-900">Test Reporter</div>
-                          <div className="text-sm text-gray-500">Generate test coverage reports</div>
-                        </div>
-                        <button className="btn-primary text-sm">Install</button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Backup Settings */}
-            {activeTab === 'backup' && (
-              <div>
-                <h2 className="text-xl font-semibold text-gray-900 mb-6">Backup & Recovery</h2>
-                <div className="space-y-6">
-                  <div>
-                    <h3 className="text-lg font-medium text-gray-900 mb-4">Automatic Backups</h3>
-                    <div className="space-y-4">
-                      <label className="flex items-center">
-                        <input type="checkbox" defaultChecked className="mr-3" />
-                        <div>
-                          <div className="text-sm font-medium text-gray-900">Enable automatic backups</div>
-                          <div className="text-sm text-gray-500">Automatically backup system data daily</div>
-                        </div>
+                  <div className="grid grid-cols-3 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        HTTP Port
                       </label>
+                      <input
+                        type="number"
+                        value={settings.general.httpPort}
+                        onChange={(e) => handleSettingChange('general', 'httpPort', e.target.value)}
+                        className="minimal-input"
+                        min="1"
+                        max="65535"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        HTTPS Port
+                      </label>
+                      <input
+                        type="number"
+                        value={settings.general.httpsPort}
+                        onChange={(e) => handleSettingChange('general', 'httpsPort', e.target.value)}
+                        className="minimal-input"
+                        min="1"
+                        max="65535"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Admin Port
+                      </label>
+                      <input
+                        type="number"
+                        value={settings.general.adminPort}
+                        onChange={(e) => handleSettingChange('general', 'adminPort', e.target.value)}
+                        className="minimal-input"
+                        min="1"
+                        max="65535"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Log Level
+                    </label>
+                    <select
+                      value={settings.general.logLevel}
+                      onChange={(e) => handleSettingChange('general', 'logLevel', e.target.value)}
+                      className="minimal-input max-w-xs"
+                    >
+                      <option value="Trace">Trace</option>
+                      <option value="Debug">Debug</option>
+                      <option value="Information">Information</option>
+                      <option value="Warning">Warning</option>
+                      <option value="Error">Error</option>
+                      <option value="Critical">Critical</option>
+                    </select>
+                    <p className="mt-1 text-sm text-gray-500">
+                      Minimum log level to record
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Performance Settings */}
+            {activeTab === 'performance' && (
+              <div>
+                <h2 className="text-xl font-semibold text-gray-900 mb-6">Performance Configuration</h2>
+                <div className="space-y-6">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Max Connections
+                    </label>
+                    <input
+                      type="number"
+                      value={settings.performance.maxConnections}
+                      onChange={(e) => handleSettingChange('performance', 'maxConnections', e.target.value)}
+                      className="minimal-input max-w-xs"
+                      min="100"
+                      max="100000"
+                    />
+                    <p className="mt-1 text-sm text-gray-500">
+                      Maximum number of concurrent connections
+                    </p>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Request Timeout (seconds)
+                    </label>
+                    <input
+                      type="number"
+                      value={settings.performance.requestTimeout}
+                      onChange={(e) => handleSettingChange('performance', 'requestTimeout', e.target.value)}
+                      className="minimal-input max-w-xs"
+                      min="1"
+                      max="300"
+                    />
+                    <p className="mt-1 text-sm text-gray-500">
+                      Maximum time to wait for upstream response
+                    </p>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Response Buffer Size (bytes)
+                    </label>
+                    <input
+                      type="number"
+                      value={settings.performance.responseBufferSize}
+                      onChange={(e) => handleSettingChange('performance', 'responseBufferSize', e.target.value)}
+                      className="minimal-input max-w-xs"
+                      min="8192"
+                      max="1048576"
+                    />
+                    <p className="mt-1 text-sm text-gray-500">
+                      Buffer size for response streaming
+                    </p>
+                  </div>
+
+                  <div>
+                    <label className="flex items-center">
+                      <input
+                        type="checkbox"
+                        checked={settings.performance.enableCompression}
+                        onChange={(e) => handleSettingChange('performance', 'enableCompression', e.target.checked)}
+                        className="mr-3"
+                      />
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Backup Schedule
-                        </label>
-                        <select className="minimal-input max-w-xs">
-                          <option value="daily">Daily at 2:00 AM</option>
-                          <option value="weekly">Weekly on Sunday</option>
-                          <option value="monthly">Monthly on 1st</option>
-                        </select>
+                        <div className="text-sm font-medium text-gray-900">Enable Response Compression</div>
+                        <div className="text-sm text-gray-500">Compress responses using gzip/brotli</div>
                       </div>
-                    </div>
+                    </label>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Health Check Settings */}
+            {activeTab === 'health' && (
+              <div>
+                <h2 className="text-xl font-semibold text-gray-900 mb-6">Health Check Configuration</h2>
+                <div className="space-y-6">
+                  <div>
+                    <label className="flex items-center">
+                      <input
+                        type="checkbox"
+                        checked={settings.health.enableHealthCheck}
+                        onChange={(e) => handleSettingChange('health', 'enableHealthCheck', e.target.checked)}
+                        className="mr-3"
+                      />
+                      <div>
+                        <div className="text-sm font-medium text-gray-900">Enable Health Check Endpoint</div>
+                        <div className="text-sm text-gray-500">Expose health check endpoint for monitoring</div>
+                      </div>
+                    </label>
                   </div>
 
-                  <div className="pt-6 border-t border-gray-200">
-                    <h3 className="text-lg font-medium text-gray-900 mb-4">Manual Backup</h3>
-                    <div className="space-y-4">
-                      <p className="text-sm text-gray-600">
-                        Create a manual backup of all system data including configurations, build history, and user data.
-                      </p>
-                      <button className="btn-primary">Create Backup Now</button>
-                    </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Health Check Path
+                    </label>
+                    <input
+                      type="text"
+                      value={settings.health.healthCheckPath}
+                      onChange={(e) => handleSettingChange('health', 'healthCheckPath', e.target.value)}
+                      className="minimal-input max-w-md"
+                      placeholder="/health"
+                    />
+                    <p className="mt-1 text-sm text-gray-500">
+                      URL path for health check endpoint
+                    </p>
                   </div>
 
-                  <div className="pt-6 border-t border-gray-200">
-                    <h3 className="text-lg font-medium text-gray-900 mb-4">Recent Backups</h3>
-                    <div className="space-y-3">
-                      <div className="flex items-center justify-between p-3 border border-gray-200 rounded-lg">
-                        <div>
-                          <div className="text-sm font-medium text-gray-900">backup-2023-12-20.zip</div>
-                          <div className="text-sm text-gray-500">December 20, 2023 • 45.2 MB</div>
-                        </div>
-                        <div className="flex space-x-2">
-                          <button className="btn-secondary text-sm">Download</button>
-                          <button className="btn-secondary text-sm">Restore</button>
-                        </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Check Interval (seconds)
+                    </label>
+                    <input
+                      type="number"
+                      value={settings.health.healthCheckInterval}
+                      onChange={(e) => handleSettingChange('health', 'healthCheckInterval', e.target.value)}
+                      className="minimal-input max-w-xs"
+                      min="5"
+                      max="300"
+                    />
+                    <p className="mt-1 text-sm text-gray-500">
+                      How often to check upstream health
+                    </p>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Unhealthy Threshold
+                    </label>
+                    <input
+                      type="number"
+                      value={settings.health.unhealthyThreshold}
+                      onChange={(e) => handleSettingChange('health', 'unhealthyThreshold', e.target.value)}
+                      className="minimal-input max-w-xs"
+                      min="1"
+                      max="10"
+                    />
+                    <p className="mt-1 text-sm text-gray-500">
+                      Failed checks before marking unhealthy
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Logging Settings */}
+            {activeTab === 'logging' && (
+              <div>
+                <h2 className="text-xl font-semibold text-gray-900 mb-6">Logging Configuration</h2>
+                <div className="space-y-6">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Log Level
+                    </label>
+                    <select
+                      value={settings.logging.logLevel}
+                      onChange={(e) => handleSettingChange('logging', 'logLevel', e.target.value)}
+                      className="minimal-input max-w-xs"
+                    >
+                      <option value="Trace">Trace</option>
+                      <option value="Debug">Debug</option>
+                      <option value="Information">Information</option>
+                      <option value="Warning">Warning</option>
+                      <option value="Error">Error</option>
+                      <option value="Critical">Critical</option>
+                    </select>
+                    <p className="mt-1 text-sm text-gray-500">
+                      Minimum log level to record
+                    </p>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Log Format
+                    </label>
+                    <select
+                      value={settings.logging.logFormat}
+                      onChange={(e) => handleSettingChange('logging', 'logFormat', e.target.value)}
+                      className="minimal-input max-w-xs"
+                    >
+                      <option value="json">JSON</option>
+                      <option value="text">Plain Text</option>
+                    </select>
+                    <p className="mt-1 text-sm text-gray-500">
+                      Output format for log entries
+                    </p>
+                  </div>
+
+                  <div>
+                    <label className="flex items-center">
+                      <input
+                        type="checkbox"
+                        checked={settings.logging.enableRequestLogging}
+                        onChange={(e) => handleSettingChange('logging', 'enableRequestLogging', e.target.checked)}
+                        className="mr-3"
+                      />
+                      <div>
+                        <div className="text-sm font-medium text-gray-900">Enable Request Logging</div>
+                        <div className="text-sm text-gray-500">Log incoming HTTP requests</div>
                       </div>
-                      <div className="flex items-center justify-between p-3 border border-gray-200 rounded-lg">
-                        <div>
-                          <div className="text-sm font-medium text-gray-900">backup-2023-12-19.zip</div>
-                          <div className="text-sm text-gray-500">December 19, 2023 • 43.8 MB</div>
-                        </div>
-                        <div className="flex space-x-2">
-                          <button className="btn-secondary text-sm">Download</button>
-                          <button className="btn-secondary text-sm">Restore</button>
-                        </div>
+                    </label>
+                  </div>
+
+                  <div>
+                    <label className="flex items-center">
+                      <input
+                        type="checkbox"
+                        checked={settings.logging.enableResponseLogging}
+                        onChange={(e) => handleSettingChange('logging', 'enableResponseLogging', e.target.checked)}
+                        className="mr-3"
+                      />
+                      <div>
+                        <div className="text-sm font-medium text-gray-900">Enable Response Logging</div>
+                        <div className="text-sm text-gray-500">Log outgoing HTTP responses</div>
                       </div>
-                    </div>
+                    </label>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Security Settings */}
+            {activeTab === 'security' && (
+              <div>
+                <h2 className="text-xl font-semibold text-gray-900 mb-6">Security Configuration</h2>
+                <div className="space-y-6">
+                  <div>
+                    <label className="flex items-center">
+                      <input
+                        type="checkbox"
+                        checked={settings.security.enableCors}
+                        onChange={(e) => handleSettingChange('security', 'enableCors', e.target.checked)}
+                        className="mr-3"
+                      />
+                      <div>
+                        <div className="text-sm font-medium text-gray-900">Enable CORS</div>
+                        <div className="text-sm text-gray-500">Allow cross-origin requests</div>
+                      </div>
+                    </label>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Allowed Origins
+                    </label>
+                    <input
+                      type="text"
+                      value={settings.security.allowedOrigins}
+                      onChange={(e) => handleSettingChange('security', 'allowedOrigins', e.target.value)}
+                      className="minimal-input"
+                      placeholder="* or https://example.com"
+                    />
+                    <p className="mt-1 text-sm text-gray-500">
+                      Comma-separated list of allowed origins (* for all)
+                    </p>
+                  </div>
+
+                  <div>
+                    <label className="flex items-center">
+                      <input
+                        type="checkbox"
+                        checked={settings.security.enableHttpsRedirect}
+                        onChange={(e) => handleSettingChange('security', 'enableHttpsRedirect', e.target.checked)}
+                        className="mr-3"
+                      />
+                      <div>
+                        <div className="text-sm font-medium text-gray-900">Force HTTPS Redirect</div>
+                        <div className="text-sm text-gray-500">Redirect HTTP requests to HTTPS</div>
+                      </div>
+                    </label>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Minimum TLS Version
+                    </label>
+                    <select
+                      value={settings.security.minTlsVersion}
+                      onChange={(e) => handleSettingChange('security', 'minTlsVersion', e.target.value)}
+                      className="minimal-input max-w-xs"
+                    >
+                      <option value="1.0">TLS 1.0</option>
+                      <option value="1.1">TLS 1.1</option>
+                      <option value="1.2">TLS 1.2</option>
+                      <option value="1.3">TLS 1.3</option>
+                    </select>
+                    <p className="mt-1 text-sm text-gray-500">
+                      Minimum TLS version for secure connections
+                    </p>
                   </div>
                 </div>
               </div>

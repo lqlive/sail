@@ -22,7 +22,15 @@ public class CertificateService(SailContext context)
         var certificate = new Certificate
         {
             Cert = request.Cert,
-            Key = request.Key
+            Key = request.Key,
+            SNIs = request.SNIs?.Select(s => new SNI
+            {
+                Id = Guid.NewGuid(),
+                HostName = s.HostName,
+                Name = s.Name,
+                CreatedAt = DateTimeOffset.UtcNow,
+                UpdatedAt = DateTimeOffset.UtcNow
+            }).ToList()
         };
 
         await context.Certificates.InsertOneAsync(certificate, cancellationToken: cancellationToken);

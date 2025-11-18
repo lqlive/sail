@@ -50,20 +50,6 @@ const Clusters: React.FC = () => {
     );
   }
 
-  if (error) {
-    return (
-      <div className="flex flex-col items-center justify-center h-64">
-        <p className="text-red-600 mb-4">{error}</p>
-        <button
-          onClick={loadClusters}
-          className="px-4 py-2 bg-gray-900 text-white rounded-md hover:bg-gray-800"
-        >
-          Retry
-        </button>
-      </div>
-    );
-  }
-
   return (
     <div className="fade-in">
       <div className="section-header">
@@ -94,19 +80,38 @@ const Clusters: React.FC = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        {clusters.length === 0 ? (
-          <div className="col-span-2 text-center py-12 text-gray-500">
-            <ServerStackIcon className="h-12 w-12 mx-auto mb-4 text-gray-400" />
-            <p>No clusters yet</p>
-            <Link
-              to="/clusters/new"
-              className="inline-block mt-4 text-sm text-gray-900 hover:underline"
-            >
-              Create your first cluster
-            </Link>
+      {error ? (
+        <div className="text-center py-12">
+          <div className="mx-auto h-12 w-12 text-red-400 mb-4">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+            </svg>
           </div>
-        ) : (
+          <h3 className="mt-2 text-sm font-medium text-gray-900">Failed to load clusters</h3>
+          <p className="mt-1 text-sm text-gray-500">Please check your connection and try again.</p>
+          <div className="mt-6">
+            <button
+              onClick={loadClusters}
+              className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md shadow-sm text-gray-700 bg-white hover:bg-gray-50"
+            >
+              Try Again
+            </button>
+          </div>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          {clusters.length === 0 ? (
+            <div className="col-span-2 text-center py-12 text-gray-500">
+              <ServerStackIcon className="h-12 w-12 mx-auto mb-4 text-gray-400" />
+              <p>No clusters yet</p>
+              <Link
+                to="/clusters/new"
+                className="inline-block mt-4 text-sm text-gray-900 hover:underline"
+              >
+                Create your first cluster
+              </Link>
+            </div>
+          ) : (
           clusters.map((cluster) => {
             const healthyCount = cluster.destinations?.filter(d => d.health === 'healthy').length || 0;
             const healthCheckEnabled = !!(cluster.healthCheck?.active?.enabled || cluster.healthCheck?.passive?.enabled);
@@ -149,9 +154,10 @@ const Clusters: React.FC = () => {
               </div>
             </Link>
           );
-        })
-        )}
-      </div>
+          })
+          )}
+        </div>
+      )}
     </div>
   );
 };

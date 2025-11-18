@@ -1,61 +1,59 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import {
   MagnifyingGlassIcon,
   PlusIcon,
-  CheckCircleIcon,
-  ExclamationTriangleIcon,
   ShieldCheckIcon,
+  PencilIcon,
+  TrashIcon,
 } from '@heroicons/react/24/outline';
 import type { Certificate } from '../../types/gateway';
-
-const mockCertificates: Certificate[] = [
-  {
-    id: '1',
-    name: 'example.com',
-    subject: 'CN=example.com',
-    issuer: 'CN=Let\'s Encrypt Authority X3',
-    notBefore: '2024-01-01T00:00:00Z',
-    notAfter: '2024-12-31T23:59:59Z',
-    thumbprint: '1A2B3C4D5E6F7G8H9I0J',
-    enabled: true,
-    createdAt: '2024-01-01T00:00:00Z',
-  },
-  {
-    id: '2',
-    name: 'api.example.com',
-    subject: 'CN=api.example.com',
-    issuer: 'CN=DigiCert Global Root CA',
-    notBefore: '2024-02-01T00:00:00Z',
-    notAfter: '2024-03-31T23:59:59Z',
-    thumbprint: 'K0L1M2N3O4P5Q6R7S8T9',
-    enabled: true,
-    createdAt: '2024-02-01T00:00:00Z',
-  },
-];
+import { CertificateService } from '../../services/certificateService';
 
 const Certificates: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [certificates, setCertificates] = useState<Certificate[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
+  const [error, setError] = useState<string | null>(null);
+
+  const loadCertificates = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const data = await CertificateService.getCertificates(searchTerm);
+      setCertificates(data);
+    } catch (err) {
+      console.error('Failed to load certificates:', err);
+      setError('Failed to load certificates');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    setLoading(true);
-    setTimeout(() => {
-      setCertificates(mockCertificates);
-      setLoading(false);
-    }, 500);
+    loadCertificates();
   }, []);
 
-  const filteredCertificates = certificates.filter(cert =>
-    cert.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    cert.subject.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (searchTerm !== '') {
+        loadCertificates();
+      }
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
 
-  const isExpiringSoon = (notAfter: string) => {
-    const expiry = new Date(notAfter);
-    const now = new Date();
-    const daysUntilExpiry = Math.floor((expiry.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-    return daysUntilExpiry <= 30;
+  const handleDelete = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this certificate?')) {
+      return;
+    }
+
+    try {
+      await CertificateService.deleteCertificate(id);
+      await loadCertificates();
+    } catch (err) {
+      console.error('Failed to delete certificate:', err);
+    }
   };
 
   if (loading) {
@@ -72,12 +70,15 @@ const Certificates: React.FC = () => {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-xl font-medium text-gray-900">Certificates</h1>
-            <p className="text-sm text-gray-600">Manage SSL/TLS certificates</p>
+            <p className="text-sm text-gray-600">Manage SSL/TLS certificates and SNI configurations</p>
           </div>
-          <button className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-gray-900 hover:bg-gray-800">
+          <Link
+            to="/certificates/new"
+            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-gray-900 hover:bg-gray-800"
+          >
             <PlusIcon className="h-4 w-4 mr-2" />
-            Upload Certificate
-          </button>
+            Add Certificate
+          </Link>
         </div>
       </div>
 
@@ -96,58 +97,99 @@ const Certificates: React.FC = () => {
         </div>
       </div>
 
-      <div className="space-y-3">
-        {filteredCertificates.map((cert) => {
-          const expiring = isExpiringSoon(cert.notAfter);
-          return (
+      {error ? (
+        <div className="text-center py-12">
+          <div className="mx-auto h-12 w-12 text-red-400 mb-4">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+            </svg>
+          </div>
+          <h3 className="mt-2 text-sm font-medium text-gray-900">Failed to load certificates</h3>
+          <p className="mt-1 text-sm text-gray-500">Please check your connection and try again.</p>
+          <div className="mt-6">
+            <button
+              onClick={loadCertificates}
+              className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md shadow-sm text-gray-700 bg-white hover:bg-gray-50"
+            >
+              Try Again
+            </button>
+          </div>
+        </div>
+      ) : certificates.length === 0 && !loading ? (
+        <div className="text-center py-12">
+          <ShieldCheckIcon className="mx-auto h-12 w-12 text-gray-400" />
+          <h3 className="mt-2 text-sm font-medium text-gray-900">No certificates</h3>
+          <p className="mt-1 text-sm text-gray-500">Get started by adding a new certificate.</p>
+          <div className="mt-6">
+            <Link
+              to="/certificates/new"
+              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-gray-900 hover:bg-gray-800"
+            >
+              <PlusIcon className="h-4 w-4 mr-2" />
+              Add Certificate
+            </Link>
+          </div>
+        </div>
+      ) : (
+        <div className="space-y-3">
+          {certificates.map((cert) => (
             <div
               key={cert.id}
-              className="bg-white border border-gray-200 rounded-lg p-4"
+              className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-sm transition-shadow"
             >
               <div className="flex items-start justify-between">
                 <div className="flex items-start space-x-3 flex-1">
-                  <ShieldCheckIcon className={`h-6 w-6 ${expiring ? 'text-yellow-600' : 'text-green-600'}`} />
+                  <ShieldCheckIcon className="h-6 w-6 text-green-600" />
                   <div className="flex-1">
-                    <h3 className="text-sm font-medium text-gray-900 mb-1">{cert.name}</h3>
-                    <p className="text-xs text-gray-600 mb-2">{cert.subject}</p>
+                    <div className="flex items-center space-x-2 mb-2">
+                      <h3 className="text-sm font-medium text-gray-900">
+                        Certificate {cert.id.substring(0, 8)}
+                      </h3>
+                    </div>
                     
-                    <div className="grid grid-cols-2 gap-3 text-xs">
-                      <div>
-                        <span className="text-gray-600">Issuer:</span>
-                        <p className="font-medium">{cert.issuer}</p>
-                      </div>
-                      <div>
-                        <span className="text-gray-600">Valid Until:</span>
-                        <p className="font-medium">{new Date(cert.notAfter).toLocaleDateString()}</p>
-                      </div>
-                      <div>
-                        <span className="text-gray-600">Thumbprint:</span>
-                        <p className="font-mono text-xs">{cert.thumbprint}</p>
-                      </div>
-                      <div>
-                        <span className="text-gray-600">Status:</span>
-                        <div className="flex items-center space-x-2 mt-0.5">
-                          {expiring ? (
-                            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs bg-yellow-100 text-yellow-800">
-                              <ExclamationTriangleIcon className="h-3 w-3 mr-1" />
-                              Expiring Soon
+                    {cert.snis && cert.snis.length > 0 && (
+                      <div className="space-y-1">
+                        <p className="text-xs text-gray-600">SNI Configurations:</p>
+                        <div className="flex flex-wrap gap-2">
+                          {cert.snis.map((sni) => (
+                            <span
+                              key={sni.id}
+                              className="inline-flex items-center px-2 py-1 rounded-md text-xs bg-blue-50 text-blue-700"
+                              title={sni.name}
+                            >
+                              {sni.hostName}
                             </span>
-                          ) : (
-                            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs bg-green-100 text-green-800">
-                              <CheckCircleIcon className="h-3 w-3 mr-1" />
-                              Valid
-                            </span>
-                          )}
+                          ))}
                         </div>
                       </div>
+                    )}
+                    
+                    <div className="mt-2 flex items-center space-x-4 text-xs text-gray-500">
+                      <span>Created: {new Date(cert.createdAt).toLocaleDateString()}</span>
+                      <span>Updated: {new Date(cert.updatedAt).toLocaleDateString()}</span>
                     </div>
                   </div>
                 </div>
+                
+                <div className="flex items-center space-x-2 ml-4">
+                  <Link
+                    to={`/certificates/${cert.id}`}
+                    className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded"
+                  >
+                    <PencilIcon className="h-4 w-4" />
+                  </Link>
+                  <button
+                    onClick={() => handleDelete(cert.id)}
+                    className="p-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded"
+                  >
+                    <TrashIcon className="h-4 w-4" />
+                  </button>
+                </div>
               </div>
             </div>
-          );
-        })}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };

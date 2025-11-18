@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+using System.Globalization;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using Microsoft.Extensions.Primitives;
@@ -10,15 +10,15 @@ using YarpRouteMatch = Yarp.ReverseProxy.Configuration.RouteMatch;
 
 namespace Sail.Compass.ConfigProvider;
 
-internal sealed class DataSourceConfigProvider : IProxyConfigProvider, IDisposable
+internal sealed class ProxyConfigProvider : IProxyConfigProvider, IDisposable
 {
     private readonly object _lockObject = new();
     private readonly CompositeDisposable _subscriptions = new();
-    private ConfigurationSnapshot? _snapshot;
+    private ProxyConfigSnapshot? _snapshot;
     private CancellationTokenSource? _changeToken;
     private bool _disposed;
 
-    public DataSourceConfigProvider(
+    public ProxyConfigProvider(
         ResourceObserver<Route> routeObserver,
         ResourceObserver<Cluster> clusterObserver)
     {
@@ -36,7 +36,7 @@ internal sealed class DataSourceConfigProvider : IProxyConfigProvider, IDisposab
     {
         lock (_lockObject)
         {
-            return _snapshot ?? new ConfigurationSnapshot();
+            return _snapshot ?? new ProxyConfigSnapshot();
         }
     }
 
@@ -106,7 +106,7 @@ internal sealed class DataSourceConfigProvider : IProxyConfigProvider, IDisposab
     {
         lock (_lockObject)
         {
-            var newSnapshot = new ConfigurationSnapshot();
+            var newSnapshot = new ProxyConfigSnapshot();
             
             foreach (var cluster in clusters.Values)
             {
@@ -233,3 +233,4 @@ internal sealed class DataSourceConfigProvider : IProxyConfigProvider, IDisposab
         }
     }
 }
+

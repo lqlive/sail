@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-
 using Sail.Api.V1;
 using Sail.Compass.ConfigProvider;
 using Sail.Compass.Observers;
@@ -36,9 +35,9 @@ public static class ServiceCollectionExtensions
         builder.Services.AddSingleton<ResourceObserver<Cluster>, ClusterObserver>();
         builder.Services.AddSingleton<ResourceObserver<Route>, RouteObserver>();
 
-        builder.Services.AddSingleton<DataSourceConfigProvider>();
+        builder.Services.AddSingleton<ProxyConfigProvider>();
         builder.Services.AddSingleton<IProxyConfigProvider>(sp => 
-            sp.GetRequiredService<DataSourceConfigProvider>());
+            sp.GetRequiredService<ProxyConfigProvider>());
         
         return builder;
     }
