@@ -23,6 +23,7 @@ const RouteEdit: React.FC = () => {
     corsPolicy: '',
     timeout: '',
     maxRequestBodySize: '',
+    httpsRedirect: false,
   });
 
   const [methodInput, setMethodInput] = useState('');
@@ -69,6 +70,7 @@ const RouteEdit: React.FC = () => {
         corsPolicy: route.corsPolicy || '',
         timeout: route.timeout || '',
         maxRequestBodySize: route.maxRequestBodySize?.toString() || '',
+        httpsRedirect: route.httpsRedirect || false,
       });
     } catch (err) {
       console.error('Failed to load route:', err);
@@ -94,6 +96,7 @@ const RouteEdit: React.FC = () => {
         rateLimiterPolicy: formData.rateLimiterPolicy || undefined,
         corsPolicy: formData.corsPolicy || undefined,
         timeout: formData.timeout || undefined,
+        httpsRedirect: formData.httpsRedirect,
         match: {
           path: formData.path,
           methods: formData.methods.length > 0 ? formData.methods : undefined,
@@ -401,21 +404,36 @@ const RouteEdit: React.FC = () => {
                 />
                 <p className="mt-1 text-xs text-gray-500">Format: HH:mm:ss</p>
               </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Max Request Body Size (bytes)
+                </label>
+                <input
+                  type="number"
+                  value={formData.maxRequestBodySize}
+                  onChange={(e) => setFormData({ ...formData, maxRequestBodySize: e.target.value })}
+                  placeholder="e.g., 10485760 (10MB)"
+                  min="-1"
+                  className="block w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-gray-400 focus:ring-1 focus:ring-gray-400 transition-colors"
+                />
+                <p className="mt-1 text-xs text-gray-500">Use -1 for unlimited</p>
+              </div>
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Max Request Body Size (bytes)
-              </label>
-              <input
-                type="number"
-                value={formData.maxRequestBodySize}
-                onChange={(e) => setFormData({ ...formData, maxRequestBodySize: e.target.value })}
-                placeholder="e.g., 10485760 (10MB)"
-                min="-1"
-                className="block w-full max-w-xs px-2.5 py-1.5 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-gray-900 focus:border-gray-900 text-sm"
-              />
-              <p className="mt-1 text-xs text-gray-500">Use -1 for unlimited</p>
+            <div className="pt-5 border-t border-gray-100">
+              <div className="flex items-center">
+                <input
+                  id="httpsRedirect"
+                  type="checkbox"
+                  checked={formData.httpsRedirect}
+                  onChange={(e) => setFormData({ ...formData, httpsRedirect: e.target.checked })}
+                  className="h-4 w-4 text-gray-900 focus:ring-gray-900 border-gray-300 rounded"
+                />
+                <label htmlFor="httpsRedirect" className="ml-2 block text-sm text-gray-700">
+                  Redirect HTTP to HTTPS
+                </label>
+              </div>
             </div>
           </div>
         </div>

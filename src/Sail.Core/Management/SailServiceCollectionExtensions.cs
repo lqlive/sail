@@ -1,6 +1,7 @@
 using Sail.Core.Certificates;
 using Sail.Core.Cors;
 using Sail.Core.RateLimiter;
+using Sail.Core.Https;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -27,6 +28,20 @@ public static class SailServiceCollectionExtensions
     {
         services.TryAddSingleton<RateLimiterPolicyProvider>();
         services.TryAddSingleton<IRateLimiterPolicyProvider>(sp => sp.GetRequiredService<RateLimiterPolicyProvider>());
+        return services;
+    }
+
+    public static IServiceCollection AddRouteHttpsRedirection(this IServiceCollection services, Action<HttpsRedirectionOptions>? configureOptions = null)
+    {
+        if (configureOptions != null)
+        {
+            services.Configure(configureOptions);
+        }
+        else
+        {
+            services.AddOptions<HttpsRedirectionOptions>();
+        }
+        
         return services;
     }
 }

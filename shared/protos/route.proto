@@ -32,6 +32,7 @@ message Route {
   google.protobuf.StringValue timeout = 9;
   google.protobuf.Int64Value max_request_body_size = 10;
   repeated RouteTransform transforms = 11;
+  bool https_redirect = 12;
 }
 
 message RouteTransform {

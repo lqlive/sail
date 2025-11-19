@@ -195,6 +195,10 @@ internal sealed class ProxyConfigProvider : IProxyConfigProvider, IDisposable
             metadata["RateLimiterPolicy"] = route.RateLimiterPolicy;
         }
 
+        if (route.HttpsRedirect)
+        {
+            metadata["HttpsRedirect"] = "true";
+        }
 
         return new RouteConfig
         {

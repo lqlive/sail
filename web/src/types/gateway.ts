@@ -12,6 +12,7 @@ export interface Route {
   corsPolicy?: string;
   timeout?: string;
   maxRequestBodySize?: number;
+  httpsRedirect?: boolean;
   createdAt: string;
   updatedAt: string;
   match?: {

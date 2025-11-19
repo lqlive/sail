@@ -50,6 +50,7 @@ public class RouteService(SailContext context)
             .Set(x => x.TimeoutPolicy, request.TimeoutPolicy)
             .Set(x => x.Timeout, request.Timeout)
             .Set(x => x.MaxRequestBodySize, request.MaxRequestBodySize)
+            .Set(x => x.HttpsRedirect, request.HttpsRedirect)
             .Set(x=>x.Transforms,request.Transforms)
             .Set(x => x.UpdatedAt, DateTimeOffset.UtcNow);
 
@@ -78,6 +79,7 @@ public class RouteService(SailContext context)
             TimeoutPolicy = request.TimeoutPolicy,
             Timeout = request.Timeout,
             MaxRequestBodySize = request.MaxRequestBodySize,
+            HttpsRedirect = request.HttpsRedirect,
             Transforms = request.Transforms
         };
         return route;
@@ -152,6 +154,7 @@ public class RouteService(SailContext context)
             TimeoutPolicy = route.TimeoutPolicy,
             Timeout = route.Timeout,
             MaxRequestBodySize = route.MaxRequestBodySize,
+            HttpsRedirect = route.HttpsRedirect,
             Transforms = route.Transforms,
             CreatedAt = route.CreatedAt,
             UpdatedAt = route.UpdatedAt

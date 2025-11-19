@@ -1,8 +1,9 @@
 using Consul.AspNetCore;
-
+using Microsoft.AspNetCore.Http;
 using Sail.Compass.Management;
 using Sail.Core.Management;
 using Sail.Core.RateLimiter;
+using Sail.Core.Https;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,6 +15,11 @@ builder.Services.AddReverseProxy()
     .LoadFromMessages();
 builder.Services.AddDynamicCors();
 builder.Services.AddDynamicRateLimiter();
+builder.Services.AddRouteHttpsRedirection(options =>
+{
+    options.HttpsPort = 443;
+    options.RedirectStatusCode = StatusCodes.Status308PermanentRedirect;
+});
 builder.Services.AddCertificateUpdater();
 builder.Services.AddCorsPolicyUpdater();
 builder.Services.AddRateLimiterPolicyUpdater();
@@ -31,6 +37,7 @@ app.UseCors();
 
 app.MapReverseProxy(proxyPipeline =>
 {
+    proxyPipeline.UseMiddleware<HttpsRedirectionMiddleware>();
     proxyPipeline.UseMiddleware<RateLimiterMiddleware>();
 });
 
