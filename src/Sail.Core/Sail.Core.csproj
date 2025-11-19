@@ -10,11 +10,8 @@
         <PackageReference Include="Yarp.ReverseProxy" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
         <PackageReference Include="Microsoft.Extensions.Options" />
+        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
+        <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" />
     </ItemGroup>
     
-    <ItemGroup>
-      <Folder Include="Authorization\JwtBearer\" />
-      <Folder Include="Authorization\OAuth2\" />
-      <Folder Include="Authorization\OpenIdConnect\" />
-    </ItemGroup>
 </Project>

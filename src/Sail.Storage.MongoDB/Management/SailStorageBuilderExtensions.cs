@@ -16,6 +16,7 @@ public static class SailStorageBuilderExtensions
         services.TryAddTransient<IClusterStore, ClusterStore>();
         services.TryAddTransient<ICertificateStore, CertificateStore>();
         services.TryAddTransient<IMiddlewareStore, MiddlewareStore>();
+        services.TryAddTransient<IAuthenticationPolicyStore, AuthenticationPolicyStore>();
         return application;
     }
 }

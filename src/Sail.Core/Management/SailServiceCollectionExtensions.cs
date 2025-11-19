@@ -2,9 +2,14 @@ using Sail.Core.Certificates;
 using Sail.Core.Cors;
 using Sail.Core.RateLimiter;
 using Sail.Core.Https;
+using Sail.Core.Authentication;
+using Sail.Core.Authentication.JwtBearer;
+using Sail.Core.Authentication.OpenIdConnect;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Microsoft.Extensions.DependencyInjection;
 
@@ -42,6 +47,21 @@ public static class SailServiceCollectionExtensions
             services.AddOptions<HttpsRedirectionOptions>();
         }
         
+        return services;
+    }
+
+    public static IServiceCollection AddDynamicAuthentication(this IServiceCollection services)
+    {
+        services.AddAuthentication();
+        services.AddAuthorization();
+        
+        // Register custom authorization policy provider
+        services.AddSingleton<DynamicAuthorizationPolicyProvider>();
+        services.AddSingleton<IAuthorizationPolicyProvider>(sp => 
+            sp.GetRequiredService<DynamicAuthorizationPolicyProvider>());
+        
+        services.AddSingleton<JwtBearerAuthenticationOptionsProvider>();
+        services.AddSingleton<OpenIdConnectAuthenticationOptionsProvider>();
         return services;
     }
 }

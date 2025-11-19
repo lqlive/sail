@@ -33,6 +33,7 @@ endpoint.MapRouteApiV1();
 endpoint.MapClusterApiV1();
 endpoint.MapCertificateApiV1();
 endpoint.MapMiddlewareApiV1();
+endpoint.MapAuthenticationPolicyApi();
 
 app.UseDefaultOpenApi();
 
@@ -41,6 +42,7 @@ app.MapGrpcService<ClusterGrpcService>();
 app.MapGrpcService<DestinationGrpcService>();
 app.MapGrpcService<CertificateGrpcService>();
 app.MapGrpcService<MiddlewareGrpcService>();
+app.MapGrpcService<AuthenticationPolicyGrpcService>();
 
 using (var scope = app.Services.CreateScope())
 {

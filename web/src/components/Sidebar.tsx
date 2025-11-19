@@ -6,6 +6,7 @@ import {
   ServerStackIcon,
   ShieldCheckIcon,
   BoltIcon,
+  KeyIcon,
   Cog6ToothIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
@@ -24,6 +25,7 @@ const navigation: NavigationItem[] = [
   { name: 'Clusters', href: '/clusters', icon: ServerStackIcon },
   { name: 'Certificates', href: '/certificates', icon: ShieldCheckIcon },
   { name: 'Middlewares', href: '/middlewares', icon: BoltIcon },
+  { name: 'Authentication', href: '/authentication-policies', icon: KeyIcon },
   { name: 'Settings', href: '/settings', icon: Cog6ToothIcon },
 ];
 

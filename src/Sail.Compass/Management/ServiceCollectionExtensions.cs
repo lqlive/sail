@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Sail.Api.V1;
+using Sail.Compass.Authentication;
 using Sail.Compass.Certificates;
 using Sail.Compass.ConfigProvider;
 using Sail.Compass.Cors;
@@ -35,6 +36,11 @@ public static class ServiceCollectionExtensions
             var receiverOptions = sp.GetRequiredService<IOptions<ReceiverOptions>>().Value;
             o.Address = new Uri("http://localhost:8000");
         });
+        services.AddGrpcClient<AuthenticationPolicyService.AuthenticationPolicyServiceClient>((sp, o) =>
+        {
+            var receiverOptions = sp.GetRequiredService<IOptions<ReceiverOptions>>().Value;
+            o.Address = new Uri("http://localhost:8000");
+        });
 
         return services;
     }
@@ -48,6 +54,7 @@ public static class ServiceCollectionExtensions
         builder.Services.AddSingleton<ResourceObserver<Route>, RouteObserver>();
         builder.Services.AddSingleton<ResourceObserver<Certificate>, CertificateObserver>();
         builder.Services.AddSingleton<ResourceObserver<Middleware>, MiddlewareObserver>();
+        builder.Services.AddSingleton<AuthenticationPolicyObserver>();
 
         builder.Services.AddSingleton<ProxyConfigProvider>();
         builder.Services.AddSingleton<IProxyConfigProvider>(sp => 
@@ -98,10 +105,25 @@ public static class ServiceCollectionExtensions
         return services;
     }
 
+    public static IServiceCollection AddAuthenticationPolicyUpdater(
+        this IServiceCollection services)
+    {
+        services.AddSingleton(sp =>
+        {
+            var policyObserver = sp.GetRequiredService<AuthenticationPolicyObserver>();
+            return AuthenticationPolicyStreamBuilder.Build(policyObserver);
+        });
+
+        services.AddSingleton<AuthenticationPolicyUpdater>();
+
+        return services;
+    }
+
     public static void UseCompassUpdaters(this IServiceProvider serviceProvider)
     {
         _ = serviceProvider.GetRequiredService<ServerCertificateUpdater>();
         _ = serviceProvider.GetRequiredService<CorsPolicyUpdater>();
         _ = serviceProvider.GetRequiredService<RateLimiterPolicyUpdater>();
+        _ = serviceProvider.GetRequiredService<AuthenticationPolicyUpdater>();
     }
 }
