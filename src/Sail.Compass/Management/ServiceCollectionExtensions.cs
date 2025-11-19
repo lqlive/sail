@@ -1,9 +1,11 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Sail.Api.V1;
-using Sail.Compass.CertificateManager;
+using Sail.Compass.Certificates;
 using Sail.Compass.ConfigProvider;
+using Sail.Compass.Cors;
 using Sail.Compass.Observers;
+using Sail.Compass.RateLimiter;
 using Sail.Core.Options;
 using Yarp.ReverseProxy.Configuration;
 
@@ -29,6 +31,11 @@ public static class ServiceCollectionExtensions
             var receiverOptions = sp.GetRequiredService<IOptions<ReceiverOptions>>().Value;
             o.Address = new Uri("http://localhost:8000");
         });
+        services.AddGrpcClient<MiddlewareService.MiddlewareServiceClient>((sp, o) =>
+        {
+            var receiverOptions = sp.GetRequiredService<IOptions<ReceiverOptions>>().Value;
+            o.Address = new Uri("http://localhost:8000");
+        });
 
         return services;
     }
@@ -41,6 +48,7 @@ public static class ServiceCollectionExtensions
         builder.Services.AddSingleton<ResourceObserver<Cluster>, ClusterObserver>();
         builder.Services.AddSingleton<ResourceObserver<Route>, RouteObserver>();
         builder.Services.AddSingleton<ResourceObserver<Certificate>, CertificateObserver>();
+        builder.Services.AddSingleton<ResourceObserver<Middleware>, MiddlewareObserver>();
 
         builder.Services.AddSingleton<ProxyConfigProvider>();
         builder.Services.AddSingleton<IProxyConfigProvider>(sp => 
@@ -59,6 +67,34 @@ public static class ServiceCollectionExtensions
         });
 
         services.AddSingleton<ServerCertificateUpdater>();
+
+        return services;
+    }
+
+    public static IServiceCollection AddCorsPolicyUpdater(
+        this IServiceCollection services)
+    {
+        services.AddSingleton(sp =>
+        {
+            var middlewareObserver = sp.GetRequiredService<ResourceObserver<Middleware>>();
+            return CorsPolicyStreamBuilder.BuildCorsPolicyStream(middlewareObserver);
+        });
+
+        services.AddSingleton<CorsPolicyUpdater>();
+
+        return services;
+    }
+
+    public static IServiceCollection AddRateLimiterPolicyUpdater(
+        this IServiceCollection services)
+    {
+        services.AddSingleton(sp =>
+        {
+            var middlewareObserver = sp.GetRequiredService<ResourceObserver<Middleware>>();
+            return RateLimiterPolicyStreamBuilder.BuildRateLimiterPolicyStream(middlewareObserver);
+        });
+
+        services.AddSingleton<RateLimiterPolicyUpdater>();
 
         return services;
     }

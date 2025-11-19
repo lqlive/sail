@@ -10,6 +10,8 @@ import ClusterDetail from './pages/Clusters/ClusterDetail';
 import ClusterEdit from './pages/Clusters/ClusterEdit';
 import CertificatesPage from './pages/Certificates';
 import CertificateEdit from './pages/Certificates/CertificateEdit';
+import MiddlewaresPage from './pages/Middlewares';
+import MiddlewareEdit from './pages/Middlewares/MiddlewareEdit';
 import Settings from './pages/Settings';
 import './App.css';
 
@@ -30,6 +32,9 @@ const AppContent: React.FC = () => {
           <Route path="/certificates" element={<CertificatesPage />} />
           <Route path="/certificates/new" element={<CertificateEdit />} />
           <Route path="/certificates/:id" element={<CertificateEdit />} />
+          <Route path="/middlewares" element={<MiddlewaresPage />} />
+          <Route path="/middlewares/new" element={<MiddlewareEdit />} />
+          <Route path="/middlewares/:id" element={<MiddlewareEdit />} />
           <Route path="/settings" element={<Settings />} />
         </Routes>
       </Layout>

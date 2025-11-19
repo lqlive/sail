@@ -195,34 +195,34 @@ const ClusterEdit: React.FC = () => {
   }
 
   return (
-    <div className="fade-in max-w-4xl">
-      <Link to="/clusters" className="inline-flex items-center text-sm text-gray-600 hover:text-gray-900 mb-4">
+    <div className="fade-in max-w-5xl mx-auto">
+      <Link to="/clusters" className="inline-flex items-center text-sm text-gray-600 hover:text-gray-900 mb-6 transition-colors">
         <ChevronLeftIcon className="h-4 w-4 mr-1" />
         Back to Clusters
       </Link>
 
-      <div className="mb-4">
-        <h1 className="text-lg font-medium text-gray-900">
+      <div className="mb-8">
+        <h1 className="text-2xl font-semibold text-gray-900">
           {isEdit ? 'Edit Cluster' : 'Create Cluster'}
         </h1>
-        <p className="text-xs text-gray-600 mt-1">
+        <p className="mt-1 text-sm text-gray-500">
           Define cluster capabilities and specifications
         </p>
       </div>
 
       {error && (
-        <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md">
-          <p className="text-xs text-red-600">{error}</p>
+        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+          <p className="text-sm text-red-700 font-medium">{error}</p>
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-6">
         {/* Basic Configuration */}
-        <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-4">
-          <h2 className="text-sm font-semibold text-gray-900 mb-3">Basic Configuration</h2>
-          <div className="space-y-3">
+        <div className="bg-white rounded-lg border border-gray-200 p-6">
+          <h2 className="text-base font-semibold text-gray-900 mb-6">Basic Configuration</h2>
+          <div className="space-y-5">
             <div>
-              <label className="block text-xs font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 Cluster Name <span className="text-red-500">*</span>
               </label>
               <input
@@ -230,19 +230,19 @@ const ClusterEdit: React.FC = () => {
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 placeholder="e.g., Backend API Cluster"
-                className="block w-full px-2.5 py-1.5 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-gray-900 focus:border-gray-900 text-sm"
+                className="block w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-gray-400 focus:ring-1 focus:ring-gray-400 transition-colors"
                 required
               />
             </div>
 
             <div>
-              <label className="block text-xs font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 Load Balancing Policy
               </label>
               <select
                 value={formData.loadBalancingPolicy}
                 onChange={(e) => setFormData({ ...formData, loadBalancingPolicy: e.target.value })}
-                className="block w-full px-2.5 py-1.5 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-gray-900 focus:border-gray-900 text-sm"
+                className="block w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-gray-400 focus:ring-1 focus:ring-gray-400 transition-colors"
               >
                 <option value="RoundRobin">Round Robin</option>
                 <option value="LeastRequests">Least Requests</option>
@@ -255,14 +255,14 @@ const ClusterEdit: React.FC = () => {
         </div>
 
         {/* Destinations */}
-        <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-4">
-          <h2 className="text-sm font-semibold text-gray-900 mb-3">
+        <div className="bg-white rounded-lg border border-gray-200 p-6">
+          <h2 className="text-base font-semibold text-gray-900 mb-6">
             Destinations
             {destinations.length > 0 && (
               <span className="ml-2 text-xs font-normal text-gray-500">({destinations.length})</span>
             )}
             </h2>
-            <div className="space-y-3">
+            <div className="space-y-5">
             {destinations.length > 0 && (
               <div className="space-y-2">
                 {destinations.map((dest) => (
@@ -331,7 +331,7 @@ const ClusterEdit: React.FC = () => {
         </div>
 
         {/* Health Check */}
-        <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-4">
+        <div className="bg-white rounded-lg border border-gray-200 p-6">
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-sm font-semibold text-gray-900">Health Check Configuration</h2>
             <label className="flex items-center cursor-pointer">
@@ -345,7 +345,7 @@ const ClusterEdit: React.FC = () => {
             </label>
           </div>
 
-          <div className="space-y-3">
+          <div className="space-y-5">
               <div className="flex items-center space-x-4 pb-2 border-b border-gray-200">
                 <label className="flex items-center cursor-pointer">
                   <input
@@ -394,7 +394,7 @@ const ClusterEdit: React.FC = () => {
               {formData.enableActiveHealthCheck && (
                 <div className="grid grid-cols-3 gap-3">
                   <div>
-                    <label className="block text-xs font-medium text-gray-700 mb-1">Path</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Path</label>
                     <input
                       type="text"
                       value={formData.healthCheckPath}
@@ -405,7 +405,7 @@ const ClusterEdit: React.FC = () => {
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-gray-700 mb-1">Interval (seconds)</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Interval (seconds)</label>
                     <input
                       type="number"
                       value={formData.healthCheckInterval}
@@ -416,7 +416,7 @@ const ClusterEdit: React.FC = () => {
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-gray-700 mb-1">Timeout (seconds)</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Timeout (seconds)</label>
                     <input
                       type="number"
                       value={formData.healthCheckTimeout}
@@ -431,7 +431,7 @@ const ClusterEdit: React.FC = () => {
 
               {formData.enablePassiveHealthCheck && (
                 <div>
-                  <label className="block text-xs font-medium text-gray-700 mb-1">Reactivation Period (seconds)</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Reactivation Period (seconds)</label>
                   <input
                     type="number"
                     value={formData.passiveReactivationPeriod}
@@ -447,7 +447,7 @@ const ClusterEdit: React.FC = () => {
         </div>
 
         {/* Session Affinity */}
-        <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-4">
+        <div className="bg-white rounded-lg border border-gray-200 p-6">
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-sm font-semibold text-gray-900">Session Affinity</h2>
             <label className="flex items-center cursor-pointer">
@@ -461,10 +461,10 @@ const ClusterEdit: React.FC = () => {
             </label>
           </div>
 
-          <div className="space-y-3">
+          <div className="space-y-5">
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1">Affinity Policy</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Affinity Policy</label>
                 <select
                   value={formData.sessionAffinityPolicy}
                   onChange={(e) => setFormData({ ...formData, sessionAffinityPolicy: e.target.value })}
@@ -476,7 +476,7 @@ const ClusterEdit: React.FC = () => {
                 </select>
               </div>
               <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1">Failure Policy</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Failure Policy</label>
                 <select
                   value={formData.sessionAffinityFailurePolicy}
                   onChange={(e) => setFormData({ ...formData, sessionAffinityFailurePolicy: e.target.value })}
@@ -493,11 +493,11 @@ const ClusterEdit: React.FC = () => {
         </div>
 
         {/* HTTP Client Configuration */}
-        <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-4">
-          <h2 className="text-sm font-semibold text-gray-900 mb-3">HTTP Client Configuration</h2>
+        <div className="bg-white rounded-lg border border-gray-200 p-6">
+          <h2 className="text-base font-semibold text-gray-900 mb-6">HTTP Client Configuration</h2>
           <div className="grid grid-cols-3 gap-3">
             <div>
-              <label className="block text-xs font-medium text-gray-700 mb-1">HTTP Version</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">HTTP Version</label>
               <select
                 value={formData.httpVersion}
                 onChange={(e) => setFormData({ ...formData, httpVersion: e.target.value })}
@@ -509,7 +509,7 @@ const ClusterEdit: React.FC = () => {
               </select>
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-700 mb-1">Request Timeout (seconds)</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Request Timeout (seconds)</label>
               <input
                 type="number"
                 value={formData.requestTimeout}
@@ -519,7 +519,7 @@ const ClusterEdit: React.FC = () => {
               />
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-700 mb-1">Max Connections</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Max Connections</label>
               <input
                 type="number"
                 value={formData.maxConnectionsPerServer}
@@ -533,26 +533,26 @@ const ClusterEdit: React.FC = () => {
         </div>
 
         {/* Actions */}
-        <div className="flex justify-end space-x-2">
+        <div className="flex justify-end gap-3 pt-2">
           <Link
             to="/clusters"
-            className="px-3 py-1.5 border border-gray-300 rounded-md text-xs font-medium text-gray-700 bg-white hover:bg-gray-50"
+            className="px-5 py-2.5 border border-gray-200 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors"
           >
             Cancel
           </Link>
           <button
             type="submit"
             disabled={saving}
-            className="inline-flex items-center px-4 py-1.5 border border-transparent rounded-md shadow-sm text-xs font-medium text-white bg-gray-900 hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="inline-flex items-center px-5 py-2.5 border border-transparent rounded-lg text-sm font-medium text-white bg-black hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             {saving ? (
               <>
-                <div className="animate-spin rounded-full h-3.5 w-3.5 border-b-2 border-white mr-2"></div>
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
                 Saving...
               </>
             ) : (
               <>
-                <CheckIcon className="h-3.5 w-3.5 mr-2" />
+                <CheckIcon className="h-4 w-4 mr-2" />
                 {isEdit ? 'Update Cluster' : 'Create Cluster'}
               </>
             )}

@@ -107,6 +107,37 @@ export interface Certificate {
   updatedAt: string;
 }
 
+export type MiddlewareType = 'Cors' | 'RateLimiter';
+
+export interface Middleware {
+  id: string;
+  name: string;
+  description?: string;
+  type: MiddlewareType;
+  enabled: boolean;
+  cors?: CorsConfig;
+  rateLimiter?: RateLimiterConfig;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CorsConfig {
+  name: string;
+  allowOrigins?: string[];
+  allowMethods?: string[];
+  allowHeaders?: string[];
+  exposeHeaders?: string[];
+  allowCredentials: boolean;
+  maxAge?: number;
+}
+
+export interface RateLimiterConfig {
+  name: string;
+  permitLimit: number;
+  window: number;
+  queueLimit: number;
+}
+
 export interface GatewayStats {
   totalRoutes: number;
   activeRoutes: number;
