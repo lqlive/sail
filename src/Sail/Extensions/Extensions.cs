@@ -16,6 +16,7 @@ public static class Extensions
         services.TryAddScoped<ClusterService>();
         services.TryAddScoped<CertificateService>();
         services.TryAddScoped<MiddlewareService>();
+        services.TryAddScoped<AuthenticationPolicyService>();
 
         services.AddDynamicCors();
         services.AddDynamicRateLimiter();

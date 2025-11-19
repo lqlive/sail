@@ -15,6 +15,7 @@ builder.Services.AddReverseProxy()
     .LoadFromMessages();
 builder.Services.AddDynamicCors();
 builder.Services.AddDynamicRateLimiter();
+builder.Services.AddDynamicAuthentication();
 builder.Services.AddRouteHttpsRedirection(options =>
 {
     options.HttpsPort = 443;
@@ -23,6 +24,7 @@ builder.Services.AddRouteHttpsRedirection(options =>
 builder.Services.AddCertificateUpdater();
 builder.Services.AddCorsPolicyUpdater();
 builder.Services.AddRateLimiterPolicyUpdater();
+builder.Services.AddAuthenticationPolicyUpdater();
  
 builder.Services.AddConsul(o =>
 {
@@ -34,6 +36,8 @@ var app = builder.Build();
 app.Services.UseCompassUpdaters();
 
 app.UseCors();
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapReverseProxy(proxyPipeline =>
 {

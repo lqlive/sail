@@ -19,14 +19,14 @@ internal sealed class ServerCertificateUpdater : IDisposable
 
         var subscription = certificateStream
             .Subscribe(
-                certificates => UpdateCertificates(certificateSelector, certificates),
+                async certificates => await UpdateCertificates(certificateSelector, certificates),
                 ex => _logger.LogError(ex, "Error in certificate stream"),
                 () => _logger.LogInformation("Certificate stream completed"));
 
         _subscriptions.Add(subscription);
     }
 
-    private async void UpdateCertificates(
+    private async Task UpdateCertificates(
         IServerCertificateSelector certificateSelector,
         IReadOnlyList<CertificateConfig> certificates)
     {

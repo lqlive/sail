@@ -19,14 +19,14 @@ internal sealed class RateLimiterPolicyUpdater : IDisposable
 
         var subscription = rateLimiterPolicyStream
             .Subscribe(
-                policies => UpdateRateLimiterPolicies(rateLimiterPolicyProvider, policies),
+                async policies => await UpdateRateLimiterPolicies(rateLimiterPolicyProvider, policies),
                 ex => _logger.LogError(ex, "Error in rate limiter policy stream"),
                 () => _logger.LogInformation("Rate limiter policy stream completed"));
 
         _subscriptions.Add(subscription);
     }
 
-    private async void UpdateRateLimiterPolicies(
+    private async Task UpdateRateLimiterPolicies(
         RateLimiterPolicyProvider rateLimiterPolicyProvider,
         IReadOnlyList<RateLimiterPolicyConfig> policies)
     {

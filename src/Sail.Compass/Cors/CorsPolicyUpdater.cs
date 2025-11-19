@@ -19,14 +19,14 @@ internal sealed class CorsPolicyUpdater : IDisposable
 
         var subscription = corsPolicyStream
             .Subscribe(
-                policies => UpdateCorsPolicies(corsPolicyProvider, policies),
+                async policies => await UpdateCorsPolicies(corsPolicyProvider, policies),
                 ex => _logger.LogError(ex, "Error in CORS policy stream"),
                 () => _logger.LogInformation("CORS policy stream completed"));
 
         _subscriptions.Add(subscription);
     }
 
-    private async void UpdateCorsPolicies(
+    private async Task UpdateCorsPolicies(
         CorsPolicyProvider corsPolicyProvider,
         IReadOnlyList<CorsPolicyConfig> policies)
     {

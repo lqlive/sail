@@ -12,6 +12,8 @@ import CertificatesPage from './pages/Certificates';
 import CertificateEdit from './pages/Certificates/CertificateEdit';
 import MiddlewaresPage from './pages/Middlewares';
 import MiddlewareEdit from './pages/Middlewares/MiddlewareEdit';
+import AuthenticationPoliciesPage from './pages/AuthenticationPolicies';
+import AuthenticationPolicyEdit from './pages/AuthenticationPolicies/AuthenticationPolicyEdit';
 import Settings from './pages/Settings';
 import './App.css';
 
@@ -35,6 +37,9 @@ const AppContent: React.FC = () => {
           <Route path="/middlewares" element={<MiddlewaresPage />} />
           <Route path="/middlewares/new" element={<MiddlewareEdit />} />
           <Route path="/middlewares/:id" element={<MiddlewareEdit />} />
+          <Route path="/authentication-policies" element={<AuthenticationPoliciesPage />} />
+          <Route path="/authentication-policies/new" element={<AuthenticationPolicyEdit />} />
+          <Route path="/authentication-policies/:id" element={<AuthenticationPolicyEdit />} />
           <Route path="/settings" element={<Settings />} />
         </Routes>
       </Layout>

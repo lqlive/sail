@@ -1,0 +1,65 @@
+syntax = "proto3";
+
+import "google/protobuf/wrappers.proto";
+import "google/protobuf/empty.proto";
+import "common.proto";
+
+option csharp_namespace = "Sail.Api.V1";
+
+package sail.api.v1;
+
+service AuthenticationPolicyService {
+  rpc List(google.protobuf.Empty) returns (ListAuthenticationPolicyResponse) {}
+  rpc Watch(google.protobuf.Empty) returns (stream WatchAuthenticationPolicyResponse) {}
+}
+
+message ListAuthenticationPolicyResponse {
+  repeated AuthenticationPolicy items = 1;
+}
+
+message WatchAuthenticationPolicyResponse {
+  EventType event_type = 1;
+  AuthenticationPolicy policy = 2;
+}
+
+message AuthenticationPolicy {
+  string policy_id = 1;
+  string name = 2;
+  AuthenticationSchemeType type = 3;
+  bool enabled = 4;
+  google.protobuf.StringValue description = 5;
+  JwtBearerConfig jwt_bearer = 6;
+  OpenIdConnectConfig open_id_connect = 7;
+}
+
+enum AuthenticationSchemeType {
+  JWT_BEARER = 0;
+  OPEN_ID_CONNECT = 1;
+}
+
+message JwtBearerConfig {
+  string authority = 1;
+  string audience = 2;
+  bool require_https_metadata = 3;
+  bool save_token = 4;
+  repeated string valid_issuers = 5;
+  repeated string valid_audiences = 6;
+  bool validate_issuer = 7;
+  bool validate_audience = 8;
+  bool validate_lifetime = 9;
+  bool validate_issuer_signing_key = 10;
+  google.protobuf.Int32Value clock_skew = 11;
+}
+
+message OpenIdConnectConfig {
+  string authority = 1;
+  string client_id = 2;
+  string client_secret = 3;
+  google.protobuf.StringValue response_type = 4;
+  bool require_https_metadata = 5;
+  bool save_tokens = 6;
+  bool get_claims_from_user_info_endpoint = 7;
+  repeated string scope = 8;
+  google.protobuf.Int32Value clock_skew = 9;
+}
+
