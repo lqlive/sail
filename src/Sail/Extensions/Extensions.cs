@@ -15,5 +15,9 @@ public static class Extensions
         services.TryAddScoped<RouteService>();
         services.TryAddScoped<ClusterService>();
         services.TryAddScoped<CertificateService>();
+        services.TryAddScoped<MiddlewareService>();
+
+        services.AddDynamicCors();
+        services.AddDynamicRateLimiter();
     }
 }

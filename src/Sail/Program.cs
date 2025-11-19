@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using Sail.Apis;
 using Sail.Core.Management;
 using Sail.Storage.MongoDB.Management;
@@ -7,6 +8,11 @@ using Sail.Storage.MongoDB;
 using ServiceDefaults;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.ConfigureHttpJsonOptions(options =>
+{
+    options.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
+});
 
 var apiVersioning = builder.Services.AddApiVersioning();
 
@@ -19,11 +25,14 @@ builder.Services.AddGrpc();
 
 var app = builder.Build();
 
+app.UseCors();
+
 var endpoint = app.NewVersionedApi();
 
 endpoint.MapRouteApiV1();
 endpoint.MapClusterApiV1();
 endpoint.MapCertificateApiV1();
+endpoint.MapMiddlewareApiV1();
 
 app.UseDefaultOpenApi();
 
@@ -31,6 +40,7 @@ app.MapGrpcService<RouteGrpcService>();
 app.MapGrpcService<ClusterGrpcService>();
 app.MapGrpcService<DestinationGrpcService>();
 app.MapGrpcService<CertificateGrpcService>();
+app.MapGrpcService<MiddlewareGrpcService>();
 
 using (var scope = app.Services.CreateScope())
 {

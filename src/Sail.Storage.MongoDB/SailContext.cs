@@ -15,6 +15,7 @@ public class SailContext
     private const string ClusterTableName = "clusters";
     private const string RouteTableName = "routes";
     private const string CertificateTableName = "certificates";
+    private const string MiddlewareTableName = "middlewares";
 
     public SailContext(IOptions<DatabaseOptions> options)
     {
@@ -29,6 +30,7 @@ public class SailContext
     public IMongoCollection<Cluster> Clusters => _database.GetCollection<Cluster>(ClusterTableName);
     public IMongoCollection<Route> Routes => _database.GetCollection<Route>(RouteTableName);
     public IMongoCollection<Certificate> Certificates => _database.GetCollection<Certificate>(CertificateTableName);
+    public IMongoCollection<Middleware> Middlewares => _database.GetCollection<Middleware>(MiddlewareTableName);
 
     public async Task InitializeAsync()
     {
@@ -42,6 +44,7 @@ public class SailContext
         await _database.CreateCollectionAsync(ClusterTableName, collectionOptions);
         await _database.CreateCollectionAsync(RouteTableName, collectionOptions);
         await _database.CreateCollectionAsync(CertificateTableName, collectionOptions);
+        await _database.CreateCollectionAsync(MiddlewareTableName, collectionOptions);
     }
     private static void RegisterClassMaps()
     {
@@ -80,6 +83,16 @@ public class SailContext
         if (!BsonClassMap.IsClassMapRegistered(typeof(Destination)))
         {
             BsonClassMap.RegisterClassMap<Destination>(classMap =>
+            {
+                classMap.AutoMap();
+                classMap.MapIdMember(x => x.Id)
+                    .SetSerializer(new GuidSerializer(GuidRepresentation.Standard));
+            });
+        }
+        
+        if (!BsonClassMap.IsClassMapRegistered(typeof(Middleware)))
+        {
+            BsonClassMap.RegisterClassMap<Middleware>(classMap =>
             {
                 classMap.AutoMap();
                 classMap.MapIdMember(x => x.Id)

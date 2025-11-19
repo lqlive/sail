@@ -4,7 +4,7 @@ using Sail.Compass.Observers;
 using Sail.Core.Certificates;
 using ObserverEventType = Sail.Compass.Observers.EventType;
 
-namespace Sail.Compass.CertificateManager;
+namespace Sail.Compass.Certificates;
 
 internal static class CertificateStreamBuilder
 {

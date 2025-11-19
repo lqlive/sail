@@ -3,7 +3,7 @@ using System.Reactive.Linq;
 using Microsoft.Extensions.Logging;
 using Sail.Core.Certificates;
 
-namespace Sail.Compass.CertificateManager;
+namespace Sail.Compass.Certificates;
 
 internal sealed class ServerCertificateUpdater : IDisposable
 {

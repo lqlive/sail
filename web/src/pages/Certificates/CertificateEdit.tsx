@@ -110,53 +110,53 @@ const CertificateEdit: React.FC = () => {
   }
 
   return (
-    <div className="fade-in">
+    <div className="fade-in max-w-5xl mx-auto">
       <div className="mb-6">
         <button
           onClick={() => navigate('/certificates')}
-          className="inline-flex items-center text-sm text-gray-600 hover:text-gray-900"
+          className="inline-flex items-center text-sm text-gray-600 hover:text-gray-900 transition-colors"
         >
           <ArrowLeftIcon className="h-4 w-4 mr-1" />
           Back to Certificates
         </button>
       </div>
 
-      <div className="section-header mb-4">
-        <h1 className="text-lg font-medium text-gray-900">
+      <div className="mb-8">
+        <h1 className="text-2xl font-semibold text-gray-900">
           {isEditMode ? 'Edit Certificate' : 'Create Certificate'}
         </h1>
-        <p className="text-xs text-gray-600">
+        <p className="mt-1 text-sm text-gray-500">
           {isEditMode ? 'Update certificate details' : 'Add a new SSL/TLS certificate'}
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="bg-white border border-gray-200 rounded-lg shadow-sm p-4">
-          <h2 className="text-sm font-medium text-gray-900 mb-3">SNI Configuration</h2>
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="bg-white border border-gray-200 rounded-lg p-6">
+          <h2 className="text-base font-semibold text-gray-900 mb-6">SNI Configuration</h2>
           
-          <div className="space-y-3 mb-4">
-            <div className="grid grid-cols-2 gap-3">
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Host Name
                 </label>
                 <input
                   type="text"
                   value={newSNI.hostName}
                   onChange={(e) => setNewSNI({ ...newSNI, hostName: e.target.value })}
-                  className="block w-full px-2.5 py-1.5 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-gray-900 focus:border-gray-900 text-sm"
+                  className="block w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-gray-400 focus:ring-1 focus:ring-gray-400 transition-colors"
                   placeholder="www.example.com"
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Display Name
                 </label>
                 <input
                   type="text"
                   value={newSNI.name}
                   onChange={(e) => setNewSNI({ ...newSNI, name: e.target.value })}
-                  className="block w-full px-2.5 py-1.5 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-gray-900 focus:border-gray-900 text-sm"
+                  className="block w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-gray-400 focus:ring-1 focus:ring-gray-400 transition-colors"
                   placeholder="Main Domain"
                 />
               </div>
@@ -165,61 +165,79 @@ const CertificateEdit: React.FC = () => {
               type="button"
               onClick={handleAddSNI}
               disabled={!newSNI.hostName || !newSNI.name}
-              className="inline-flex items-center px-3 py-1.5 border border-gray-300 text-xs font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="inline-flex items-center px-4 py-2 border border-gray-200 text-sm font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
-              <PlusIcon className="h-3.5 w-3.5 mr-1.5" />
+              <PlusIcon className="h-4 w-4 mr-2" />
               Add SNI
             </button>
           </div>
 
           {(isEditMode ? snis : formData.snis || []).length > 0 && (
-            <div className="space-y-2">
-              <h3 className="text-xs font-medium text-gray-700 mb-2">Configured SNIs</h3>
-              {isEditMode ? (
-                snis.map((sni) => (
-                  <div
-                    key={sni.id}
-                    className="flex items-center justify-between p-2 bg-gray-50 rounded-md"
-                  >
-                    <div>
-                      <p className="text-xs font-medium text-gray-900">{sni.hostName}</p>
-                      <p className="text-xs text-gray-600">{sni.name}</p>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => handleDeleteSNI(sni.id)}
-                      className="text-red-600 hover:text-red-800"
+            <div className="mt-6 pt-6 border-t border-gray-200">
+              <h3 className="text-sm font-medium text-gray-900 mb-4">Configured SNIs</h3>
+              <div className="space-y-3">
+                {isEditMode ? (
+                  snis.map((sni) => (
+                    <div
+                      key={sni.id}
+                      className="flex items-center justify-between p-4 bg-gray-50 border border-gray-100 rounded-lg hover:border-gray-200 transition-colors"
                     >
-                      <TrashIcon className="h-3.5 w-3.5" />
-                    </button>
-                  </div>
-                ))
-              ) : (
-                formData.snis?.map((sni, index) => (
-                  <div
-                    key={index}
-                    className="flex items-center justify-between p-2 bg-gray-50 rounded-md"
-                  >
-                    <div>
-                      <p className="text-xs font-medium text-gray-900">{sni.hostName}</p>
-                      <p className="text-xs text-gray-600">{sni.name}</p>
+                      <div className="flex items-center gap-4 flex-1 min-w-0">
+                        <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center flex-shrink-0">
+                          <svg className="w-5 h-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
+                          </svg>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-gray-900 truncate">{sni.hostName}</p>
+                          <p className="text-sm text-gray-500 truncate">{sni.name}</p>
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteSNI(sni.id)}
+                        className="p-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg transition-colors flex-shrink-0"
+                        title="Delete SNI"
+                      >
+                        <TrashIcon className="h-5 w-5" />
+                      </button>
                     </div>
-                    <button
-                      type="button"
-                      onClick={() => handleDeleteSNI(index.toString())}
-                      className="text-red-600 hover:text-red-800"
+                  ))
+                ) : (
+                  formData.snis?.map((sni, index) => (
+                    <div
+                      key={index}
+                      className="flex items-center justify-between p-4 bg-gray-50 border border-gray-100 rounded-lg hover:border-gray-200 transition-colors"
                     >
-                      <TrashIcon className="h-3.5 w-3.5" />
-                    </button>
-                  </div>
-                ))
-              )}
+                      <div className="flex items-center gap-4 flex-1 min-w-0">
+                        <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center flex-shrink-0">
+                          <svg className="w-5 h-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
+                          </svg>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-gray-900 truncate">{sni.hostName}</p>
+                          <p className="text-sm text-gray-500 truncate">{sni.name}</p>
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteSNI(index.toString())}
+                        className="p-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg transition-colors flex-shrink-0"
+                        title="Delete SNI"
+                      >
+                        <TrashIcon className="h-5 w-5" />
+                      </button>
+                    </div>
+                  ))
+                )}
+              </div>
             </div>
           )}
         </div>
 
-        <div className="bg-white border border-gray-200 rounded-lg shadow-sm p-4">
-          <h2 className="text-sm font-medium text-gray-900 mb-3">Certificate Information</h2>
+        <div className="bg-white border border-gray-200 rounded-lg p-6">
+          <h2 className="text-base font-semibold text-gray-900 mb-6">Certificate Information</h2>
           
           <div className="space-y-3">
             <div>
@@ -256,18 +274,18 @@ const CertificateEdit: React.FC = () => {
           </div>
         </div>
 
-        <div className="flex justify-end space-x-2">
+        <div className="flex justify-end gap-3 pt-2">
           <button
             type="button"
             onClick={() => navigate('/certificates')}
-            className="px-3 py-1.5 border border-gray-300 text-xs font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+            className="px-5 py-2.5 border border-gray-200 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors"
           >
             Cancel
           </button>
           <button
             type="submit"
             disabled={saving}
-            className="px-3 py-1.5 border border-transparent text-xs font-medium rounded-md text-white bg-gray-900 hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-5 py-2.5 border border-transparent rounded-lg text-sm font-medium text-white bg-black hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             {saving ? 'Saving...' : isEditMode ? 'Update Certificate' : 'Create Certificate'}
           </button>

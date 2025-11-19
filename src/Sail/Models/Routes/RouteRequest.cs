@@ -12,5 +12,6 @@ public record RouteRequest
     public string? TimeoutPolicy { get; init; }
     public TimeSpan? Timeout { get; init; }
     public long? MaxRequestBodySize { get; init; }
+    public bool HttpsRedirect { get; init; }
     public IReadOnlyList<IReadOnlyDictionary<string, string>>? Transforms { get; set; }
 }

@@ -2,13 +2,11 @@
   <Folder Name="/samples/">
     <Project Path="samples\ApiSample\ApiSample.csproj" />
     <Project Path="samples\SampleServer\SampleServer.csproj" />
-    <Project Path="samples\YarpSample\YarpSample.csproj" />
     <Project Path="samples\YarpServiceDiscovery\YarpServiceDiscovery.csproj" />
   </Folder>
   <Folder Name="/shared/">
     <Project Path="shared\Sail.ServiceDiscovery.Consul\Sail.ServiceDiscovery.Consul.csproj" />
     <Project Path="shared\ServiceDefaults\ServiceDefaults.csproj" />
-    <Project Path="shared\Yarp.Extensions.Resilience\Yarp.Extensions.Resilience.csproj" />
   </Folder>
   <Folder Name="/Solution Items/">
     <File Path="Directory.Packages.props" />

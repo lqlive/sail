@@ -76,10 +76,10 @@ const Settings: React.FC = () => {
 
   return (
     <div className="fade-in">
-      {/* Page Title */}
-      <div className="section-header">
-        <h1 className="text-xl font-medium text-gray-900">Gateway Settings</h1>
-        <p className="text-sm text-gray-600">Configure gateway behavior, performance, and security</p>
+      {/* Header */}
+      <div className="mb-8">
+        <h1 className="text-2xl font-semibold text-gray-900">Gateway Settings</h1>
+        <p className="mt-1 text-sm text-gray-500">Configure gateway behavior, performance, and security</p>
       </div>
 
       <div className="flex flex-col lg:flex-row gap-6">

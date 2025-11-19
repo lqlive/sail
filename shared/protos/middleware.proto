@@ -1,11 +1,37 @@
 syntax = "proto3";
+import "common.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/wrappers.proto";
 
 package sail.api.v1;
 
+service MiddlewareService {
+  rpc List(google.protobuf.Empty) returns (ListMiddlewareResponse) {}
+  rpc Watch(google.protobuf.Empty) returns (stream WatchMiddlewareResponse) {}
+}
+
+message ListMiddlewareResponse {
+  repeated Middleware items = 1;
+}
+
+message WatchMiddlewareResponse {
+  EventType event_type = 1;
+  Middleware middleware = 2;
+}
+
 message Middleware {
-  Cors cors = 1;
-  RateLimiter rate_limiter = 2;
-  Retry retry = 3;
+  string middleware_id = 1;
+  string name = 2;
+  google.protobuf.StringValue description = 3;
+  MiddlewareType type = 4;
+  bool enabled = 5;
+  Cors cors = 6;
+  RateLimiter rate_limiter = 7;
+}
+
+enum MiddlewareType {
+  CORS = 0;
+  RATE_LIMITER = 1;
 }
 
 message Cors {
@@ -13,18 +39,14 @@ message Cors {
   repeated string allow_origins = 2;
   repeated string allow_methods = 3;
   repeated string allow_headers = 4;
+  repeated string expose_headers = 5;
+  bool allow_credentials = 6;
+  google.protobuf.Int32Value max_age = 7;
 }
 
 message RateLimiter {
-  string  name = 1;
-  int32   permit_limit = 2;
-  int32   window = 3;
-  int32   queue_limit = 4;
-}
-
-message Retry {
   string name = 1;
-  int32 retries = 2;
-  repeated int32 retryable_status_codes = 3;
-  string per_try_timeout = 4;
+  int32 permit_limit = 2;
+  int32 window = 3;
+  int32 queue_limit = 4;
 }

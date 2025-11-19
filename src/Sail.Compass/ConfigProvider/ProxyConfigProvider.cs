@@ -188,6 +188,18 @@ internal sealed class ProxyConfigProvider : IProxyConfigProvider, IDisposable
 
     private static RouteConfig ConvertRoute(Route route)
     {
+        var metadata = new Dictionary<string, string>();
+        
+        if (!string.IsNullOrEmpty(route.RateLimiterPolicy))
+        {
+            metadata["RateLimiterPolicy"] = route.RateLimiterPolicy;
+        }
+
+        if (route.HttpsRedirect)
+        {
+            metadata["HttpsRedirect"] = "true";
+        }
+
         return new RouteConfig
         {
             RouteId = route.RouteId,
@@ -213,11 +225,12 @@ internal sealed class ProxyConfigProvider : IProxyConfigProvider, IDisposable
                 }).ToArray()
             },
             AuthorizationPolicy = route.AuthorizationPolicy,
-            RateLimiterPolicy = route.RateLimiterPolicy,
+            RateLimiterPolicy = null,
             Timeout = TimeSpan.TryParse(route.Timeout, CultureInfo.InvariantCulture, out var timeout) ? timeout : null,
             TimeoutPolicy = route.TimeoutPolicy,
             CorsPolicy = route.CorsPolicy,
             MaxRequestBodySize = route.MaxRequestBodySize,
+            Metadata = metadata,
             Transforms = route.Transforms.Select(x => x.Properties.ToDictionary(kvp => kvp.Key, kvp => kvp.Value)).ToArray(),
             Order = route.Order
         };

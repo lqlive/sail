@@ -110,7 +110,8 @@ public class RouteGrpcService(SailContext dbContext, IRouteStore routeStore) : R
             AuthorizationPolicy = route.AuthorizationPolicy,
             MaxRequestBodySize = route.MaxRequestBodySize,
             Transforms = { route.Transforms?.Select(MapToRouteTransform) ?? [] },
-            RateLimiterPolicy = route.RateLimiterPolicy
+            RateLimiterPolicy = route.RateLimiterPolicy,
+            HttpsRedirect = route.HttpsRedirect
         };
     }
 

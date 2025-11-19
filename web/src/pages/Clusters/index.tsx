@@ -52,21 +52,24 @@ const Clusters: React.FC = () => {
 
   return (
     <div className="fade-in">
-      <div className="section-header">
-        <div className="flex items-center justify-between">
+      {/* Header */}
+      <div className="mb-8">
+        <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-xl font-medium text-gray-900">Clusters</h1>
-            <p className="text-sm text-gray-600">Manage backend server clusters</p>
+            <h1 className="text-2xl font-semibold text-gray-900">Clusters</h1>
+            <p className="mt-1 text-sm text-gray-500">Manage backend server clusters</p>
           </div>
-          <Link to="/clusters/new" className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-gray-900 hover:bg-gray-800">
+          <Link 
+            to="/clusters/new" 
+            className="inline-flex items-center px-4 py-2 bg-black text-white text-sm font-medium rounded-lg hover:bg-gray-800 transition-colors"
+          >
             <PlusIcon className="h-4 w-4 mr-2" />
             Create Cluster
           </Link>
         </div>
-      </div>
 
-      <div className="mb-6">
-        <div className="relative">
+        {/* Search Bar */}
+        <div className="relative max-w-md">
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
             <MagnifyingGlassIcon className="h-4 w-4 text-gray-400" />
           </div>
@@ -74,7 +77,7 @@ const Clusters: React.FC = () => {
             type="text"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-gray-900 focus:border-gray-900 sm:text-sm"
+            className="block w-full pl-10 pr-3 py-2 border border-gray-200 rounded-lg text-sm placeholder-gray-400 focus:outline-none focus:border-gray-400 focus:ring-1 focus:ring-gray-400 transition-colors"
             placeholder="Search clusters..."
           />
         </div>
@@ -99,57 +102,81 @@ const Clusters: React.FC = () => {
           </div>
         </div>
       ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
           {clusters.length === 0 ? (
-            <div className="col-span-2 text-center py-12 text-gray-500">
-              <ServerStackIcon className="h-12 w-12 mx-auto mb-4 text-gray-400" />
-              <p>No clusters yet</p>
+            <div className="col-span-full bg-white border border-gray-200 rounded-lg p-12 text-center">
+              <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <ServerStackIcon className="h-6 w-6 text-gray-400" />
+              </div>
+              <h3 className="text-sm font-medium text-gray-900 mb-1">No clusters yet</h3>
+              <p className="text-sm text-gray-500 mb-4">Get started by creating your first cluster</p>
               <Link
                 to="/clusters/new"
-                className="inline-block mt-4 text-sm text-gray-900 hover:underline"
+                className="inline-flex items-center px-4 py-2 bg-black text-white text-sm font-medium rounded-lg hover:bg-gray-800 transition-colors"
               >
-                Create your first cluster
+                <PlusIcon className="h-4 w-4 mr-2" />
+                Create Cluster
               </Link>
             </div>
           ) : (
           clusters.map((cluster) => {
+            const destinationCount = cluster.destinations?.length || 0;
             const healthyCount = cluster.destinations?.filter(d => d.health === 'healthy').length || 0;
             const healthCheckEnabled = !!(cluster.healthCheck?.active?.enabled || cluster.healthCheck?.passive?.enabled);
+            const isFullyHealthy = destinationCount > 0 && healthyCount === destinationCount;
           return (
             <Link
               key={cluster.id}
               to={`/clusters/${cluster.id}/edit`}
-              className="block bg-white border border-gray-200 rounded-lg p-4 hover:border-gray-300 transition-colors"
+              className="block bg-white border border-gray-200 rounded-lg p-5 hover:border-gray-300 hover:shadow-sm transition-all"
             >
-              <div className="flex items-center space-x-2 mb-3">
-                <ServerStackIcon className="h-5 w-5 text-purple-600" />
-                <h3 className="text-sm font-medium text-gray-900">{cluster.name}</h3>
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 bg-purple-50 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <ServerStackIcon className="h-5 w-5 text-purple-600" />
+                </div>
+                <h3 className="text-base font-medium text-gray-900 truncate">{cluster.name}</h3>
               </div>
               
-              <div className="space-y-2 text-xs">
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Load Balancing</span>
-                  <span className="font-medium">{cluster.loadBalancingPolicy || 'None'}</span>
+              <div className="space-y-3">
+                <div className="flex items-center justify-between py-2 border-b border-gray-100">
+                  <span className="text-sm text-gray-500">Load Balancing</span>
+                  <span className="text-sm font-medium text-gray-900">{cluster.loadBalancingPolicy || 'RoundRobin'}</span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Destinations</span>
-                  <span className="font-medium">{cluster.destinations?.length || 0}</span>
+                
+                <div className="flex items-center justify-between py-2 border-b border-gray-100">
+                  <span className="text-sm text-gray-500">Destinations</span>
+                  <span className="text-sm font-medium text-gray-900">{destinationCount}</span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Healthy</span>
-                  <span className={`font-medium ${healthyCount === (cluster.destinations?.length || 0) ? 'text-green-600' : 'text-yellow-600'}`}>
-                    {healthyCount}/{cluster.destinations?.length || 0}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Health Check</span>
-                  <span className="font-medium">
-                    {healthCheckEnabled ? (
-                      <CheckCircleIcon className="h-4 w-4 text-green-600 inline" />
-                    ) : (
-                      'Disabled'
+                
+                <div className="flex items-center justify-between py-2 border-b border-gray-100">
+                  <span className="text-sm text-gray-500">Healthy</span>
+                  <div className="flex items-center gap-2">
+                    <span className={`text-sm font-medium ${
+                      destinationCount === 0 ? 'text-gray-400' :
+                      isFullyHealthy ? 'text-green-600' : 
+                      healthyCount > 0 ? 'text-yellow-600' : 'text-red-600'
+                    }`}>
+                      {healthyCount}/{destinationCount}
+                    </span>
+                    {destinationCount > 0 && (
+                      <div className={`w-2 h-2 rounded-full ${
+                        isFullyHealthy ? 'bg-green-500' : 
+                        healthyCount > 0 ? 'bg-yellow-500' : 'bg-red-500'
+                      }`} />
                     )}
-                  </span>
+                  </div>
+                </div>
+                
+                <div className="flex items-center justify-between py-2">
+                  <span className="text-sm text-gray-500">Health Check</span>
+                  {healthCheckEnabled ? (
+                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-50 text-green-700 border border-green-100">
+                      <CheckCircleIcon className="h-3.5 w-3.5 mr-1" />
+                      Enabled
+                    </span>
+                  ) : (
+                    <span className="text-sm text-gray-400">Disabled</span>
+                  )}
                 </div>
               </div>
             </Link>
