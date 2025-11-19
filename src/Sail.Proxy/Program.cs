@@ -10,13 +10,13 @@ builder.WebHost.UseCertificateSelector();
 
 builder.Services.AddSailCore();
 builder.Services.AddServerCertificateSelector();
+builder.Services.AddReverseProxy()
+    .LoadFromMessages();
 builder.Services.AddDynamicCors();
 builder.Services.AddDynamicRateLimiter();
 builder.Services.AddCertificateUpdater();
 builder.Services.AddCorsPolicyUpdater();
 builder.Services.AddRateLimiterPolicyUpdater();
-builder.Services.AddReverseProxy()
-    .LoadFromMessages();
  
 builder.Services.AddConsul(o =>
 {
@@ -25,12 +25,13 @@ builder.Services.AddConsul(o =>
 
 var app = builder.Build();
 
+app.Services.UseCompassUpdaters();
+
 app.UseCors();
 
 app.MapReverseProxy(proxyPipeline =>
 {
     proxyPipeline.UseMiddleware<RateLimiterMiddleware>();
 });
-
 
 await app.RunAsync();

@@ -9,7 +9,6 @@ using Sail.Compass.RateLimiter;
 using Sail.Core.Options;
 using Yarp.ReverseProxy.Configuration;
 
-
 namespace Sail.Compass.Management;
 
 public static class ServiceCollectionExtensions
@@ -97,5 +96,12 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<RateLimiterPolicyUpdater>();
 
         return services;
+    }
+
+    public static void UseCompassUpdaters(this IServiceProvider serviceProvider)
+    {
+        _ = serviceProvider.GetRequiredService<ServerCertificateUpdater>();
+        _ = serviceProvider.GetRequiredService<CorsPolicyUpdater>();
+        _ = serviceProvider.GetRequiredService<RateLimiterPolicyUpdater>();
     }
 }

@@ -194,11 +194,7 @@ internal sealed class ProxyConfigProvider : IProxyConfigProvider, IDisposable
         {
             metadata["RateLimiterPolicy"] = route.RateLimiterPolicy;
         }
-        
-        if (!string.IsNullOrEmpty(route.CorsPolicy))
-        {
-            metadata["CorsPolicy"] = route.CorsPolicy;
-        }
+
 
         return new RouteConfig
         {
@@ -228,7 +224,7 @@ internal sealed class ProxyConfigProvider : IProxyConfigProvider, IDisposable
             RateLimiterPolicy = null,
             Timeout = TimeSpan.TryParse(route.Timeout, CultureInfo.InvariantCulture, out var timeout) ? timeout : null,
             TimeoutPolicy = route.TimeoutPolicy,
-            CorsPolicy = null,
+            CorsPolicy = route.CorsPolicy,
             MaxRequestBodySize = route.MaxRequestBodySize,
             Metadata = metadata,
             Transforms = route.Transforms.Select(x => x.Properties.ToDictionary(kvp => kvp.Key, kvp => kvp.Value)).ToArray(),

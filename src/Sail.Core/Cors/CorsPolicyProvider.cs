@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using Yarp.ReverseProxy.Model;
 
 namespace Sail.Core.Cors;
 
@@ -22,16 +21,6 @@ public class CorsPolicyProvider : ICorsPolicyProvider
     {
         if (string.IsNullOrEmpty(policyName))
         {
-            var reverseProxyFeature = context.Features.Get<IReverseProxyFeature>();
-            if (reverseProxyFeature?.Route.Config.Metadata?.TryGetValue("CorsPolicy", out var metadataPolicyName) == true)
-            {
-                policyName = metadataPolicyName;
-                _logger.LogDebug("Using CORS policy from route metadata: {PolicyName}", policyName);
-            }
-        }
-
-        if (string.IsNullOrEmpty(policyName))
-        {
             return Task.FromResult<CorsPolicy?>(null);
         }
 
@@ -48,7 +37,7 @@ public class CorsPolicyProvider : ICorsPolicyProvider
     public Task UpdateAsync(IReadOnlyList<CorsPolicyConfig> configs, CancellationToken cancellationToken)
     {
         var newPolicies = new Dictionary<string, CorsPolicy>(StringComparer.OrdinalIgnoreCase);
-
+         
         foreach (var config in configs)
         {
             try

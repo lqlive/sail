@@ -18,8 +18,8 @@ public static class SailServiceCollectionExtensions
     public static IServiceCollection AddDynamicCors(this IServiceCollection services)
     {
         services.AddCors();
-        services.TryAddSingleton<CorsPolicyProvider>();
-        services.TryAddSingleton<ICorsPolicyProvider>(sp => sp.GetRequiredService<CorsPolicyProvider>());
+        services.AddSingleton<CorsPolicyProvider>();
+        services.AddSingleton<ICorsPolicyProvider>(sp => sp.GetRequiredService<CorsPolicyProvider>());
         return services;
     }
 
@@ -28,13 +28,5 @@ public static class SailServiceCollectionExtensions
         services.TryAddSingleton<RateLimiterPolicyProvider>();
         services.TryAddSingleton<IRateLimiterPolicyProvider>(sp => sp.GetRequiredService<RateLimiterPolicyProvider>());
         return services;
-    }
-}
-
-public static class SailApplicationBuilderExtensions
-{
-    public static IApplicationBuilder UseDynamicRateLimiter(this IApplicationBuilder app)
-    {
-        return app.UseMiddleware<RateLimiterMiddleware>();
     }
 }
