@@ -21,6 +21,7 @@ const RouteEdit: React.FC = () => {
     authorizationPolicy: '',
     rateLimiterPolicy: '',
     corsPolicy: '',
+    timeoutPolicy: '',
     timeout: '',
     maxRequestBodySize: '',
     httpsRedirect: false,
@@ -73,6 +74,7 @@ const RouteEdit: React.FC = () => {
         authorizationPolicy: route.authorizationPolicy || '',
         rateLimiterPolicy: route.rateLimiterPolicy || '',
         corsPolicy: route.corsPolicy || '',
+        timeoutPolicy: route.timeoutPolicy || '',
         timeout: route.timeout || '',
         maxRequestBodySize: route.maxRequestBodySize?.toString() || '',
         httpsRedirect: route.httpsRedirect || false,
@@ -101,6 +103,7 @@ const RouteEdit: React.FC = () => {
         authorizationPolicy: formData.authorizationPolicy || undefined,
         rateLimiterPolicy: formData.rateLimiterPolicy || undefined,
         corsPolicy: formData.corsPolicy || undefined,
+        timeoutPolicy: formData.timeoutPolicy || undefined,
         timeout: formData.timeout || undefined,
         httpsRedirect: formData.httpsRedirect,
         transforms: formData.transforms.length > 0 ? formData.transforms : undefined,
@@ -495,6 +498,19 @@ const RouteEdit: React.FC = () => {
                   value={formData.corsPolicy}
                   onChange={(e) => setFormData({ ...formData, corsPolicy: e.target.value })}
                   placeholder="e.g., allow-all, strict"
+                  className="block w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-gray-400 focus:ring-1 focus:ring-gray-400 transition-colors"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Timeout Policy
+                </label>
+                <input
+                  type="text"
+                  value={formData.timeoutPolicy}
+                  onChange={(e) => setFormData({ ...formData, timeoutPolicy: e.target.value })}
+                  placeholder="e.g., default-timeout"
                   className="block w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-gray-400 focus:ring-1 focus:ring-gray-400 transition-colors"
                 />
               </div>

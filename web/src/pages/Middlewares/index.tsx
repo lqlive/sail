@@ -66,7 +66,7 @@ const Middlewares: React.FC = () => {
         <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className="text-2xl font-semibold text-gray-900">Middlewares</h1>
-            <p className="mt-1 text-sm text-gray-500">Configure rate limiting and CORS policies</p>
+            <p className="mt-1 text-sm text-gray-500">Configure rate limiting, CORS, and timeout policies</p>
           </div>
           <Link 
             to="/middlewares/new" 
@@ -124,6 +124,17 @@ const Middlewares: React.FC = () => {
               <BoltIcon className="h-4 w-4 mr-1.5" />
               Rate Limiter
             </button>
+            <button
+              onClick={() => setFilterType('Timeout')}
+              className={`inline-flex items-center px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
+                filterType === 'Timeout'
+                  ? 'bg-orange-600 text-white'
+                  : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50'
+              }`}
+            >
+              <ClockIcon className="h-4 w-4 mr-1.5" />
+              Timeout
+            </button>
           </div>
         </div>
 
@@ -174,12 +185,15 @@ const Middlewares: React.FC = () => {
             >
               <div className="flex items-center gap-3 mb-4">
                 <div className={`w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 ${
-                  middleware.type === 'Cors' ? 'bg-blue-50' : 'bg-indigo-50'
+                  middleware.type === 'Cors' ? 'bg-blue-50' : 
+                  middleware.type === 'RateLimiter' ? 'bg-indigo-50' : 'bg-orange-50'
                 }`}>
                   {middleware.type === 'Cors' ? (
                     <ShieldCheckIcon className="h-5 w-5 text-blue-600" />
-                  ) : (
+                  ) : middleware.type === 'RateLimiter' ? (
                     <BoltIcon className="h-5 w-5 text-indigo-600" />
+                  ) : (
+                    <ClockIcon className="h-5 w-5 text-orange-600" />
                   )}
                 </div>
                 <div className="flex-1 min-w-0">
@@ -188,9 +202,11 @@ const Middlewares: React.FC = () => {
                     <span className={`inline-flex items-center px-2 py-0.5 text-xs font-medium rounded ${
                       middleware.type === 'Cors'
                         ? 'bg-blue-50 text-blue-700'
-                        : 'bg-indigo-50 text-indigo-700'
+                        : middleware.type === 'RateLimiter'
+                          ? 'bg-indigo-50 text-indigo-700'
+                          : 'bg-orange-50 text-orange-700'
                     }`}>
-                      {middleware.type === 'Cors' ? 'CORS' : 'Rate Limiter'}
+                      {middleware.type === 'Cors' ? 'CORS' : middleware.type === 'RateLimiter' ? 'Rate Limiter' : 'Timeout'}
                     </span>
                     {middleware.enabled ? (
                       <span className="text-xs text-green-600 font-medium">● Enabled</span>
@@ -219,14 +235,24 @@ const Middlewares: React.FC = () => {
                 {middleware.rateLimiter && (
                   <div className="flex items-center justify-between py-2 border-b border-gray-100">
                     <div className="flex items-center gap-2">
-                      <ClockIcon className="h-4 w-4 text-gray-400" />
+                      <BoltIcon className="h-4 w-4 text-gray-400" />
                       <span className="text-sm text-gray-600">Rate Limiter</span>
                     </div>
                     <span className="text-sm font-medium text-gray-900">{middleware.rateLimiter.permitLimit}/s</span>
                   </div>
                 )}
 
-                {!middleware.cors && !middleware.rateLimiter && (
+                {middleware.timeout && (
+                  <div className="flex items-center justify-between py-2 border-b border-gray-100">
+                    <div className="flex items-center gap-2">
+                      <ClockIcon className="h-4 w-4 text-gray-400" />
+                      <span className="text-sm text-gray-600">Timeout</span>
+                    </div>
+                    <span className="text-sm font-medium text-gray-900">{middleware.timeout.seconds}s</span>
+                  </div>
+                )}
+
+                {!middleware.cors && !middleware.rateLimiter && !middleware.timeout && (
                   <div className="text-sm text-gray-400 py-2">No policies configured</div>
                 )}
               </div>
@@ -239,4 +265,3 @@ const Middlewares: React.FC = () => {
 };
 
 export default Middlewares;
-

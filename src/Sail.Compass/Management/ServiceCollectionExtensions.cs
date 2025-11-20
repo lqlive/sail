@@ -7,6 +7,7 @@ using Sail.Compass.ConfigProvider;
 using Sail.Compass.Cors;
 using Sail.Compass.Observers;
 using Sail.Compass.RateLimiter;
+using Sail.Compass.Timeout;
 using Sail.Core.Options;
 using Yarp.ReverseProxy.Configuration;
 
@@ -119,11 +120,26 @@ public static class ServiceCollectionExtensions
         return services;
     }
 
+    public static IServiceCollection AddTimeoutPolicyUpdater(
+        this IServiceCollection services)
+    {
+        services.AddSingleton(sp =>
+        {
+            var middlewareObserver = sp.GetRequiredService<ResourceObserver<Middleware>>();
+            return TimeoutPolicyStreamBuilder.BuildTimeoutPolicyStream(middlewareObserver);
+        });
+
+        services.AddSingleton<TimeoutPolicyUpdater>();
+
+        return services;
+    }
+
     public static void UseCompassUpdaters(this IServiceProvider serviceProvider)
     {
         _ = serviceProvider.GetRequiredService<ServerCertificateUpdater>();
         _ = serviceProvider.GetRequiredService<CorsPolicyUpdater>();
         _ = serviceProvider.GetRequiredService<RateLimiterPolicyUpdater>();
         _ = serviceProvider.GetRequiredService<AuthenticationPolicyUpdater>();
+        _ = serviceProvider.GetRequiredService<TimeoutPolicyUpdater>();
     }
 }

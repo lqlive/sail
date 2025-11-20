@@ -10,6 +10,7 @@ export interface Route {
   authorizationPolicy?: string;
   rateLimiterPolicy?: string;
   corsPolicy?: string;
+  timeoutPolicy?: string;
   timeout?: string;
   maxRequestBodySize?: number;
   httpsRedirect?: boolean;
@@ -108,7 +109,7 @@ export interface Certificate {
   updatedAt: string;
 }
 
-export type MiddlewareType = 'Cors' | 'RateLimiter';
+export type MiddlewareType = 'Cors' | 'RateLimiter' | 'Timeout';
 
 export interface Middleware {
   id: string;
@@ -118,6 +119,7 @@ export interface Middleware {
   enabled: boolean;
   cors?: CorsConfig;
   rateLimiter?: RateLimiterConfig;
+  timeout?: TimeoutConfig;
   createdAt: string;
   updatedAt: string;
 }
@@ -137,6 +139,12 @@ export interface RateLimiterConfig {
   permitLimit: number;
   window: number;
   queueLimit: number;
+}
+
+export interface TimeoutConfig {
+  name: string;
+  seconds: number;
+  timeoutStatusCode?: number;
 }
 
 export interface GatewayStats {
@@ -193,4 +201,3 @@ export interface OpenIdConnectConfig {
   scope?: string[];
   clockSkew?: number;
 }
-

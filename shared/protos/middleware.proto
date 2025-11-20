@@ -27,11 +27,13 @@ message Middleware {
   bool enabled = 5;
   Cors cors = 6;
   RateLimiter rate_limiter = 7;
+  Timeout timeout = 8;
 }
 
 enum MiddlewareType {
   CORS = 0;
   RATE_LIMITER = 1;
+  TIMEOUT = 2;
 }
 
 message Cors {
@@ -49,4 +51,10 @@ message RateLimiter {
   int32 permit_limit = 2;
   int32 window = 3;
   int32 queue_limit = 4;
+}
+
+message Timeout {
+  string name = 1;
+  int32 seconds = 2;
+  google.protobuf.Int32Value timeout_status_code = 3;
 }
