@@ -5,6 +5,7 @@ using Sail.Core.Https;
 using Sail.Core.Authentication;
 using Sail.Core.Authentication.JwtBearer;
 using Sail.Core.Authentication.OpenIdConnect;
+using Sail.Core.Timeout;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Cors.Infrastructure;
@@ -62,6 +63,13 @@ public static class SailServiceCollectionExtensions
         
         services.AddSingleton<JwtBearerAuthenticationOptionsProvider>();
         services.AddSingleton<OpenIdConnectAuthenticationOptionsProvider>();
+        return services;
+    }
+
+    public static IServiceCollection AddDynamicTimeout(this IServiceCollection services)
+    {
+        services.AddRequestTimeouts();
+        services.AddSingleton<TimeoutPolicyProvider>();
         return services;
     }
 }

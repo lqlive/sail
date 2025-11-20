@@ -21,6 +21,11 @@ export interface CreateMiddlewareRequest {
     window: number;
     queueLimit: number;
   };
+  timeout?: {
+    name: string;
+    seconds: number;
+    timeoutStatusCode?: number;
+  };
 }
 
 export const MiddlewareService = {
@@ -68,4 +73,3 @@ export const MiddlewareService = {
     await apiClient.delete(`/api/middlewares/${id}?${queryParams.toString()}`);
   },
 };
-

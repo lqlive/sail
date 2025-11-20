@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Sail.Compass.Management;
 using Sail.Core.Management;
 using Sail.Core.RateLimiter;
+using Sail.Core.Timeout;
 using Sail.Core.Https;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -16,6 +17,7 @@ builder.Services.AddReverseProxy()
 builder.Services.AddDynamicCors();
 builder.Services.AddDynamicRateLimiter();
 builder.Services.AddDynamicAuthentication();
+builder.Services.AddDynamicTimeout();
 builder.Services.AddRouteHttpsRedirection(options =>
 {
     options.HttpsPort = 443;
@@ -25,6 +27,7 @@ builder.Services.AddCertificateUpdater();
 builder.Services.AddCorsPolicyUpdater();
 builder.Services.AddRateLimiterPolicyUpdater();
 builder.Services.AddAuthenticationPolicyUpdater();
+builder.Services.AddTimeoutPolicyUpdater();
  
 builder.Services.AddConsul(o =>
 {
@@ -38,6 +41,7 @@ app.Services.UseCompassUpdaters();
 app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseRequestTimeouts();
 
 app.MapReverseProxy(proxyPipeline =>
 {

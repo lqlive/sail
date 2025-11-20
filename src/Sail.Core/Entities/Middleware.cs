@@ -3,7 +3,8 @@
 public enum MiddlewareType
 {
     Cors,
-    RateLimiter
+    RateLimiter,
+    Timeout
 }
 
 public class Middleware
@@ -15,6 +16,7 @@ public class Middleware
     public bool Enabled { get; init; } = true;
     public Cors? Cors { get; init; }
     public RateLimiter? RateLimiter { get; init; }
+    public Timeout? Timeout { get; init; }
     public DateTimeOffset CreatedAt { get; init; } = DateTimeOffset.UtcNow;
     public DateTimeOffset UpdatedAt { get; init; } = DateTimeOffset.UtcNow;
 }
@@ -36,4 +38,11 @@ public class RateLimiter
     public int PermitLimit { get; init; }
     public int Window { get; init; }
     public int QueueLimit { get; init; }
+}
+
+public class Timeout
+{
+    public required string Name { get; init; }
+    public int Seconds { get; init; }
+    public int? TimeoutStatusCode { get; init; }
 }

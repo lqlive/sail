@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { ChevronLeftIcon, CheckIcon, PlusIcon, XMarkIcon, ShieldCheckIcon, BoltIcon } from '@heroicons/react/24/outline';
+import { ChevronLeftIcon, CheckIcon, PlusIcon, XMarkIcon, ShieldCheckIcon, BoltIcon, ClockIcon } from '@heroicons/react/24/outline';
 import type { MiddlewareType } from '../../types/gateway';
 import { MiddlewareService } from '../../services/middlewareService';
 
@@ -25,6 +25,9 @@ const MiddlewareEdit: React.FC = () => {
     rateLimiterPermitLimit: '',
     rateLimiterWindow: '',
     rateLimiterQueueLimit: '',
+    timeoutName: '',
+    timeoutSeconds: '',
+    timeoutStatusCode: '',
   });
 
   const [originInput, setOriginInput] = useState('');
@@ -63,6 +66,9 @@ const MiddlewareEdit: React.FC = () => {
         rateLimiterPermitLimit: middleware.rateLimiter?.permitLimit.toString() || '',
         rateLimiterWindow: middleware.rateLimiter?.window.toString() || '',
         rateLimiterQueueLimit: middleware.rateLimiter?.queueLimit.toString() || '',
+        timeoutName: middleware.timeout?.name || '',
+        timeoutSeconds: middleware.timeout?.seconds.toString() || '',
+        timeoutStatusCode: middleware.timeout?.timeoutStatusCode?.toString() || '',
       });
     } catch (err) {
       console.error('Failed to load middleware:', err);
@@ -103,6 +109,11 @@ const MiddlewareEdit: React.FC = () => {
           permitLimit: parseInt(formData.rateLimiterPermitLimit) || 0,
           window: parseInt(formData.rateLimiterWindow) || 0,
           queueLimit: parseInt(formData.rateLimiterQueueLimit) || 0,
+        } : undefined,
+        timeout: formData.type === 'Timeout' ? {
+          name: formData.timeoutName,
+          seconds: parseInt(formData.timeoutSeconds) || 0,
+          timeoutStatusCode: formData.timeoutStatusCode ? parseInt(formData.timeoutStatusCode) : undefined,
         } : undefined,
       };
 
@@ -185,7 +196,7 @@ const MiddlewareEdit: React.FC = () => {
           {isEdit ? 'Edit Middleware' : 'Create Middleware'}
         </h1>
         <p className="mt-1 text-sm text-gray-500">
-          Configure rate limiting and CORS policies
+          Configure rate limiting, CORS, and timeout policies
         </p>
       </div>
 
@@ -231,7 +242,7 @@ const MiddlewareEdit: React.FC = () => {
                 Type <span className="text-red-500">*</span>
               </label>
               {!isEdit ? (
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-3 gap-3">
                   <button
                     type="button"
                     onClick={() => setFormData({ ...formData, type: 'Cors' })}
@@ -262,6 +273,21 @@ const MiddlewareEdit: React.FC = () => {
                     <div className="text-sm font-medium text-gray-900">Rate Limiter</div>
                     <div className="text-xs text-gray-500 mt-1">Request rate limiting</div>
                   </button>
+                  <button
+                    type="button"
+                    onClick={() => setFormData({ ...formData, type: 'Timeout' })}
+                    className={`p-4 border-2 rounded-lg transition-all ${
+                      formData.type === 'Timeout'
+                        ? 'border-orange-500 bg-orange-50'
+                        : 'border-gray-200 hover:border-gray-300'
+                    }`}
+                  >
+                    <ClockIcon className={`h-6 w-6 mx-auto mb-2 ${
+                      formData.type === 'Timeout' ? 'text-orange-600' : 'text-gray-400'
+                    }`} />
+                    <div className="text-sm font-medium text-gray-900">Timeout</div>
+                    <div className="text-xs text-gray-500 mt-1">Request timeout policy</div>
+                  </button>
                 </div>
               ) : (
                 <div className="flex items-center gap-2 px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg">
@@ -270,10 +296,15 @@ const MiddlewareEdit: React.FC = () => {
                       <ShieldCheckIcon className="h-5 w-5 text-blue-600" />
                       <span className="text-sm font-medium text-gray-900">CORS</span>
                     </>
-                  ) : (
+                  ) : formData.type === 'RateLimiter' ? (
                     <>
                       <BoltIcon className="h-5 w-5 text-indigo-600" />
                       <span className="text-sm font-medium text-gray-900">Rate Limiter</span>
+                    </>
+                  ) : (
+                    <>
+                      <ClockIcon className="h-5 w-5 text-orange-600" />
+                      <span className="text-sm font-medium text-gray-900">Timeout</span>
                     </>
                   )}
                   <span className="text-xs text-gray-500 ml-auto">Cannot change type when editing</span>
@@ -583,6 +614,57 @@ const MiddlewareEdit: React.FC = () => {
           </div>
         )}
 
+        {formData.type === 'Timeout' && (
+          <div className="bg-white rounded-lg border border-gray-200 p-6">
+            <h2 className="text-base font-semibold text-gray-900 mb-6">Timeout Configuration</h2>
+            <div className="space-y-5">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Policy Name <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={formData.timeoutName}
+                  onChange={(e) => setFormData({ ...formData, timeoutName: e.target.value })}
+                  placeholder="e.g., default"
+                  className="block w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-gray-400 focus:ring-1 focus:ring-gray-400 transition-colors"
+                  required={formData.type === 'Timeout'}
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Timeout (seconds) <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="number"
+                    value={formData.timeoutSeconds}
+                    onChange={(e) => setFormData({ ...formData, timeoutSeconds: e.target.value })}
+                    placeholder="30"
+                    className="block w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-gray-400 focus:ring-1 focus:ring-gray-400 transition-colors"
+                    required={formData.type === 'Timeout'}
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Status Code
+                  </label>
+                  <input
+                    type="number"
+                    value={formData.timeoutStatusCode}
+                    onChange={(e) => setFormData({ ...formData, timeoutStatusCode: e.target.value })}
+                    placeholder="504"
+                    className="block w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-gray-400 focus:ring-1 focus:ring-gray-400 transition-colors"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">Default is 504 (Gateway Timeout)</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         <div className="flex justify-end gap-3 pt-2">
           <Link
             to="/middlewares"
@@ -614,4 +696,3 @@ const MiddlewareEdit: React.FC = () => {
 };
 
 export default MiddlewareEdit;
-
