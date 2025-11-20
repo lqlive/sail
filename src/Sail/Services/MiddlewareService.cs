@@ -2,6 +2,7 @@ using ErrorOr;
 using Sail.Core.Entities;
 using Sail.Core.Stores;
 using Sail.Models.Middlewares;
+using TimeoutEntity = Sail.Core.Entities.Timeout;
 
 namespace Sail.Services;
 
@@ -39,9 +40,15 @@ public class MiddlewareService(IMiddlewareStore store)
             return Error.Validation(description: "RateLimiter configuration is required for RateLimiter middleware");
         }
 
+        if (request.Type == MiddlewareType.Timeout && request.Timeout == null)
+        {
+            return Error.Validation(description: "Timeout configuration is required for Timeout middleware");
+        }
+
         var configCount = 0;
         if (request.Cors != null) configCount++;
         if (request.RateLimiter != null) configCount++;
+        if (request.Timeout != null) configCount++;
 
         if (configCount > 1)
         {
@@ -72,6 +79,12 @@ public class MiddlewareService(IMiddlewareStore store)
                 Window = request.RateLimiter.Window,
                 QueueLimit = request.RateLimiter.QueueLimit
             } : null,
+            Timeout = request.Timeout != null ? new TimeoutEntity
+            {
+                Name = request.Timeout.Name,
+                Seconds = request.Timeout.Seconds,
+                TimeoutStatusCode = request.Timeout.TimeoutStatusCode
+            } : null,
             CreatedAt = DateTimeOffset.UtcNow,
             UpdatedAt = DateTimeOffset.UtcNow
         };
@@ -98,9 +111,15 @@ public class MiddlewareService(IMiddlewareStore store)
             return Error.Validation(description: "RateLimiter configuration is required for RateLimiter middleware");
         }
 
+        if (request.Type == MiddlewareType.Timeout && request.Timeout == null)
+        {
+            return Error.Validation(description: "Timeout configuration is required for Timeout middleware");
+        }
+
         var configCount = 0;
         if (request.Cors != null) configCount++;
         if (request.RateLimiter != null) configCount++;
+        if (request.Timeout != null) configCount++;
 
         if (configCount > 1)
         {
@@ -130,6 +149,12 @@ public class MiddlewareService(IMiddlewareStore store)
                 PermitLimit = request.RateLimiter.PermitLimit,
                 Window = request.RateLimiter.Window,
                 QueueLimit = request.RateLimiter.QueueLimit
+            } : null,
+            Timeout = request.Timeout != null ? new TimeoutEntity
+            {
+                Name = request.Timeout.Name,
+                Seconds = request.Timeout.Seconds,
+                TimeoutStatusCode = request.Timeout.TimeoutStatusCode
             } : null,
             CreatedAt = existing.CreatedAt,
             UpdatedAt = DateTimeOffset.UtcNow
@@ -176,6 +201,12 @@ public class MiddlewareService(IMiddlewareStore store)
                 PermitLimit = middleware.RateLimiter.PermitLimit,
                 Window = middleware.RateLimiter.Window,
                 QueueLimit = middleware.RateLimiter.QueueLimit
+            } : null,
+            Timeout = middleware.Timeout != null ? new TimeoutResponse
+            {
+                Name = middleware.Timeout.Name,
+                Seconds = middleware.Timeout.Seconds,
+                TimeoutStatusCode = middleware.Timeout.TimeoutStatusCode
             } : null,
             CreatedAt = middleware.CreatedAt,
             UpdatedAt = middleware.UpdatedAt

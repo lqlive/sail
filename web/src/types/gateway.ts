@@ -10,6 +10,7 @@ export interface Route {
   authorizationPolicy?: string;
   rateLimiterPolicy?: string;
   corsPolicy?: string;
+  timeoutPolicy?: string;
   timeout?: string;
   maxRequestBodySize?: number;
   httpsRedirect?: boolean;

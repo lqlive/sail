@@ -10,6 +10,7 @@ public record MiddlewareRequest
     public bool Enabled { get; init; } = true;
     public CorsRequest? Cors { get; init; }
     public RateLimiterRequest? RateLimiter { get; init; }
+    public TimeoutRequest? Timeout { get; init; }
 }
 
 public record CorsRequest
@@ -29,5 +30,12 @@ public record RateLimiterRequest
     public int PermitLimit { get; init; }
     public int Window { get; init; }
     public int QueueLimit { get; init; }
+}
+
+public record TimeoutRequest
+{
+    public required string Name { get; init; }
+    public int Seconds { get; init; }
+    public int? TimeoutStatusCode { get; init; }
 }
 
