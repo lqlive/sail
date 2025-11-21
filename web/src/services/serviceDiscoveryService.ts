@@ -63,4 +63,3 @@ export const ServiceDiscoveryService = {
     await apiClient.delete(`/api/service-discoveries/${id}?${queryParams.toString()}`);
   },
 };
-
