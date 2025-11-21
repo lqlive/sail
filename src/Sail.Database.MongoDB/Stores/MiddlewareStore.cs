@@ -2,7 +2,7 @@ using Sail.Core.Entities;
 using Sail.Core.Stores;
 using MongoDB.Driver;
 
-namespace Sail.Storage.MongoDB.Stores;
+namespace Sail.Database.MongoDB.Stores;
 
 public class MiddlewareStore(SailContext context) : IMiddlewareStore
 {

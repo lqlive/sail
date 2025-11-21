@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
     <PropertyGroup>
         <TargetFramework>net9.0</TargetFramework>
@@ -8,14 +8,15 @@
     
     <ItemGroup>
         <PackageReference Include="ErrorOr" />
-        <PackageReference Include="Asp.Versioning.Http"/>
+        <PackageReference Include="Asp.Versioning.Http" />
         <PackageReference Include="Grpc.AspNetCore" />
     </ItemGroup>
     
     <ItemGroup>
         <ProjectReference Include="..\..\shared\ServiceDefaults\ServiceDefaults.csproj" />
         <ProjectReference Include="..\Sail.Compass\Sail.Compass.csproj" />
-        <ProjectReference Include="..\Sail.Storage.MongoDB\Sail.Storage.MongoDB.csproj" />
+        <ProjectReference Include="..\Sail.Database.MongoDB\Sail.Database.MongoDB.csproj" />
+        <ProjectReference Include="..\Sail.Storage.MongoDB\Sail.Database.MongoDB.csproj" />
     </ItemGroup>
 
     <ItemGroup>

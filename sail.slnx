@@ -15,10 +15,10 @@
     <File Path="Directory.Build.targets" />
   </Folder>
   <Folder Name="/src/">
+    <Project Path="src/Sail.Database.MongoDB/Sail.Database.MongoDB.csproj" />
     <Project Path="src\Sail.Compass\Sail.Compass.csproj" />
     <Project Path="src\Sail.Core\Sail.Core.csproj" />
     <Project Path="src\Sail.Proxy\Sail.Proxy.csproj" />
-    <Project Path="src\Sail.Storage.MongoDB\Sail.Storage.MongoDB.csproj" />
     <Project Path="src\Sail\Sail.csproj" />
   </Folder>
   <Folder Name="/tests/">

@@ -6,7 +6,7 @@ using MongoDB.Driver;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Serializers;
 
-namespace Sail.Storage.MongoDB;
+namespace Sail.Database.MongoDB;
 
 public class SailContext
 {

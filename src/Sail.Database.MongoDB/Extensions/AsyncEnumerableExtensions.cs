@@ -1,7 +1,7 @@
 using System.Runtime.CompilerServices;
 using MongoDB.Driver;
 
-namespace Sail.Storage.MongoDB.Extensions;
+namespace Sail.Database.MongoDB.Extensions;
 
 public static class AsyncEnumerableExtensions
 {

@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Http;
 using Sail.Compass.Management;
 using Sail.Core.Management;
 using Sail.Core.RateLimiter;
-using Sail.Core.Timeout;
 using Sail.Core.Https;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,7 +12,8 @@ builder.WebHost.UseCertificateSelector();
 builder.Services.AddSailCore();
 builder.Services.AddServerCertificateSelector();
 builder.Services.AddReverseProxy()
-    .LoadFromMessages();
+    .LoadFromMessages()
+    .AddServiceDiscoveryDestinationResolver();
 builder.Services.AddSailCors();
 builder.Services.AddSailRateLimiter();
 builder.Services.AddSailAuthentication();

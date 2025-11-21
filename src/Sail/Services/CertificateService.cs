@@ -1,6 +1,6 @@
 using ErrorOr;
 using Sail.Core.Entities;
-using Sail.Storage.MongoDB;
+using Sail.Database.MongoDB;
 using MongoDB.Driver;
 using Sail.Models.Certificates;
 

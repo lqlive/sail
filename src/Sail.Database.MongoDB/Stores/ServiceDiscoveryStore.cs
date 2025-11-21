@@ -3,7 +3,7 @@ using MongoDB.Driver;
 using Sail.Core.Entities;
 using Sail.Core.Stores;
 
-namespace Sail.Storage.MongoDB.Stores;
+namespace Sail.Database.MongoDB.Stores;
 
 public class ServiceDiscoveryStore(SailContext context) : IServiceDiscoveryStore
 {

@@ -2,7 +2,7 @@ using MongoDB.Driver;
 using Sail.Core.Entities;
 using Sail.Core.Stores;
 
-namespace Sail.Storage.MongoDB.Stores;
+namespace Sail.Database.MongoDB.Stores;
 
 public class CertificateStore(SailContext context) : ICertificateStore
 {
