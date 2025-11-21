@@ -83,20 +83,20 @@ const Routes: React.FC = () => {
         <div className="flex items-center gap-3">
           <div className="relative flex-1 max-w-md">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <MagnifyingGlassIcon className="h-4 w-4 text-gray-400" />
+              <MagnifyingGlassIcon className="h-5 w-5 text-gray-400" />
             </div>
             <input
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="block w-full pl-10 pr-3 py-2 border border-gray-200 rounded-lg text-sm placeholder-gray-400 focus:outline-none focus:border-gray-400 focus:ring-1 focus:ring-gray-400 transition-colors"
+              className="block w-full pl-10 pr-3 py-2.5 border border-gray-200 rounded-lg text-sm placeholder-gray-400 focus:outline-none focus:border-gray-400 focus:ring-1 focus:ring-gray-400 transition-colors"
               placeholder="Search routes by name or path..."
             />
           </div>
           <select
             value={filterStatus}
             onChange={(e) => setFilterStatus(e.target.value as 'all' | 'active' | 'inactive')}
-            className="px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:border-gray-400 focus:ring-1 focus:ring-gray-400 bg-white transition-colors"
+            className="px-3 py-2.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:border-gray-400 focus:ring-1 focus:ring-gray-400 bg-white transition-colors"
           >
             <option value="all">All status</option>
             <option value="active">Active</option>
@@ -107,46 +107,43 @@ const Routes: React.FC = () => {
       </div>
 
       {error ? (
-        <div className="text-center py-12">
-          <div className="mx-auto h-12 w-12 text-red-400 mb-4">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+        <div className="bg-white border border-gray-200 rounded-lg p-12 text-center">
+          <div className="w-12 h-12 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg className="h-6 w-6 text-red-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
             </svg>
           </div>
-          <h3 className="mt-2 text-sm font-medium text-gray-900">Failed to load routes</h3>
-          <p className="mt-1 text-sm text-gray-500">Please check your connection and try again.</p>
-          <div className="mt-6">
-            <button
-              onClick={loadRoutes}
-              className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md shadow-sm text-gray-700 bg-white hover:bg-gray-50"
-            >
-              Try Again
-            </button>
+          <h3 className="text-sm font-medium text-gray-900 mb-1">Failed to load routes</h3>
+          <p className="text-sm text-gray-500 mb-4">Please check your connection and try again</p>
+          <button
+            onClick={loadRoutes}
+            className="inline-flex items-center px-4 py-2 bg-white border border-gray-200 text-sm font-medium rounded-lg hover:bg-gray-50 transition-colors"
+          >
+            Try Again
+          </button>
+        </div>
+      ) : routes.length === 0 ? (
+        <div className="bg-white border border-gray-200 rounded-lg p-12 text-center">
+          <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <PlusIcon className="h-6 w-6 text-gray-400" />
           </div>
+          <h3 className="text-sm font-medium text-gray-900 mb-1">No routes yet</h3>
+          <p className="text-sm text-gray-500 mb-4">Get started by creating your first route</p>
+          <Link
+            to="/routes/new"
+            className="inline-flex items-center px-4 py-2 bg-black text-white text-sm font-medium rounded-lg hover:bg-gray-800 transition-colors"
+          >
+            <PlusIcon className="h-4 w-4 mr-2" />
+            Create Route
+          </Link>
+        </div>
+      ) : filteredRoutes.length === 0 ? (
+        <div className="bg-white border border-gray-200 rounded-lg p-12 text-center">
+          <p className="text-sm text-gray-500">No routes match your search</p>
         </div>
       ) : (
         <div className="space-y-3">
-          {routes.length === 0 ? (
-            <div className="bg-white border border-gray-200 rounded-lg p-12 text-center">
-              <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <PlusIcon className="h-6 w-6 text-gray-400" />
-              </div>
-              <h3 className="text-sm font-medium text-gray-900 mb-1">No routes yet</h3>
-              <p className="text-sm text-gray-500 mb-4">Get started by creating your first route</p>
-              <Link
-                to="/routes/new"
-                className="inline-flex items-center px-4 py-2 bg-black text-white text-sm font-medium rounded-lg hover:bg-gray-800 transition-colors"
-              >
-                <PlusIcon className="h-4 w-4 mr-2" />
-                Create Route
-              </Link>
-            </div>
-          ) : filteredRoutes.length === 0 ? (
-            <div className="bg-white border border-gray-200 rounded-lg p-12 text-center">
-              <p className="text-sm text-gray-500">No routes match your search</p>
-            </div>
-          ) : (
-          filteredRoutes.map((route) => {
+          {filteredRoutes.map((route) => {
             const path = route.match?.path || route.path || '';
             const methods = route.match?.methods || route.methods || [];
             const hosts = route.match?.hosts || route.hosts || [];
@@ -195,7 +192,7 @@ const Routes: React.FC = () => {
               </Link>
             );
           })
-          )}
+          }
         </div>
       )}
     </div>

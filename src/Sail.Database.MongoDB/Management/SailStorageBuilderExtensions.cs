@@ -1,9 +1,9 @@
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Sail.Core;
 using Sail.Core.Stores;
-using Sail.Storage.MongoDB.Stores;
+using Sail.Database.MongoDB.Stores;
 
-namespace Sail.Storage.MongoDB.Management;
+namespace Sail.Database.MongoDB.Management;
 
 public static class SailStorageBuilderExtensions
 {

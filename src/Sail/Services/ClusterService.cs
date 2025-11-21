@@ -2,7 +2,7 @@ using ErrorOr;
 using Sail.Core.Entities;
 using MongoDB.Driver;
 using Sail.Models.Clusters;
-using Sail.Storage.MongoDB;
+using Sail.Database.MongoDB;
 
 namespace Sail.Services;
 public class ClusterService(SailContext context)

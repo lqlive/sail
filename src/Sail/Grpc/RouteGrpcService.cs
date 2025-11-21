@@ -3,8 +3,8 @@ using Grpc.Core;
 using MongoDB.Driver;
 using Sail.Api.V1;
 using Sail.Core.Stores;
-using Sail.Storage.MongoDB;
-using Sail.Storage.MongoDB.Extensions;
+using Sail.Database.MongoDB;
+using Sail.Database.MongoDB.Extensions;
 using Route = Sail.Core.Entities.Route;
 using RouteResponse = Sail.Api.V1.Route;
 

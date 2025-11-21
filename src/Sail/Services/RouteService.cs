@@ -1,7 +1,7 @@
 using ErrorOr;
 using MongoDB.Driver;
 using Sail.Core.Entities;
-using Sail.Storage.MongoDB;
+using Sail.Database.MongoDB;
 using Sail.Models.Routes;
 using Route = Sail.Core.Entities.Route;
 

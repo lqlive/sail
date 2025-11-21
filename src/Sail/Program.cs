@@ -1,10 +1,10 @@
 using System.Text.Json.Serialization;
 using Sail.Apis;
 using Sail.Core.Management;
-using Sail.Storage.MongoDB.Management;
+using Sail.Database.MongoDB.Management;
 using Sail.Extensions;
 using Sail.Grpc;
-using Sail.Storage.MongoDB;
+using Sail.Database.MongoDB;
 using ServiceDefaults;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -34,6 +34,7 @@ endpoint.MapClusterApiV1();
 endpoint.MapCertificateApiV1();
 endpoint.MapMiddlewareApiV1();
 endpoint.MapAuthenticationPolicyApi();
+endpoint.MapServiceDiscoveryApiV1();
 
 app.UseDefaultOpenApi();
 

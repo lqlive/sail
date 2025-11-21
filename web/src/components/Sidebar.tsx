@@ -7,6 +7,7 @@ import {
   ShieldCheckIcon,
   BoltIcon,
   KeyIcon,
+  SignalIcon,
   Cog6ToothIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
@@ -26,6 +27,7 @@ const navigation: NavigationItem[] = [
   { name: 'Certificates', href: '/certificates', icon: ShieldCheckIcon },
   { name: 'Middlewares', href: '/middlewares', icon: BoltIcon },
   { name: 'Authentication', href: '/authentication-policies', icon: KeyIcon },
+  { name: 'Discovery', href: '/service-discoveries', icon: SignalIcon },
   { name: 'Settings', href: '/settings', icon: Cog6ToothIcon },
 ];
 
