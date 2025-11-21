@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Sail.Core.Utilities;
 using Yarp.ReverseProxy.Model;
 
 namespace Sail.Core.Https;
@@ -62,8 +63,8 @@ public class HttpsRedirectionMiddleware
         }
 
         var reverseProxyFeature = context.Features.Get<IReverseProxyFeature>();
-        if (reverseProxyFeature?.Route.Config.Metadata?.TryGetValue("HttpsRedirect", out var httpsRedirect) != true
-            || httpsRedirect != "true")
+
+        if (!reverseProxyFeature?.Route.GetMetadata<bool>("HttpsRedirect") ?? false)
         {
             return _next(context);
         }
@@ -73,7 +74,7 @@ public class HttpsRedirectionMiddleware
         {
             _logger.LogWarning(
                 "Failed to determine HTTPS port for route {RouteId}. HTTPS redirection disabled.",
-                reverseProxyFeature.Route.Config.RouteId);
+                reverseProxyFeature?.Route.Config.RouteId);
             return _next(context);
         }
 
@@ -100,7 +101,7 @@ public class HttpsRedirectionMiddleware
 
         _logger.LogInformation(
             "Redirecting to HTTPS. Route: {RouteId}, URL: {RedirectUrl}",
-            reverseProxyFeature.Route.Config.RouteId,
+            reverseProxyFeature?.Route.Config.RouteId,
             redirectUrl);
 
         return Task.CompletedTask;
