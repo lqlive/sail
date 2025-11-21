@@ -1,12 +1,12 @@
-﻿using Microsoft.AspNetCore.Http.Timeouts;
+using Microsoft.AspNetCore.Http.Timeouts;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace Sail.Core.Timeout;
 
-public class TimeoutPolicyProvider(
+public class SailTimeoutPolicyProvider(
     IOptionsMonitorCache<RequestTimeoutOptions> optionsCache,
-    ILogger<TimeoutPolicyProvider> logger)
+    ILogger<SailTimeoutPolicyProvider> logger)
 {
     public Task UpdateAsync(IReadOnlyList<TimeoutPolicyConfig> policies, CancellationToken cancellationToken)
     {
@@ -26,3 +26,4 @@ public class TimeoutPolicyProvider(
         return Task.CompletedTask;
     }
 }
+

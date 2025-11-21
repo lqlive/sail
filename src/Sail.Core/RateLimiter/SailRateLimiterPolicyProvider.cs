@@ -1,14 +1,14 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
 
 namespace Sail.Core.RateLimiter;
 
-public class RateLimiterPolicyProvider : IRateLimiterPolicyProvider
+public class SailRateLimiterPolicyProvider : IRateLimiterPolicyProvider
 {
-    private readonly ILogger<RateLimiterPolicyProvider> _logger;
+    private readonly ILogger<SailRateLimiterPolicyProvider> _logger;
     private volatile IReadOnlyDictionary<string, RateLimiterPolicyConfig> _policies =
         new Dictionary<string, RateLimiterPolicyConfig>(StringComparer.OrdinalIgnoreCase);
 
-    public RateLimiterPolicyProvider(ILogger<RateLimiterPolicyProvider> logger)
+    public SailRateLimiterPolicyProvider(ILogger<SailRateLimiterPolicyProvider> logger)
     {
         _logger = logger;
     }
@@ -113,3 +113,4 @@ public class RateLimiterPolicyProvider : IRateLimiterPolicyProvider
                config.QueueLimit >= 0;
     }
 }
+

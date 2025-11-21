@@ -12,7 +12,7 @@ internal sealed class CorsPolicyUpdater : IDisposable
 
     public CorsPolicyUpdater(
         ILogger<CorsPolicyUpdater> logger,
-        CorsPolicyProvider corsPolicyProvider,
+        SailCorsPolicyProvider corsPolicyProvider,
         IObservable<IReadOnlyList<CorsPolicyConfig>> corsPolicyStream)
     {
         _logger = logger;
@@ -27,7 +27,7 @@ internal sealed class CorsPolicyUpdater : IDisposable
     }
 
     private async Task UpdateCorsPolicies(
-        CorsPolicyProvider corsPolicyProvider,
+        SailCorsPolicyProvider corsPolicyProvider,
         IReadOnlyList<CorsPolicyConfig> policies)
     {
         try

@@ -4,12 +4,12 @@ using Microsoft.Extensions.Options;
 
 namespace Sail.Core.Authentication;
 
-public class DynamicAuthorizationPolicyProvider : IAuthorizationPolicyProvider
+public class SailAuthorizationPolicyProvider : IAuthorizationPolicyProvider
 {
     private readonly DefaultAuthorizationPolicyProvider _fallbackPolicyProvider;
     private readonly ConcurrentDictionary<string, AuthorizationPolicy> _policies = new();
 
-    public DynamicAuthorizationPolicyProvider(IOptions<AuthorizationOptions> options)
+    public SailAuthorizationPolicyProvider(IOptions<AuthorizationOptions> options)
     {
         _fallbackPolicyProvider = new DefaultAuthorizationPolicyProvider(options);
     }

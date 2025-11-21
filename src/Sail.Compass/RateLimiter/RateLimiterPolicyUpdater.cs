@@ -12,7 +12,7 @@ internal sealed class RateLimiterPolicyUpdater : IDisposable
 
     public RateLimiterPolicyUpdater(
         ILogger<RateLimiterPolicyUpdater> logger,
-        RateLimiterPolicyProvider rateLimiterPolicyProvider,
+        SailRateLimiterPolicyProvider rateLimiterPolicyProvider,
         IObservable<IReadOnlyList<RateLimiterPolicyConfig>> rateLimiterPolicyStream)
     {
         _logger = logger;
@@ -27,7 +27,7 @@ internal sealed class RateLimiterPolicyUpdater : IDisposable
     }
 
     private async Task UpdateRateLimiterPolicies(
-        RateLimiterPolicyProvider rateLimiterPolicyProvider,
+        SailRateLimiterPolicyProvider rateLimiterPolicyProvider,
         IReadOnlyList<RateLimiterPolicyConfig> policies)
     {
         try

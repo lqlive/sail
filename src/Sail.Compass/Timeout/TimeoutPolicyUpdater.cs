@@ -12,7 +12,7 @@ internal sealed class TimeoutPolicyUpdater : IDisposable
 
     public TimeoutPolicyUpdater(
         ILogger<TimeoutPolicyUpdater> logger,
-        TimeoutPolicyProvider timeoutPolicyProvider,
+        SailTimeoutPolicyProvider timeoutPolicyProvider,
         IObservable<IReadOnlyList<TimeoutPolicyConfig>> timeoutPolicyStream)
     {
         _logger = logger;
@@ -27,7 +27,7 @@ internal sealed class TimeoutPolicyUpdater : IDisposable
     }
 
     private async Task UpdateTimeoutPolicies(
-        TimeoutPolicyProvider timeoutPolicyProvider,
+        SailTimeoutPolicyProvider timeoutPolicyProvider,
         IReadOnlyList<TimeoutPolicyConfig> policies)
     {
         try

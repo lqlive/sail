@@ -11,13 +11,13 @@ public class OpenIdConnectAuthenticationOptionsProvider
 {
     private readonly IAuthenticationSchemeProvider _schemeProvider;
     private readonly IOptionsMonitorCache<OpenIdConnectOptions> _optionsCache;
-    private readonly DynamicAuthorizationPolicyProvider _authorizationPolicyProvider;
+    private readonly SailAuthorizationPolicyProvider _authorizationPolicyProvider;
     private readonly ILogger<OpenIdConnectAuthenticationOptionsProvider> _logger;
 
     public OpenIdConnectAuthenticationOptionsProvider(
         IAuthenticationSchemeProvider schemeProvider,
         IOptionsMonitorCache<OpenIdConnectOptions> optionsCache,
-        DynamicAuthorizationPolicyProvider authorizationPolicyProvider,
+        SailAuthorizationPolicyProvider authorizationPolicyProvider,
         ILogger<OpenIdConnectAuthenticationOptionsProvider> logger)
     {
         _schemeProvider = schemeProvider;
