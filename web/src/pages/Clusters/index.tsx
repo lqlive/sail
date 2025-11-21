@@ -69,42 +69,43 @@ const Clusters: React.FC = () => {
         </div>
 
         {/* Search Bar */}
-        <div className="relative max-w-md">
+        <div className="relative flex-1 max-w-md">
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <MagnifyingGlassIcon className="h-4 w-4 text-gray-400" />
+            <MagnifyingGlassIcon className="h-5 w-5 text-gray-400" />
           </div>
           <input
             type="text"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="block w-full pl-10 pr-3 py-2 border border-gray-200 rounded-lg text-sm placeholder-gray-400 focus:outline-none focus:border-gray-400 focus:ring-1 focus:ring-gray-400 transition-colors"
+            className="block w-full pl-10 pr-3 py-2.5 border border-gray-200 rounded-lg text-sm placeholder-gray-400 focus:outline-none focus:border-gray-400 focus:ring-1 focus:ring-gray-400 transition-colors"
             placeholder="Search clusters..."
           />
+        </div>
+
+        <div className="flex items-center text-sm text-gray-500 font-medium mt-4">
+          <ServerStackIcon className="h-4 w-4 mr-1.5" />
+          {clusters.length} {clusters.length === 1 ? 'cluster' : 'clusters'}
         </div>
       </div>
 
       {error ? (
-        <div className="text-center py-12">
-          <div className="mx-auto h-12 w-12 text-red-400 mb-4">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+        <div className="bg-white border border-gray-200 rounded-lg p-12 text-center">
+          <div className="w-12 h-12 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg className="h-6 w-6 text-red-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
             </svg>
           </div>
-          <h3 className="mt-2 text-sm font-medium text-gray-900">Failed to load clusters</h3>
-          <p className="mt-1 text-sm text-gray-500">Please check your connection and try again.</p>
-          <div className="mt-6">
-            <button
-              onClick={loadClusters}
-              className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md shadow-sm text-gray-700 bg-white hover:bg-gray-50"
-            >
-              Try Again
-            </button>
-          </div>
+          <h3 className="text-sm font-medium text-gray-900 mb-1">Failed to load clusters</h3>
+          <p className="text-sm text-gray-500 mb-4">Please check your connection and try again</p>
+          <button
+            onClick={loadClusters}
+            className="inline-flex items-center px-4 py-2 bg-white border border-gray-200 text-sm font-medium rounded-lg hover:bg-gray-50 transition-colors"
+          >
+            Try Again
+          </button>
         </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-          {clusters.length === 0 ? (
-            <div className="col-span-full bg-white border border-gray-200 rounded-lg p-12 text-center">
+      ) : clusters.length === 0 ? (
+        <div className="bg-white border border-gray-200 rounded-lg p-12 text-center">
               <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <ServerStackIcon className="h-6 w-6 text-gray-400" />
               </div>
@@ -118,12 +119,15 @@ const Clusters: React.FC = () => {
                 Create Cluster
               </Link>
             </div>
-          ) : (
+      ) : (
+        <div className="space-y-3">
+          {
           clusters.map((cluster) => {
             const destinationCount = cluster.destinations?.length || 0;
             const healthyCount = cluster.destinations?.filter(d => d.health === 'healthy').length || 0;
             const healthCheckEnabled = !!(cluster.healthCheck?.active?.enabled || cluster.healthCheck?.passive?.enabled);
             const isFullyHealthy = destinationCount > 0 && healthyCount === destinationCount;
+            const hasServiceDiscovery = !!(cluster as any).serviceName;
           return (
             <Link
               key={cluster.id}
@@ -134,7 +138,19 @@ const Clusters: React.FC = () => {
                 <div className="w-10 h-10 bg-purple-50 rounded-lg flex items-center justify-center flex-shrink-0">
                   <ServerStackIcon className="h-5 w-5 text-purple-600" />
                 </div>
-                <h3 className="text-base font-medium text-gray-900 truncate">{cluster.name}</h3>
+                <div className="flex-1 min-w-0">
+                  <h3 className="text-base font-medium text-gray-900 truncate">{cluster.name}</h3>
+                  {hasServiceDiscovery && (
+                    <div className="flex items-center gap-1 mt-1">
+                      <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
+                        🔍 {(cluster as any).serviceDiscoveryType}
+                      </span>
+                      <span className="text-xs text-gray-500 truncate">
+                        {(cluster as any).serviceName}
+                      </span>
+                    </div>
+                  )}
+                </div>
               </div>
               
               <div className="space-y-3">
@@ -143,10 +159,12 @@ const Clusters: React.FC = () => {
                   <span className="text-sm font-medium text-gray-900">{cluster.loadBalancingPolicy || 'RoundRobin'}</span>
                 </div>
                 
-                <div className="flex items-center justify-between py-2 border-b border-gray-100">
-                  <span className="text-sm text-gray-500">Destinations</span>
-                  <span className="text-sm font-medium text-gray-900">{destinationCount}</span>
-                </div>
+                {!hasServiceDiscovery && (
+                  <div className="flex items-center justify-between py-2 border-b border-gray-100">
+                    <span className="text-sm text-gray-500">Destinations</span>
+                    <span className="text-sm font-medium text-gray-900">{destinationCount}</span>
+                  </div>
+                )}
                 
                 <div className="flex items-center justify-between py-2 border-b border-gray-100">
                   <span className="text-sm text-gray-500">Healthy</span>
@@ -182,7 +200,7 @@ const Clusters: React.FC = () => {
             </Link>
           );
           })
-          )}
+          }
         </div>
       )}
     </div>

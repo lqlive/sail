@@ -17,6 +17,7 @@ public static class Extensions
         services.TryAddScoped<CertificateService>();
         services.TryAddScoped<MiddlewareService>();
         services.TryAddScoped<AuthenticationPolicyService>();
+        services.TryAddScoped<ServiceDiscoveryService>();
 
         services.AddSailCors();
         services.AddSailRateLimiter();

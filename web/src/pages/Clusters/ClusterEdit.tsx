@@ -11,6 +11,9 @@ const ClusterEdit: React.FC = () => {
 
   const [formData, setFormData] = useState({
     name: '',
+    useServiceDiscovery: false,
+    serviceName: '',
+    serviceDiscoveryType: 'Consul' as 'Consul' | 'Dns',
     loadBalancingPolicy: 'RoundRobin',
     healthCheckEnabled: false,
     sessionAffinityEnabled: false,
@@ -68,6 +71,9 @@ const ClusterEdit: React.FC = () => {
       
       setFormData({
         name: cluster.name || '',
+        useServiceDiscovery: !!(cluster as any).serviceName,
+        serviceName: (cluster as any).serviceName || '',
+        serviceDiscoveryType: (cluster as any).serviceDiscoveryType || 'Consul',
         loadBalancingPolicy: cluster.loadBalancingPolicy || 'RoundRobin',
         healthCheckEnabled: !!(healthCheck?.active?.enabled || healthCheck?.passive?.enabled),
         sessionAffinityEnabled: sessionAffinity?.enabled || false,
@@ -111,6 +117,8 @@ const ClusterEdit: React.FC = () => {
       const clusterData: any = {
         name: formData.name,
         loadBalancingPolicy: formData.loadBalancingPolicy || undefined,
+        serviceName: formData.useServiceDiscovery ? formData.serviceName : undefined,
+        serviceDiscoveryType: formData.useServiceDiscovery ? (formData.serviceDiscoveryType === 'Consul' ? 1 : 2) : undefined,
         destinations: destinations.map(d => ({
           address: d.address,
           host: d.host || undefined,
@@ -251,6 +259,63 @@ const ClusterEdit: React.FC = () => {
               </select>
               <p className="mt-1 text-xs text-gray-500">Algorithm used to distribute requests across destinations</p>
             </div>
+          </div>
+        </div>
+
+        {/* Service Discovery */}
+        <div className="bg-white rounded-lg border border-gray-200 p-6">
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-base font-semibold text-gray-900">Service Discovery</h2>
+            <label className="flex items-center cursor-pointer">
+              <input
+                type="checkbox"
+                checked={formData.useServiceDiscovery}
+                onChange={(e) => setFormData({ ...formData, useServiceDiscovery: e.target.checked })}
+                className="h-3.5 w-3.5 text-gray-900 focus:ring-gray-900 border-gray-300 rounded"
+              />
+              <span className="ml-2 text-xs text-gray-700">Enable</span>
+            </label>
+          </div>
+
+          <div className="space-y-5">
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Service Name {formData.useServiceDiscovery && <span className="text-red-500">*</span>}
+                </label>
+                <input
+                  type="text"
+                  value={formData.serviceName}
+                  onChange={(e) => setFormData({ ...formData, serviceName: e.target.value })}
+                  placeholder="e.g., my-service"
+                  disabled={!formData.useServiceDiscovery}
+                  required={formData.useServiceDiscovery}
+                  className="block w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-gray-400 focus:ring-1 focus:ring-gray-400 transition-colors disabled:bg-gray-50 disabled:text-gray-500 disabled:cursor-not-allowed"
+                />
+                <p className="mt-1 text-xs text-gray-500">Service name to discover</p>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Discovery Type</label>
+                <select
+                  value={formData.serviceDiscoveryType}
+                  onChange={(e) => setFormData({ ...formData, serviceDiscoveryType: e.target.value as 'Consul' | 'Dns' })}
+                  disabled={!formData.useServiceDiscovery}
+                  className="block w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-gray-400 focus:ring-1 focus:ring-gray-400 transition-colors disabled:bg-gray-50 disabled:text-gray-500 disabled:cursor-not-allowed"
+                >
+                  <option value="Consul">Consul</option>
+                  <option value="Dns">DNS</option>
+                </select>
+                <p className="mt-1 text-xs text-gray-500">Service discovery provider</p>
+              </div>
+            </div>
+            {formData.useServiceDiscovery && (
+              <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                <p className="text-xs text-blue-700">
+                  🔍 When service discovery is enabled, destinations will be automatically discovered from {formData.serviceDiscoveryType}. 
+                  Manual destinations below will be ignored.
+                </p>
+              </div>
+            )}
           </div>
         </div>
 

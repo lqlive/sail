@@ -37,9 +37,36 @@ export interface Route {
   metadata?: Record<string, string>;
 }
 
+export enum ServiceDiscoveryType {
+  Consul = 1,
+  Dns = 2,
+}
+
+export interface ServiceDiscovery {
+  id: string;
+  name: string;
+  type: ServiceDiscoveryType;
+  enabled: boolean;
+  consul?: {
+    address: string;
+    token?: string;
+    datacenter?: string;
+    refreshIntervalSeconds: number;
+  };
+  dns?: {
+    serverAddress: string;
+    port: number;
+    refreshIntervalSeconds: number;
+  };
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface Cluster {
   id: string;
   name: string;
+  serviceName?: string;
+  serviceDiscoveryType?: ServiceDiscoveryType;
   loadBalancingPolicy?: string;
   healthCheckEnabled?: boolean;
   sessionAffinityEnabled?: boolean;
