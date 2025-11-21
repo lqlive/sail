@@ -22,18 +22,18 @@ public static class SailServiceCollectionExtensions
         return services;
     }
 
-    public static IServiceCollection AddDynamicCors(this IServiceCollection services)
+    public static IServiceCollection AddSailCors(this IServiceCollection services)
     {
         services.AddCors();
-        services.AddSingleton<CorsPolicyProvider>();
-        services.AddSingleton<ICorsPolicyProvider>(sp => sp.GetRequiredService<CorsPolicyProvider>());
+        services.AddSingleton<SailCorsPolicyProvider>();
+        services.AddSingleton<ICorsPolicyProvider>(sp => sp.GetRequiredService<SailCorsPolicyProvider>());
         return services;
     }
 
-    public static IServiceCollection AddDynamicRateLimiter(this IServiceCollection services)
+    public static IServiceCollection AddSailRateLimiter(this IServiceCollection services)
     {
-        services.TryAddSingleton<RateLimiterPolicyProvider>();
-        services.TryAddSingleton<IRateLimiterPolicyProvider>(sp => sp.GetRequiredService<RateLimiterPolicyProvider>());
+        services.TryAddSingleton<SailRateLimiterPolicyProvider>();
+        services.TryAddSingleton<IRateLimiterPolicyProvider>(sp => sp.GetRequiredService<SailRateLimiterPolicyProvider>());
         return services;
     }
 
@@ -51,25 +51,25 @@ public static class SailServiceCollectionExtensions
         return services;
     }
 
-    public static IServiceCollection AddDynamicAuthentication(this IServiceCollection services)
+    public static IServiceCollection AddSailAuthentication(this IServiceCollection services)
     {
         services.AddAuthentication();
         services.AddAuthorization();
         
         // Register custom authorization policy provider
-        services.AddSingleton<DynamicAuthorizationPolicyProvider>();
+        services.AddSingleton<SailAuthorizationPolicyProvider>();
         services.AddSingleton<IAuthorizationPolicyProvider>(sp => 
-            sp.GetRequiredService<DynamicAuthorizationPolicyProvider>());
+            sp.GetRequiredService<SailAuthorizationPolicyProvider>());
         
         services.AddSingleton<JwtBearerAuthenticationOptionsProvider>();
         services.AddSingleton<OpenIdConnectAuthenticationOptionsProvider>();
         return services;
     }
 
-    public static IServiceCollection AddDynamicTimeout(this IServiceCollection services)
+    public static IServiceCollection AddSailTimeout(this IServiceCollection services)
     {
         services.AddRequestTimeouts();
-        services.AddSingleton<TimeoutPolicyProvider>();
+        services.AddSingleton<SailTimeoutPolicyProvider>();
         return services;
     }
 }

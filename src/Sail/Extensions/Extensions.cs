@@ -18,7 +18,7 @@ public static class Extensions
         services.TryAddScoped<MiddlewareService>();
         services.TryAddScoped<AuthenticationPolicyService>();
 
-        services.AddDynamicCors();
-        services.AddDynamicRateLimiter();
+        services.AddSailCors();
+        services.AddSailRateLimiter();
     }
 }

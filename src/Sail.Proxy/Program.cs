@@ -14,10 +14,10 @@ builder.Services.AddSailCore();
 builder.Services.AddServerCertificateSelector();
 builder.Services.AddReverseProxy()
     .LoadFromMessages();
-builder.Services.AddDynamicCors();
-builder.Services.AddDynamicRateLimiter();
-builder.Services.AddDynamicAuthentication();
-builder.Services.AddDynamicTimeout();
+builder.Services.AddSailCors();
+builder.Services.AddSailRateLimiter();
+builder.Services.AddSailAuthentication();
+builder.Services.AddSailTimeout();
 builder.Services.AddRouteHttpsRedirection(options =>
 {
     options.HttpsPort = 443;

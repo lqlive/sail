@@ -1,16 +1,16 @@
-﻿using Microsoft.AspNetCore.Cors.Infrastructure;
+using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 
 namespace Sail.Core.Cors;
 
-public class CorsPolicyProvider : ICorsPolicyProvider
+public class SailCorsPolicyProvider : ICorsPolicyProvider
 {
-    private readonly ILogger<CorsPolicyProvider> _logger;
+    private readonly ILogger<SailCorsPolicyProvider> _logger;
     private volatile IReadOnlyDictionary<string, CorsPolicy> _policies =
         new Dictionary<string, CorsPolicy>(StringComparer.OrdinalIgnoreCase);
 
-    public CorsPolicyProvider(ILogger<CorsPolicyProvider> logger)
+    public SailCorsPolicyProvider(ILogger<SailCorsPolicyProvider> logger)
     {
         _logger = logger;
     }
@@ -159,3 +159,4 @@ public class CorsPolicyProvider : ICorsPolicyProvider
         }
     }
 }
+

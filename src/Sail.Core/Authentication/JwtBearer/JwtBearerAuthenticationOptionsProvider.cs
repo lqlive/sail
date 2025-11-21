@@ -10,13 +10,13 @@ public class JwtBearerAuthenticationOptionsProvider
 {
     private readonly IAuthenticationSchemeProvider _schemeProvider;
     private readonly IOptionsMonitorCache<JwtBearerOptions> _optionsCache;
-    private readonly DynamicAuthorizationPolicyProvider _authorizationPolicyProvider;
+    private readonly SailAuthorizationPolicyProvider _authorizationPolicyProvider;
     private readonly ILogger<JwtBearerAuthenticationOptionsProvider> _logger;
 
     public JwtBearerAuthenticationOptionsProvider(
         IAuthenticationSchemeProvider schemeProvider,
         IOptionsMonitorCache<JwtBearerOptions> optionsCache,
-        DynamicAuthorizationPolicyProvider authorizationPolicyProvider,
+        SailAuthorizationPolicyProvider authorizationPolicyProvider,
         ILogger<JwtBearerAuthenticationOptionsProvider> logger)
     {
         _schemeProvider = schemeProvider;
