@@ -3,6 +3,9 @@ using System.Threading.RateLimiting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.Extensions.Logging;
+
+using Sail.Core.Utilities;
+
 using Yarp.ReverseProxy.Model;
 
 namespace Sail.Core.RateLimiter;
@@ -56,8 +59,9 @@ public class RateLimiterMiddleware
     private async Task InvokeInternal(HttpContext context)
     {
         var reverseProxyFeature = context.Features.Get<IReverseProxyFeature>();
-        if (reverseProxyFeature?.Route.Config.Metadata?.TryGetValue("RateLimiterPolicy", out var policyName) != true 
-            || string.IsNullOrEmpty(policyName))
+        var policyName = reverseProxyFeature?.Route.GetMetadata<string>("RateLimiterPolicy");
+
+        if (string.IsNullOrEmpty(policyName))
         {
             await _next(context);
             return;
