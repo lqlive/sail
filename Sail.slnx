@@ -1,0 +1,29 @@
+<Solution>
+  <Folder Name="/samples/">
+    <Project Path="samples\ApiSample\ApiSample.csproj" />
+    <Project Path="samples\SampleServer\SampleServer.csproj" />
+    <Project Path="samples\YarpServiceDiscovery\YarpServiceDiscovery.csproj" />
+  </Folder>
+  <Folder Name="/shared/">
+    <Project Path="shared\Sail.ServiceDiscovery.Consul\Sail.ServiceDiscovery.Consul.csproj" />
+    <Project Path="shared\ServiceDefaults\ServiceDefaults.csproj" />
+  </Folder>
+  <Folder Name="/Solution Items/">
+    <File Path="Directory.Packages.props" />
+    <File Path="NuGet.config" />
+    <File Path="Directory.Build.props" />
+    <File Path="Directory.Build.targets" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="src/Sail.Database.MongoDB/Sail.Database.MongoDB.csproj" />
+    <Project Path="src\Sail.Compass\Sail.Compass.csproj" />
+    <Project Path="src\Sail.Core\Sail.Core.csproj" />
+    <Project Path="src\Sail.Proxy\Sail.Proxy.csproj" />
+    <Project Path="src\Sail\Sail.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Sail.Compass.Tests/Sail.Compass.Tests.csproj" Id="85b438fe-c97c-4ae9-ad52-8e7026fef0e1" />
+    <Project Path="tests/Sail.Core.Tests/Sail.Core.Tests.csproj" Id="2bd65e7f-e6cf-4c94-8af2-4bf2b6d69639" />
+    <Project Path="tests\Sail.FunctionalTests\Sail.FunctionalTests.csproj" />
+  </Folder>
+</Solution>
