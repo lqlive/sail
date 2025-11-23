@@ -28,7 +28,7 @@ builder.Services.AddCorsPolicyUpdater();
 builder.Services.AddRateLimiterPolicyUpdater();
 builder.Services.AddAuthenticationPolicyUpdater();
 builder.Services.AddTimeoutPolicyUpdater();
- 
+
 builder.Services.AddConsul(o =>
 {
     o.Address = new Uri("http://127.0.0.1:8500");

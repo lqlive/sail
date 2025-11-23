@@ -7,7 +7,7 @@ using Sail.Compass.Extensions;
 namespace Sail.Compass.Observers;
 
 public sealed class AuthenticationPolicyObserver(
-    AuthenticationPolicyService.AuthenticationPolicyServiceClient client) 
+    AuthenticationPolicyService.AuthenticationPolicyServiceClient client)
     : ResourceObserver<AuthenticationPolicy>
 {
     public override IObservable<ResourceEvent<AuthenticationPolicy>> GetObservable(bool watch)
@@ -16,7 +16,7 @@ public sealed class AuthenticationPolicyObserver(
         {
             return List();
         }
-        
+
         return Observable.Concat(
             List(),
             Watch()

@@ -12,4 +12,4 @@ public class SessionAffinityCookie
     public TimeSpan? Expiration { get; init; }
     public TimeSpan? MaxAge { get; init; }
     public bool? IsEssential { get; init; }
-}  
+}

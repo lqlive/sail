@@ -14,7 +14,7 @@ internal sealed class CertificateObserver(CertificateService.CertificateServiceC
         {
             return List();
         }
-        
+
         return Observable.Concat(
             List(),
             Watch()

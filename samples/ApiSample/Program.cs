@@ -14,7 +14,7 @@ app.MapGet("/", async (HttpContext context) =>
     return Results.Ok(111);
 });
 
-app.MapGet("/test", async ( HttpContext context,DynamicRateLimitConfigurationProvider provider) =>
+app.MapGet("/test", async (HttpContext context, DynamicRateLimitConfigurationProvider provider) =>
 {
     Console.WriteLine(Random.Shared.Next(10000, 90000));
     provider.AddRateLimitOptions();

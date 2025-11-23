@@ -28,7 +28,7 @@ internal sealed class ProxyConfigProvider : IProxyConfigProvider, IDisposable
         var subscription = routes
             .CombineLatest(clusters, (r, c) => (Routes: r, Clusters: c))
             .Subscribe(x => UpdateSnapshot(x.Routes, x.Clusters));
-        
+
         _subscriptions.Add(subscription);
     }
 
@@ -51,7 +51,7 @@ internal sealed class ProxyConfigProvider : IProxyConfigProvider, IDisposable
                 {
                     var key = @event.Value.RouteId;
                     var newKeys = new Dictionary<string, Route>(keys, keys.Comparer);
-                    
+
                     switch (@event.EventType)
                     {
                         case ObserverEventType.List:
@@ -63,7 +63,7 @@ internal sealed class ProxyConfigProvider : IProxyConfigProvider, IDisposable
                             newKeys.Remove(key);
                             break;
                     }
-                    
+
                     return newKeys;
                 })
             .Throttle(TimeSpan.FromMilliseconds(100))
@@ -81,7 +81,7 @@ internal sealed class ProxyConfigProvider : IProxyConfigProvider, IDisposable
                 {
                     var key = @event.Value.ClusterId;
                     var newKeys = new Dictionary<string, Cluster>(keys, keys.Comparer);
-                    
+
                     switch (@event.EventType)
                     {
                         case ObserverEventType.List:
@@ -93,7 +93,7 @@ internal sealed class ProxyConfigProvider : IProxyConfigProvider, IDisposable
                             newKeys.Remove(key);
                             break;
                     }
-                    
+
                     return newKeys;
                 })
             .Throttle(TimeSpan.FromMilliseconds(100))
@@ -107,12 +107,12 @@ internal sealed class ProxyConfigProvider : IProxyConfigProvider, IDisposable
         lock (_lockObject)
         {
             var newSnapshot = new ProxyConfigSnapshot();
-            
+
             foreach (var cluster in clusters.Values)
             {
                 newSnapshot.Clusters.Add(ConvertCluster(cluster));
             }
-            
+
             foreach (var route in routes.Values)
             {
                 newSnapshot.Routes.Add(ConvertRoute(route));
@@ -121,7 +121,7 @@ internal sealed class ProxyConfigProvider : IProxyConfigProvider, IDisposable
             var oldToken = _changeToken;
             _changeToken = new CancellationTokenSource();
             newSnapshot.ChangeToken = new CancellationChangeToken(_changeToken.Token);
-            
+
             _snapshot = newSnapshot;
 
             try
@@ -189,7 +189,7 @@ internal sealed class ProxyConfigProvider : IProxyConfigProvider, IDisposable
     private static RouteConfig ConvertRoute(Route route)
     {
         var metadata = new Dictionary<string, string>();
-        
+
         if (!string.IsNullOrEmpty(route.RateLimiterPolicy))
         {
             metadata["RateLimiterPolicy"] = route.RateLimiterPolicy;

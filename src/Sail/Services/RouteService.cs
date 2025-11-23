@@ -9,7 +9,7 @@ namespace Sail.Services;
 
 public class RouteService(SailContext context)
 {
-    
+
     public async Task<RouteResponse> GetAsync(Guid id, CancellationToken cancellationToken = default)
     {
         var filter = Builders<Route>.Filter.Where(x => x.Id == id);
@@ -18,7 +18,7 @@ public class RouteService(SailContext context)
         return MapToRoute(result);
     }
 
-    
+
     public async Task<IEnumerable<RouteResponse>> ListAsync(string? keywords,
         CancellationToken cancellationToken = default)
     {
@@ -45,13 +45,13 @@ public class RouteService(SailContext context)
             .Set(x => x.ClusterId, request.ClusterId)
             .Set(x => x.Match, CreateRouteMatchFromRequest(request.Match))
             .Set(x => x.AuthorizationPolicy, request.AuthorizationPolicy)
-            .Set(x => x.RateLimiterPolicy, request.RateLimiterPolicy) 
+            .Set(x => x.RateLimiterPolicy, request.RateLimiterPolicy)
             .Set(x => x.CorsPolicy, request.CorsPolicy)
             .Set(x => x.TimeoutPolicy, request.TimeoutPolicy)
             .Set(x => x.Timeout, request.Timeout)
             .Set(x => x.MaxRequestBodySize, request.MaxRequestBodySize)
             .Set(x => x.HttpsRedirect, request.HttpsRedirect)
-            .Set(x=>x.Transforms,request.Transforms)
+            .Set(x => x.Transforms, request.Transforms)
             .Set(x => x.UpdatedAt, DateTimeOffset.UtcNow);
 
         await context.Routes.FindOneAndUpdateAsync(filter, update, cancellationToken: cancellationToken);

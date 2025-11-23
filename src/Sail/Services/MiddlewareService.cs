@@ -17,7 +17,7 @@ public class MiddlewareService(IMiddlewareStore store)
     public async Task<IEnumerable<MiddlewareResponse>> ListAsync(string? keywords, CancellationToken cancellationToken)
     {
         var middlewares = await store.GetAsync(cancellationToken);
-        
+
         if (!string.IsNullOrEmpty(keywords))
         {
             middlewares = middlewares

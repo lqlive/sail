@@ -17,7 +17,7 @@ public class SailTimeoutPolicyProviderTests
     {
         _mockOptionsCache = new Mock<IOptionsMonitorCache<RequestTimeoutOptions>>();
         _mockLogger = new Mock<ILogger<SailTimeoutPolicyProvider>>();
-        
+
         // Setup the cache to store options when TryAdd is called
         _mockOptionsCache
             .Setup(x => x.TryAdd(It.IsAny<string>(), It.IsAny<RequestTimeoutOptions>()))
@@ -46,7 +46,7 @@ public class SailTimeoutPolicyProviderTests
         // Assert
         _mockOptionsCache.Verify(x => x.TryRemove(Microsoft.Extensions.Options.Options.DefaultName), Times.Once);
         _mockOptionsCache.Verify(x => x.TryAdd(Microsoft.Extensions.Options.Options.DefaultName, It.IsAny<RequestTimeoutOptions>()), Times.Once);
-        
+
         Assert.NotNull(_cachedOptions);
         Assert.Single(_cachedOptions.Policies);
         Assert.True(_cachedOptions.Policies.ContainsKey("ShortTimeout"));
@@ -85,7 +85,7 @@ public class SailTimeoutPolicyProviderTests
         Assert.True(_cachedOptions.Policies.ContainsKey("ShortTimeout"));
         Assert.True(_cachedOptions.Policies.ContainsKey("MediumTimeout"));
         Assert.True(_cachedOptions.Policies.ContainsKey("LongTimeout"));
-        
+
         Assert.Equal(TimeSpan.FromSeconds(30), _cachedOptions.Policies["ShortTimeout"].Timeout);
         Assert.Equal(TimeSpan.FromSeconds(60), _cachedOptions.Policies["MediumTimeout"].Timeout);
         Assert.Equal(TimeSpan.FromSeconds(120), _cachedOptions.Policies["LongTimeout"].Timeout);
@@ -174,7 +174,7 @@ public class SailTimeoutPolicyProviderTests
         var invocations = _mockOptionsCache.Invocations.Select(i => i.Method.Name).ToList();
         var removeIndex = invocations.IndexOf("TryRemove");
         var addIndex = invocations.IndexOf("TryAdd");
-        
+
         Assert.True(removeIndex < addIndex, "TryRemove should be called before TryAdd");
     }
 
@@ -290,7 +290,7 @@ public class SailTimeoutPolicyProviderTests
         // Assert
         _mockOptionsCache.Verify(x => x.TryRemove(Microsoft.Extensions.Options.Options.DefaultName), Times.Exactly(2));
         _mockOptionsCache.Verify(x => x.TryAdd(Microsoft.Extensions.Options.Options.DefaultName, It.IsAny<RequestTimeoutOptions>()), Times.Exactly(2));
-        
+
         // The last cached options should contain only the second policy
         Assert.NotNull(_cachedOptions);
         Assert.Single(_cachedOptions.Policies);
@@ -416,7 +416,7 @@ public class SailTimeoutPolicyProviderTests
             x => x.TryRemove(Microsoft.Extensions.Options.Options.DefaultName),
             Times.Once,
             "Should use Options.DefaultName for cache key");
-        
+
         _mockOptionsCache.Verify(
             x => x.TryAdd(Microsoft.Extensions.Options.Options.DefaultName, It.IsAny<RequestTimeoutOptions>()),
             Times.Once,

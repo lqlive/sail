@@ -10,7 +10,7 @@ public static class SailStorageBuilderExtensions
     public static SailApplication AddDatabaseStore(this SailApplication application)
     {
         var services = application.Services;
-        
+
         services.TryAddScoped<SailContext>();
         services.TryAddTransient<IRouteStore, RouteStore>();
         services.TryAddTransient<IClusterStore, ClusterStore>();

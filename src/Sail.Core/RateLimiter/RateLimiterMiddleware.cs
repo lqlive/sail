@@ -31,7 +31,7 @@ public class RateLimiterMiddleware
     public Task Invoke(HttpContext context)
     {
         _logger.LogInformation("RateLimiterMiddleware invoked for path: {Path}", context.Request.Path);
-        
+
         var endpoint = context.GetEndpoint();
         _logger.LogInformation("Endpoint: {Endpoint}", endpoint?.DisplayName ?? "null");
 
@@ -42,8 +42,8 @@ public class RateLimiterMiddleware
         }
 
         var reverseProxyFeature = context.Features.Get<IReverseProxyFeature>();
-        _logger.LogInformation("IReverseProxyFeature found: {Found}, Route: {Route}", 
-            reverseProxyFeature != null, 
+        _logger.LogInformation("IReverseProxyFeature found: {Found}, Route: {Route}",
+            reverseProxyFeature != null,
             reverseProxyFeature?.Route?.Config?.RouteId ?? "null");
 
         if (reverseProxyFeature?.Route.Config.Metadata?.ContainsKey("RateLimiterPolicy") == true)
@@ -98,7 +98,7 @@ public class RateLimiterMiddleware
             {
                 _logger.LogWarning("Rate limit exceeded for policy: {PolicyName}", policyName);
                 context.Response.StatusCode = _rejectionStatusCode;
-                
+
                 if (lease.TryGetMetadata(MetadataName.RetryAfter, out var retryAfter))
                 {
                     context.Response.Headers.RetryAfter = retryAfter.TotalSeconds.ToString("F0");

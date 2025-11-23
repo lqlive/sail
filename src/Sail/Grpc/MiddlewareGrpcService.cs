@@ -14,13 +14,13 @@ public class MiddlewareGrpcService(SailContext dbContext, IMiddlewareStore middl
     public override async Task<ListMiddlewareResponse> List(Empty request, ServerCallContext context)
     {
         var middlewares = await middlewareStore.GetAsync(context.CancellationToken);
-        
+
         var response = new ListMiddlewareResponse();
         foreach (var middleware in middlewares)
         {
             response.Items.Add(ConvertToProto(middleware));
         }
-        
+
         return response;
     }
 
@@ -51,13 +51,13 @@ public class MiddlewareGrpcService(SailContext dbContext, IMiddlewareStore middl
                     ChangeStreamOperationType.Delete => EventType.Delete,
                     _ => EventType.Unknown
                 };
-                
+
                 var response = new WatchMiddlewareResponse
                 {
                     Middleware = ConvertToProto(document),
                     EventType = eventType
                 };
-                
+
                 await responseStream.WriteAsync(response);
             }
         }
@@ -69,8 +69,8 @@ public class MiddlewareGrpcService(SailContext dbContext, IMiddlewareStore middl
         {
             MiddlewareId = middleware.Id.ToString(),
             Name = middleware.Name,
-            Type = middleware.Type == Core.Entities.MiddlewareType.Cors 
-                ? Api.V1.MiddlewareType.Cors 
+            Type = middleware.Type == Core.Entities.MiddlewareType.Cors
+                ? Api.V1.MiddlewareType.Cors
                 : middleware.Type == Core.Entities.MiddlewareType.Timeout
                     ? Api.V1.MiddlewareType.Timeout
                     : Api.V1.MiddlewareType.RateLimiter,
@@ -134,7 +134,7 @@ public class MiddlewareGrpcService(SailContext dbContext, IMiddlewareStore middl
                 Name = middleware.Timeout.Name,
                 Seconds = middleware.Timeout.Seconds
             };
-            
+
             if (middleware.Timeout.TimeoutStatusCode.HasValue)
             {
                 proto.Timeout.TimeoutStatusCode = middleware.Timeout.TimeoutStatusCode.Value;

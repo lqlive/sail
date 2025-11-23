@@ -11,7 +11,7 @@ public class SailTimeoutPolicyProvider(
     public Task UpdateAsync(IReadOnlyList<TimeoutPolicyConfig> policies, CancellationToken cancellationToken)
     {
         var newOptions = new RequestTimeoutOptions();
-        
+
         foreach (var policy in policies)
         {
             newOptions.Policies[policy.Name] = new RequestTimeoutPolicy

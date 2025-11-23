@@ -54,7 +54,7 @@ public class CorsPolicyStreamBuilderTests
         // Act
         var stream = CorsPolicyStreamBuilder.BuildCorsPolicyStream(observer);
         var task = stream.Skip(1).FirstAsync().ToTask();
-        
+
         subject.OnNext(new ResourceEvent<Middleware>(ObserverEventType.Created, middleware, default!));
         var result = await task;
 
@@ -93,7 +93,7 @@ public class CorsPolicyStreamBuilderTests
         // Act
         var stream = CorsPolicyStreamBuilder.BuildCorsPolicyStream(observer);
         var task = stream.Skip(1).FirstAsync().ToTask();
-        
+
         subject.OnNext(new ResourceEvent<Middleware>(ObserverEventType.Created, middleware, default!));
         var result = await task;
 
@@ -126,7 +126,7 @@ public class CorsPolicyStreamBuilderTests
         // Act
         var stream = CorsPolicyStreamBuilder.BuildCorsPolicyStream(observer);
         var task = stream.Skip(1).FirstAsync().ToTask();
-        
+
         subject.OnNext(new ResourceEvent<Middleware>(ObserverEventType.Created, middleware, default!));
         var result = await task;
 
@@ -153,7 +153,7 @@ public class CorsPolicyStreamBuilderTests
         // Act
         var stream = CorsPolicyStreamBuilder.BuildCorsPolicyStream(observer);
         var task = stream.Skip(1).FirstAsync().ToTask();
-        
+
         subject.OnNext(new ResourceEvent<Middleware>(ObserverEventType.Created, middleware, default!));
         var result = await task;
 
@@ -197,7 +197,7 @@ public class CorsPolicyStreamBuilderTests
         // Act
         var stream = CorsPolicyStreamBuilder.BuildCorsPolicyStream(observer);
         var task = stream.Skip(1).FirstAsync().ToTask();
-        
+
         subject.OnNext(new ResourceEvent<Middleware>(ObserverEventType.Created, middleware1, default!));
         subject.OnNext(new ResourceEvent<Middleware>(ObserverEventType.Created, middleware2, default!));
         var result = await task;
@@ -244,7 +244,7 @@ public class CorsPolicyStreamBuilderTests
         // Act
         var stream = CorsPolicyStreamBuilder.BuildCorsPolicyStream(observer);
         var task = stream.Skip(2).FirstAsync().ToTask();
-        
+
         subject.OnNext(new ResourceEvent<Middleware>(ObserverEventType.Created, middleware, default!));
         subject.OnNext(new ResourceEvent<Middleware>(ObserverEventType.Updated, updatedMiddleware, middleware));
         var result = await task;
@@ -277,7 +277,7 @@ public class CorsPolicyStreamBuilderTests
         // Act
         var stream = CorsPolicyStreamBuilder.BuildCorsPolicyStream(observer);
         var task = stream.Skip(2).FirstAsync().ToTask();
-        
+
         subject.OnNext(new ResourceEvent<Middleware>(ObserverEventType.Created, middleware, default!));
         subject.OnNext(new ResourceEvent<Middleware>(ObserverEventType.Deleted, middleware, default!));
         var result = await task;
@@ -309,7 +309,7 @@ public class CorsPolicyStreamBuilderTests
         // Act
         var stream = CorsPolicyStreamBuilder.BuildCorsPolicyStream(observer);
         var task = stream.Skip(1).FirstAsync().ToTask();
-        
+
         subject.OnNext(new ResourceEvent<Middleware>(ObserverEventType.List, middleware, default!));
         var result = await task;
 

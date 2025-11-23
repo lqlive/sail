@@ -37,7 +37,7 @@ public class SailCorsPolicyProvider : ICorsPolicyProvider
     public Task UpdateAsync(IReadOnlyList<CorsPolicyConfig> configs, CancellationToken cancellationToken)
     {
         var newPolicies = new Dictionary<string, CorsPolicy>(StringComparer.OrdinalIgnoreCase);
-         
+
         foreach (var config in configs)
         {
             try

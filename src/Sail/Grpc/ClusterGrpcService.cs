@@ -7,7 +7,7 @@ using Sail.Core.Stores;
 using Sail.Database.MongoDB;
 using Sail.Database.MongoDB.Extensions;
 using Cluster = Sail.Core.Entities.Cluster;
-using ClusterResponse =  Sail.Api.V1.Cluster;
+using ClusterResponse = Sail.Api.V1.Cluster;
 using Destination = Sail.Api.V1.Destination;
 
 namespace Sail.Grpc;

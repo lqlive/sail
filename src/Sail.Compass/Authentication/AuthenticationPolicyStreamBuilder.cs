@@ -76,11 +76,11 @@ public static class AuthenticationPolicyStreamBuilder
                 Audience = policy.JwtBearer.Audience,
                 RequireHttpsMetadata = policy.JwtBearer.RequireHttpsMetadata,
                 SaveToken = policy.JwtBearer.SaveToken,
-                ValidIssuers = policy.JwtBearer.ValidIssuers.Count > 0 
-                    ? policy.JwtBearer.ValidIssuers.ToList() 
+                ValidIssuers = policy.JwtBearer.ValidIssuers.Count > 0
+                    ? policy.JwtBearer.ValidIssuers.ToList()
                     : null,
-                ValidAudiences = policy.JwtBearer.ValidAudiences.Count > 0 
-                    ? policy.JwtBearer.ValidAudiences.ToList() 
+                ValidAudiences = policy.JwtBearer.ValidAudiences.Count > 0
+                    ? policy.JwtBearer.ValidAudiences.ToList()
                     : null,
                 ValidateIssuer = policy.JwtBearer.ValidateIssuer,
                 ValidateAudience = policy.JwtBearer.ValidateAudience,
@@ -106,8 +106,8 @@ public static class AuthenticationPolicyStreamBuilder
                 RequireHttpsMetadata = policy.OpenIdConnect.RequireHttpsMetadata,
                 SaveTokens = policy.OpenIdConnect.SaveTokens,
                 GetClaimsFromUserInfoEndpoint = policy.OpenIdConnect.GetClaimsFromUserInfoEndpoint,
-                Scope = policy.OpenIdConnect.Scope.Count > 0 
-                    ? policy.OpenIdConnect.Scope.ToList() 
+                Scope = policy.OpenIdConnect.Scope.Count > 0
+                    ? policy.OpenIdConnect.Scope.ToList()
                     : null,
                 ClockSkew = policy.OpenIdConnect.ClockSkew
             }

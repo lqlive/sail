@@ -47,7 +47,7 @@ public static class SailServiceCollectionExtensions
         {
             services.AddOptions<HttpsRedirectionOptions>();
         }
-        
+
         return services;
     }
 
@@ -55,12 +55,12 @@ public static class SailServiceCollectionExtensions
     {
         services.AddAuthentication();
         services.AddAuthorization();
-        
+
         // Register custom authorization policy provider
         services.AddSingleton<SailAuthorizationPolicyProvider>();
-        services.AddSingleton<IAuthorizationPolicyProvider>(sp => 
+        services.AddSingleton<IAuthorizationPolicyProvider>(sp =>
             sp.GetRequiredService<SailAuthorizationPolicyProvider>());
-        
+
         services.AddSingleton<JwtBearerAuthenticationOptionsProvider>();
         services.AddSingleton<OpenIdConnectAuthenticationOptionsProvider>();
         return services;

@@ -75,7 +75,7 @@ public class SailContext
                     .SetSerializer(new GuidSerializer(GuidRepresentation.Standard));
             });
         }
-        
+
         if (!BsonClassMap.IsClassMapRegistered(typeof(Certificate)))
         {
             BsonClassMap.RegisterClassMap<Certificate>(classMap =>
@@ -85,7 +85,7 @@ public class SailContext
                     .SetSerializer(new GuidSerializer(GuidRepresentation.Standard));
             });
         }
-        
+
         if (!BsonClassMap.IsClassMapRegistered(typeof(Destination)))
         {
             BsonClassMap.RegisterClassMap<Destination>(classMap =>
@@ -95,7 +95,7 @@ public class SailContext
                     .SetSerializer(new GuidSerializer(GuidRepresentation.Standard));
             });
         }
-        
+
         if (!BsonClassMap.IsClassMapRegistered(typeof(Middleware)))
         {
             BsonClassMap.RegisterClassMap<Middleware>(classMap =>
@@ -105,7 +105,7 @@ public class SailContext
                     .SetSerializer(new GuidSerializer(GuidRepresentation.Standard));
             });
         }
-        
+
         if (!BsonClassMap.IsClassMapRegistered(typeof(AuthenticationPolicy)))
         {
             BsonClassMap.RegisterClassMap<AuthenticationPolicy>(classMap =>
@@ -115,7 +115,7 @@ public class SailContext
                     .SetSerializer(new GuidSerializer(GuidRepresentation.Standard));
             });
         }
-        
+
         if (!BsonClassMap.IsClassMapRegistered(typeof(ServiceDiscovery)))
         {
             BsonClassMap.RegisterClassMap<ServiceDiscovery>(classMap =>

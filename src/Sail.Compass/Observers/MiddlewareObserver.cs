@@ -14,7 +14,7 @@ internal sealed class MiddlewareObserver(MiddlewareService.MiddlewareServiceClie
         {
             return List();
         }
-        
+
         return Observable.Concat(
             List(),
             Watch()

@@ -446,7 +446,7 @@ public class SailCorsPolicyProviderTests
         // Assert
         var context = new DefaultHttpContext();
         var policy = await _provider.GetPolicyAsync(context, "ComplexPolicy");
-        
+
         Assert.NotNull(policy);
         Assert.Equal(2, policy.Origins.Count);
         Assert.Contains("https://example.com", policy.Origins);

@@ -5,7 +5,7 @@ using Microsoft.Extensions.ServiceDiscovery;
 
 namespace Sail.ServiceDiscovery.Consul;
 
-internal sealed  class ConsulServiceEndpointProviderFactory(
+internal sealed class ConsulServiceEndpointProviderFactory(
     IOptionsMonitor<ConsulServiceEndpointProviderOptions> options,
     ILogger<ConsulServiceEndpointProvider> logger,
     TimeProvider timeProvider,
