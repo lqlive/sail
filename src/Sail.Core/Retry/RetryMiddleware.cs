@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using Polly;
+using Polly.Retry;
 using Sail.Core.Utilities;
 using Yarp.ReverseProxy.Model;
 
@@ -43,59 +45,51 @@ public class RetryMiddleware
         return InvokeInternalAsync(context, reverseProxyFeature, policy);
     }
 
-    private async Task InvokeInternalAsync(HttpContext context, IReverseProxyFeature reverseProxyFeature, RetryPolicyConfig policy)
+    private async Task InvokeInternalAsync(HttpContext context, IReverseProxyFeature reverseProxyFeature, RetryPipelineWrapper policy)
     {
         context.Request.EnableBuffering();
 
         var availableDestinations = reverseProxyFeature.AvailableDestinations;
         var retryCount = 0;
 
-        await _next(context);
-
-        var statusCode = context.Response.StatusCode;
-
-        while (policy.RetryStatusCodes.Contains(statusCode) && retryCount < policy.MaxRetryAttempts)
+        await policy.Pipeline.ExecuteAsync(async ct =>
         {
-            var healthyDestinations = availableDestinations
-                .Where(m => m != reverseProxyFeature.ProxiedDestination)
-                .ToList();
-
-            if (healthyDestinations.Count == 0)
+            if (retryCount > 0)
             {
-                _logger.LogWarning("No healthy destinations available for retry. Route: {RouteId}", reverseProxyFeature.Route.Config.RouteId);
-                return;
+                var healthyDestinations = availableDestinations
+                    .Where(m => m != reverseProxyFeature.ProxiedDestination)
+                    .ToList();
+
+                if (healthyDestinations.Count == 0)
+                {
+                    _logger.LogWarning("No healthy destinations available for retry. Route: {RouteId}", reverseProxyFeature.Route.Config.RouteId);
+                    return;
+                }
+
+                _logger.LogInformation("Retrying request (attempt {RetryCount}/{MaxRetryAttempts}). Route: {RouteId}",
+                    retryCount, policy.Config.MaxRetryAttempts, reverseProxyFeature.Route.Config.RouteId);
+
+                reverseProxyFeature.AvailableDestinations = healthyDestinations;
+                reverseProxyFeature.ProxiedDestination = null;
+                context.Request.Body.Position = 0;
             }
 
-            retryCount++;
-
-            var delay = CalculateRetryDelay(policy, retryCount);
-            _logger.LogInformation("Retrying request (attempt {RetryCount}/{MaxRetryAttempts}) after {Delay}ms. Route: {RouteId}, StatusCode: {StatusCode}",
-                retryCount, policy.MaxRetryAttempts, delay, reverseProxyFeature.Route.Config.RouteId, statusCode);
-
-            await Task.Delay(delay, context.RequestAborted);
-
-            reverseProxyFeature.AvailableDestinations = healthyDestinations;
-            reverseProxyFeature.ProxiedDestination = null;
-            context.Request.Body.Position = 0;
-
             await _next(context);
-            statusCode = context.Response.StatusCode;
-        }
+
+            var statusCode = context.Response.StatusCode;
+
+            if (policy.Config.RetryStatusCodes.Contains(statusCode))
+            {
+                retryCount++;
+                throw new HttpRequestException($"Request failed with status code {statusCode}");
+            }
+        }, context.RequestAborted);
 
         if (retryCount > 0)
         {
-            _logger.LogInformation("Retry completed after {RetryCount} attempts. Final StatusCode: {StatusCode}", retryCount, statusCode);
+            _logger.LogInformation("Retry completed after {RetryCount} attempts. Final StatusCode: {StatusCode}",
+                retryCount, context.Response.StatusCode);
         }
-    }
-
-    private static int CalculateRetryDelay(RetryPolicyConfig policy, int retryAttempt)
-    {
-        if (policy.UseExponentialBackoff)
-        {
-            return policy.RetryDelayMilliseconds * (int)Math.Pow(2, retryAttempt - 1);
-        }
-
-        return policy.RetryDelayMilliseconds * retryAttempt;
     }
 }
 
