@@ -50,11 +50,11 @@ public class RetryMiddleware
         context.Request.EnableBuffering();
 
         var availableDestinations = reverseProxyFeature.AvailableDestinations;
-        var retryCount = 0;
+        var firstAttempt = true;
 
         await policy.Pipeline.ExecuteAsync(async ct =>
         {
-            if (retryCount > 0)
+            if (!firstAttempt)
             {
                 var healthyDestinations = availableDestinations
                     .Where(m => m != reverseProxyFeature.ProxiedDestination)
@@ -66,30 +66,21 @@ public class RetryMiddleware
                     return;
                 }
 
-                _logger.LogInformation("Retrying request (attempt {RetryCount}/{MaxRetryAttempts}). Route: {RouteId}",
-                    retryCount, policy.Config.MaxRetryAttempts, reverseProxyFeature.Route.Config.RouteId);
-
                 reverseProxyFeature.AvailableDestinations = healthyDestinations;
                 reverseProxyFeature.ProxiedDestination = null;
                 context.Request.Body.Position = 0;
             }
 
+            firstAttempt = false;
             await _next(context);
 
             var statusCode = context.Response.StatusCode;
 
             if (policy.Config.RetryStatusCodes.Contains(statusCode))
             {
-                retryCount++;
                 throw new HttpRequestException($"Request failed with status code {statusCode}");
             }
         }, context.RequestAborted);
-
-        if (retryCount > 0)
-        {
-            _logger.LogInformation("Retry completed after {RetryCount} attempts. Final StatusCode: {StatusCode}",
-                retryCount, context.Response.StatusCode);
-        }
     }
 }
 
