@@ -4,10 +4,6 @@
     <Project Path="samples\SampleServer\SampleServer.csproj" />
     <Project Path="samples\YarpServiceDiscovery\YarpServiceDiscovery.csproj" />
   </Folder>
-  <Folder Name="/shared/">
-    <Project Path="shared\Sail.ServiceDiscovery.Consul\Sail.ServiceDiscovery.Consul.csproj" />
-    <Project Path="shared\ServiceDefaults\ServiceDefaults.csproj" />
-  </Folder>
   <Folder Name="/Solution Items/">
     <File Path="Directory.Packages.props" />
     <File Path="NuGet.config" />
@@ -20,6 +16,8 @@
     <Project Path="src\Sail.Core\Sail.Core.csproj" />
     <Project Path="src\Sail.Proxy\Sail.Proxy.csproj" />
     <Project Path="src\Sail\Sail.csproj" />
+    <Project Path="src\Sail.ServiceDiscovery.Consul\Sail.ServiceDiscovery.Consul.csproj" />
+    <Project Path="src\Shared\ServiceDefaults\ServiceDefaults.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/Sail.Compass.Tests/Sail.Compass.Tests.csproj" Id="85b438fe-c97c-4ae9-ad52-8e7026fef0e1" />

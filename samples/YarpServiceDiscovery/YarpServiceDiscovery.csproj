@@ -12,7 +12,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\shared\Sail.ServiceDiscovery.Consul\Sail.ServiceDiscovery.Consul.csproj" />
+      <ProjectReference Include="..\..\src\Sail.ServiceDiscovery.Consul\Sail.ServiceDiscovery.Consul.csproj" />
     </ItemGroup>
 
 </Project>
