@@ -58,9 +58,9 @@ public static class ServiceCollectionExtensions
         builder.Services.AddSingleton<AuthenticationPolicyObserver>();
 
         builder.Services.AddSingleton<ProxyConfigProvider>();
-        builder.Services.AddSingleton<IProxyConfigProvider>(sp => 
+        builder.Services.AddSingleton<IProxyConfigProvider>(sp =>
             sp.GetRequiredService<ProxyConfigProvider>());
-        
+
         return builder;
     }
 

@@ -46,8 +46,8 @@ internal static class TimeoutPolicyStreamBuilder
 
         foreach (var middleware in middlewares)
         {
-            if (middleware.Type != MiddlewareType.Timeout 
-                ||!middleware.Enabled 
+            if (middleware.Type != MiddlewareType.Timeout
+                || !middleware.Enabled
                 || middleware.Timeout == null)
             {
                 continue;

@@ -8,19 +8,19 @@ using Sail.Database.MongoDB.Extensions;
 
 namespace Sail.Grpc;
 
-public class AuthenticationPolicyGrpcService(SailContext dbContext, IAuthenticationPolicyStore policyStore) 
+public class AuthenticationPolicyGrpcService(SailContext dbContext, IAuthenticationPolicyStore policyStore)
     : Api.V1.AuthenticationPolicyService.AuthenticationPolicyServiceBase
 {
     public override async Task<ListAuthenticationPolicyResponse> List(Empty request, ServerCallContext context)
     {
         var policies = await policyStore.GetAsync(context.CancellationToken);
-        
+
         var response = new ListAuthenticationPolicyResponse();
         foreach (var policy in policies)
         {
             response.Items.Add(ConvertToProto(policy));
         }
-        
+
         return response;
     }
 
@@ -51,13 +51,13 @@ public class AuthenticationPolicyGrpcService(SailContext dbContext, IAuthenticat
                     ChangeStreamOperationType.Delete => EventType.Delete,
                     _ => EventType.Unknown
                 };
-                
+
                 var response = new WatchAuthenticationPolicyResponse
                 {
                     Policy = ConvertToProto(document),
                     EventType = eventType
                 };
-                
+
                 await responseStream.WriteAsync(response);
             }
         }
@@ -69,8 +69,8 @@ public class AuthenticationPolicyGrpcService(SailContext dbContext, IAuthenticat
         {
             PolicyId = policy.Id.ToString(),
             Name = policy.Name,
-            Type = policy.Type == Core.Entities.AuthenticationSchemeType.JwtBearer 
-                ? Api.V1.AuthenticationSchemeType.JwtBearer 
+            Type = policy.Type == Core.Entities.AuthenticationSchemeType.JwtBearer
+                ? Api.V1.AuthenticationSchemeType.JwtBearer
                 : Api.V1.AuthenticationSchemeType.OpenIdConnect,
             Enabled = policy.Enabled
         };

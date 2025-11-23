@@ -10,7 +10,7 @@ internal class BindingAddress
     public static BindingAddress Parse(string address)
     {
         var result = new BindingAddress();
-        
+
         var uri = new Uri(address, UriKind.Absolute);
         result.Scheme = uri.Scheme;
         result.Host = uri.Host;

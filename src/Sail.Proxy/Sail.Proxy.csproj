@@ -7,7 +7,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\shared\Sail.ServiceDiscovery.Consul\Sail.ServiceDiscovery.Consul.csproj" />
+      <ProjectReference Include="..\Sail.ServiceDiscovery.Consul\Sail.ServiceDiscovery.Consul.csproj" />
       <ProjectReference Include="..\Sail.Compass\Sail.Compass.csproj" />
       <ProjectReference Include="..\Sail.Core\Sail.Core.csproj" />
     </ItemGroup>

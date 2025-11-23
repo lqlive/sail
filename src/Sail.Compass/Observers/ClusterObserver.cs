@@ -5,7 +5,7 @@ using Google.Protobuf.WellKnownTypes;
 using Sail.Compass.Extensions;
 
 namespace Sail.Compass.Observers;
-internal sealed class ClusterObserver(ClusterService.ClusterServiceClient client): ResourceObserver<Cluster>
+internal sealed class ClusterObserver(ClusterService.ClusterServiceClient client) : ResourceObserver<Cluster>
 {
     public override IObservable<ResourceEvent<Cluster>> GetObservable(bool watch)
     {
@@ -13,7 +13,7 @@ internal sealed class ClusterObserver(ClusterService.ClusterServiceClient client
         {
             return List();
         }
-        
+
         return Observable.Concat(
             List(),
             Watch()

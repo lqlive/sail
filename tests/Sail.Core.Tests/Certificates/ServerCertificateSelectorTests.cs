@@ -179,7 +179,7 @@ public class ServerCertificateSelectorTests : IDisposable
         // Arrange
         var exactHostname = "api.example.com";
         var wildcardHostname = "*.example.com";
-        
+
         var exactCert = CreateTestCertificate(exactHostname);
         var wildcardCert = CreateTestCertificate(wildcardHostname);
         _certificatesToDispose.Add(exactCert);

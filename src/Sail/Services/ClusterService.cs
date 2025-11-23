@@ -14,7 +14,7 @@ public class ClusterService(SailContext context)
         var result = await routes.SingleOrDefaultAsync(cancellationToken: cancellationToken);
         return MapToCluster(result);
     }
-    
+
     public async Task<IEnumerable<ClusterResponse>> ListAsync(string keywords,
         CancellationToken cancellationToken = default)
     {
@@ -162,7 +162,7 @@ public class ClusterService(SailContext context)
                 Enabled = cluster.SessionAffinity?.Enabled,
                 Policy = cluster.SessionAffinity?.Policy,
                 FailurePolicy = cluster.SessionAffinity?.FailurePolicy,
-                AffinityKeyName =cluster.SessionAffinity?.AffinityKeyName,
+                AffinityKeyName = cluster.SessionAffinity?.AffinityKeyName,
                 Cookie = new SessionAffinityCookieResponse
                 {
                     Path = cluster.SessionAffinity?.Cookie?.Path,

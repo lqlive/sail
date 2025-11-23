@@ -273,7 +273,7 @@ public class HttpsRedirectionMiddlewareTests
         // Assert
         Assert.False(_nextCalled);
         Assert.Equal(308, context.Response.StatusCode);
-        Assert.Equal("https://example.com/api/test?param1=value1&param2=value2", 
+        Assert.Equal("https://example.com/api/test?param1=value1&param2=value2",
             context.Response.Headers.Location.ToString());
     }
 
@@ -282,7 +282,7 @@ public class HttpsRedirectionMiddlewareTests
     {
         // Arrange
         _mockConfiguration.Setup(x => x["HTTPS_PORT"]).Returns("5001");
-        
+
         var options = Microsoft.Extensions.Options.Options.Create(new HttpsRedirectionOptions());
         var middleware = new HttpsRedirectionMiddleware(
             NextDelegate,
@@ -439,7 +439,7 @@ public class HttpsRedirectionMiddlewareTests
     private Mock<IReverseProxyFeature> CreateMockReverseProxyFeature(string httpsRedirect)
     {
         var mockRoute = new Mock<IReverseProxyFeature>();
-        
+
         var metadata = new Dictionary<string, string>
         {
             { "HttpsRedirect", httpsRedirect }

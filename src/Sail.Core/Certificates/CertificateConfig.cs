@@ -7,4 +7,3 @@ public class CertificateConfig
     public string Key { get; set; }
 }
 
- 

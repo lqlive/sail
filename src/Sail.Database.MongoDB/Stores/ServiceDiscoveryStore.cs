@@ -10,7 +10,7 @@ public class ServiceDiscoveryStore(SailContext context) : IServiceDiscoveryStore
     public async Task<IEnumerable<ServiceDiscovery>> ListAsync(string? keywords, CancellationToken cancellationToken = default)
     {
         var filter = Builders<ServiceDiscovery>.Filter.Empty;
-        
+
         if (!string.IsNullOrWhiteSpace(keywords))
         {
             var keywordFilter = Builders<ServiceDiscovery>.Filter.Or(

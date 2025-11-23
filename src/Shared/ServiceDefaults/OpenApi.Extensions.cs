@@ -14,7 +14,7 @@ public static partial class Extensions
     {
         var configuration = app.Configuration;
         var openApiSection = configuration.GetSection("OpenApi");
-   
+
         if (!openApiSection.Exists())
         {
             return app;

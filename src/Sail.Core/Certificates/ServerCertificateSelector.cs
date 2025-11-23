@@ -14,21 +14,21 @@ public class ServerCertificateSelector(
 {
     private readonly ILogger<ServerCertificateSelector> _logger = logger;
     private readonly CertificateOptions _options = options.Value;
-    
-    private volatile IReadOnlyDictionary<string, X509Certificate2> _certificates = 
+
+    private volatile IReadOnlyDictionary<string, X509Certificate2> _certificates =
         new Dictionary<string, X509Certificate2>(StringComparer.OrdinalIgnoreCase);
-    private volatile IReadOnlyDictionary<string, X509Certificate2> _wildcardCertificates = 
+    private volatile IReadOnlyDictionary<string, X509Certificate2> _wildcardCertificates =
         new Dictionary<string, X509Certificate2>(StringComparer.OrdinalIgnoreCase);
-    
+
     private X509Certificate2? _defaultCertificate;
 
     public IReadOnlyDictionary<string, X509Certificate2> Certificates => _certificates;
-    
+
     public IReadOnlyDictionary<string, X509Certificate2> WildcardCertificates => _wildcardCertificates;
 
     public X509Certificate2 GetCertificate(ConnectionContext connectionContext, string domainName)
     {
-        _logger.LogDebug("ConnectionId: '{ConnectionId}', SNI hostname: '{HostName}'", 
+        _logger.LogDebug("ConnectionId: '{ConnectionId}', SNI hostname: '{HostName}'",
             connectionContext?.ConnectionId, domainName);
 
         if (string.IsNullOrEmpty(domainName))
@@ -48,19 +48,19 @@ public class ServerCertificateSelector(
         {
             var domainSpan = domainName.AsSpan(firstDotIndex + 1);
             var wildcardCertificates = _wildcardCertificates;
-            
+
             foreach (var kvp in wildcardCertificates)
             {
                 if (MemoryExtensions.Equals(domainSpan, kvp.Key.AsSpan(), StringComparison.OrdinalIgnoreCase))
                 {
-                    _logger.LogDebug("Wildcard match found for hostname: '{HostName}' (*.{Domain})", 
+                    _logger.LogDebug("Wildcard match found for hostname: '{HostName}' (*.{Domain})",
                         domainName, kvp.Key);
                     return kvp.Value;
                 }
             }
         }
 
-        _logger.LogWarning("No certificate found for hostname: '{HostName}', using default certificate", 
+        _logger.LogWarning("No certificate found for hostname: '{HostName}', using default certificate",
             domainName);
         return GetDefaultCertificate();
     }
@@ -77,7 +77,7 @@ public class ServerCertificateSelector(
             {
                 var cert = LoadCertificateFromConfig(config);
                 loadedCerts.Add(cert);
-                
+
                 if (config.HostName.StartsWith("*.", StringComparison.Ordinal))
                 {
                     var domain = config.HostName.AsSpan(2).ToString();
@@ -103,7 +103,7 @@ public class ServerCertificateSelector(
         var oldCertificates = _certificates;
         var oldWildcardCertificates = _wildcardCertificates;
 
-        var changed = !AreEquivalent(oldCertificates, newCertificates) || 
+        var changed = !AreEquivalent(oldCertificates, newCertificates) ||
                      !AreEquivalent(oldWildcardCertificates, newWildcardCertificates);
 
         if (!changed)
@@ -163,7 +163,7 @@ public class ServerCertificateSelector(
 
         using var pemCertificate = X509Certificate2.CreateFromPem(certPem, keyPem);
         var pfxBytes = pemCertificate.Export(X509ContentType.Pkcs12);
-        return X509CertificateLoader.LoadPkcs12(pfxBytes, null, 
+        return X509CertificateLoader.LoadPkcs12(pfxBytes, null,
             X509KeyStorageFlags.Exportable | X509KeyStorageFlags.PersistKeySet);
     }
 
@@ -176,16 +176,16 @@ public class ServerCertificateSelector(
 
         using var pemCertificate = X509Certificate2.CreateFromPemFile(certPath, keyPath);
         var pfxBytes = pemCertificate.Export(X509ContentType.Pkcs12);
-        return X509CertificateLoader.LoadPkcs12(pfxBytes, null, 
+        return X509CertificateLoader.LoadPkcs12(pfxBytes, null,
             X509KeyStorageFlags.Exportable | X509KeyStorageFlags.PersistKeySet);
     }
 
     private static bool AreEquivalent(
-        IReadOnlyDictionary<string, X509Certificate2> old, 
+        IReadOnlyDictionary<string, X509Certificate2> old,
         IReadOnlyDictionary<string, X509Certificate2> updated)
     {
-        return old.Count == updated.Count && 
-               old.All(kvp => updated.TryGetValue(kvp.Key, out var cert) && 
+        return old.Count == updated.Count &&
+               old.All(kvp => updated.TryGetValue(kvp.Key, out var cert) &&
                              kvp.Value.Thumbprint == cert.Thumbprint);
     }
 
@@ -217,7 +217,7 @@ public class ServerCertificateSelector(
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(ex, "Error disposing certificate with thumbprint: {Thumbprint}", 
+            _logger.LogWarning(ex, "Error disposing certificate with thumbprint: {Thumbprint}",
                 certificate.Thumbprint);
         }
     }

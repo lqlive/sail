@@ -120,7 +120,7 @@ public class SailAuthorizationPolicyProviderTests
         // Act & Assert
         var exception = Record.Exception(() => _provider.RemovePolicy(policyName));
         Assert.Null(exception);
-        
+
         var result = await _provider.GetPolicyAsync(policyName);
         Assert.Null(result);
     }
@@ -225,7 +225,7 @@ public class SailAuthorizationPolicyProviderTests
         {
             _provider.AddOrUpdatePolicy(policyName, scheme);
             var result = await _provider.GetPolicyAsync(policyName);
-            
+
             Assert.NotNull(result);
             Assert.Contains(scheme, result.AuthenticationSchemes);
         }
@@ -245,7 +245,7 @@ public class SailAuthorizationPolicyProviderTests
         // Act
         _provider.AddOrUpdatePolicy(policyName, schemeName);
         var resultBeforeRemove = await _provider.GetPolicyAsync(policyName);
-        
+
         _provider.RemovePolicy(policyName);
         var resultAfterRemove = await _provider.GetPolicyAsync(policyName);
 

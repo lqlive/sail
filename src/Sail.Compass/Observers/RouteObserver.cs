@@ -14,7 +14,7 @@ internal sealed class RouteObserver(RouteService.RouteServiceClient client) : Re
         {
             return List();
         }
-        
+
         return Observable.Concat(
             List(),
             Watch()

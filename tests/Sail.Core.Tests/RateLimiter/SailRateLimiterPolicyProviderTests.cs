@@ -484,7 +484,7 @@ public class SailRateLimiterPolicyProviderTests
         // Act
         await _provider.UpdateAsync(config1, CancellationToken.None);
         var before = _provider.GetPolicy("Test")!.PermitLimit;
-        
+
         await _provider.UpdateAsync(config2, CancellationToken.None);
         var after = _provider.GetPolicy("Test")!.PermitLimit;
 
@@ -509,7 +509,7 @@ public class SailRateLimiterPolicyProviderTests
         // Act
         await _provider.UpdateAsync(config1, CancellationToken.None);
         var before = _provider.GetPolicy("Test")!.Window;
-        
+
         await _provider.UpdateAsync(config2, CancellationToken.None);
         var after = _provider.GetPolicy("Test")!.Window;
 
@@ -534,7 +534,7 @@ public class SailRateLimiterPolicyProviderTests
         // Act
         await _provider.UpdateAsync(config1, CancellationToken.None);
         var before = _provider.GetPolicy("Test")!.QueueLimit;
-        
+
         await _provider.UpdateAsync(config2, CancellationToken.None);
         var after = _provider.GetPolicy("Test")!.QueueLimit;
 

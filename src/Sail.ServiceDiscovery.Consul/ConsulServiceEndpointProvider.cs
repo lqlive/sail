@@ -6,7 +6,7 @@ using Sail.ServiceDiscovery.Consul.Internal;
 
 namespace Sail.ServiceDiscovery.Consul;
 
-internal sealed  class ConsulServiceEndpointProvider(
+internal sealed class ConsulServiceEndpointProvider(
     ServiceEndpointQuery query,
     string hostName,
     IOptionsMonitor<ConsulServiceEndpointProviderOptions> options,
@@ -38,7 +38,7 @@ internal sealed  class ConsulServiceEndpointProvider(
                 endpoints.Add(serviceEndpoint);
             }
         }
-        
+
         SetResult(endpoints, ttl);
     }
 }

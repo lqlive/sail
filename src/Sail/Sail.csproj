@@ -13,15 +13,15 @@
     </ItemGroup>
     
     <ItemGroup>
-        <ProjectReference Include="..\..\shared\ServiceDefaults\ServiceDefaults.csproj" />
+        <ProjectReference Include="..\Shared\ServiceDefaults\ServiceDefaults.csproj" />
         <ProjectReference Include="..\Sail.Compass\Sail.Compass.csproj" />
         <ProjectReference Include="..\Sail.Database.MongoDB\Sail.Database.MongoDB.csproj" />
         <ProjectReference Include="..\Sail.Storage.MongoDB\Sail.Database.MongoDB.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-        <Protobuf Include="$(RepoRoot)\shared\protos\*.proto" Link="Protos\%(RecursiveDir)%(Filename)%(Extension)">
-            <ProtoRoot>$(RepoRoot)\shared\protos</ProtoRoot>
+        <Protobuf Include="$(RepoRoot)\src\Shared\Protos\*.proto" Link="Protos\%(RecursiveDir)%(Filename)%(Extension)">
+            <ProtoRoot>$(RepoRoot)\src\Shared\Protos</ProtoRoot>
         </Protobuf>
     </ItemGroup>
 </Project>
