@@ -12,6 +12,7 @@ public record MiddlewareResponse
     public CorsResponse? Cors { get; init; }
     public RateLimiterResponse? RateLimiter { get; init; }
     public TimeoutResponse? Timeout { get; init; }
+    public RetryResponse? Retry { get; init; }
     public DateTimeOffset CreatedAt { get; init; }
     public DateTimeOffset UpdatedAt { get; init; }
 }
@@ -40,5 +41,14 @@ public record TimeoutResponse
     public required string Name { get; init; }
     public int Seconds { get; init; }
     public int? TimeoutStatusCode { get; init; }
+}
+
+public record RetryResponse
+{
+    public required string Name { get; init; }
+    public int MaxRetryAttempts { get; init; }
+    public int[] RetryStatusCodes { get; init; }
+    public int RetryDelayMilliseconds { get; init; }
+    public bool UseExponentialBackoff { get; init; }
 }
 

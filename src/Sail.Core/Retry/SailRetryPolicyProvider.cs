@@ -77,6 +77,12 @@ public class SailRetryPolicyProvider : IRetryPolicyProvider
             {
                 _logger.LogDebug("Retry attempt {AttemptNumber} after {Delay}ms",
                     args.AttemptNumber + 1, args.RetryDelay.TotalMilliseconds);
+
+                if (args.Context.Properties.TryGetValue(RetryKeys.OnRetryCallback, out var callback))
+                {
+                    callback?.Invoke();
+                }
+
                 return ValueTask.CompletedTask;
             }
         };

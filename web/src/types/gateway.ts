@@ -11,6 +11,7 @@ export interface Route {
   rateLimiterPolicy?: string;
   corsPolicy?: string;
   timeoutPolicy?: string;
+  retryPolicy?: string;
   timeout?: string;
   maxRequestBodySize?: number;
   httpsRedirect?: boolean;
@@ -136,7 +137,7 @@ export interface Certificate {
   updatedAt: string;
 }
 
-export type MiddlewareType = 'Cors' | 'RateLimiter' | 'Timeout';
+export type MiddlewareType = 'Cors' | 'RateLimiter' | 'Timeout' | 'Retry';
 
 export interface Middleware {
   id: string;
@@ -147,6 +148,7 @@ export interface Middleware {
   cors?: CorsConfig;
   rateLimiter?: RateLimiterConfig;
   timeout?: TimeoutConfig;
+  retry?: RetryConfig;
   createdAt: string;
   updatedAt: string;
 }
@@ -172,6 +174,14 @@ export interface TimeoutConfig {
   name: string;
   seconds: number;
   timeoutStatusCode?: number;
+}
+
+export interface RetryConfig {
+  name: string;
+  maxRetryAttempts: number;
+  retryStatusCodes: number[];
+  retryDelayMilliseconds: number;
+  useExponentialBackoff: boolean;
 }
 
 export interface GatewayStats {

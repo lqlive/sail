@@ -6,6 +6,7 @@ using Sail.Core.Authentication;
 using Sail.Core.Authentication.JwtBearer;
 using Sail.Core.Authentication.OpenIdConnect;
 using Sail.Core.Timeout;
+using Sail.Core.Retry;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Cors.Infrastructure;
@@ -34,6 +35,13 @@ public static class SailServiceCollectionExtensions
     {
         services.TryAddSingleton<SailRateLimiterPolicyProvider>();
         services.TryAddSingleton<IRateLimiterPolicyProvider>(sp => sp.GetRequiredService<SailRateLimiterPolicyProvider>());
+        return services;
+    }
+
+    public static IServiceCollection AddSailRetry(this IServiceCollection services)
+    {
+        services.TryAddSingleton<SailRetryPolicyProvider>();
+        services.TryAddSingleton<IRetryPolicyProvider>(sp => sp.GetRequiredService<SailRetryPolicyProvider>());
         return services;
     }
 

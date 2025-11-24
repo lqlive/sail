@@ -4,7 +4,8 @@ public enum MiddlewareType
 {
     Cors,
     RateLimiter,
-    Timeout
+    Timeout,
+    Retry
 }
 
 public class Middleware
@@ -17,6 +18,7 @@ public class Middleware
     public Cors? Cors { get; init; }
     public RateLimiter? RateLimiter { get; init; }
     public Timeout? Timeout { get; init; }
+    public Retry? Retry { get; init; }
     public DateTimeOffset CreatedAt { get; init; } = DateTimeOffset.UtcNow;
     public DateTimeOffset UpdatedAt { get; init; } = DateTimeOffset.UtcNow;
 }
@@ -45,4 +47,13 @@ public class Timeout
     public required string Name { get; init; }
     public int Seconds { get; init; }
     public int? TimeoutStatusCode { get; init; }
+}
+
+public class Retry
+{
+    public required string Name { get; init; }
+    public int MaxRetryAttempts { get; init; } = 1;
+    public int[] RetryStatusCodes { get; init; } = [500, 502, 503, 504];
+    public int RetryDelayMilliseconds { get; init; } = 1000;
+    public bool UseExponentialBackoff { get; init; } = false;
 }

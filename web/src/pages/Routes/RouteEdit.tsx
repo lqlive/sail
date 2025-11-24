@@ -22,6 +22,7 @@ const RouteEdit: React.FC = () => {
     rateLimiterPolicy: '',
     corsPolicy: '',
     timeoutPolicy: '',
+    retryPolicy: '',
     timeout: '',
     maxRequestBodySize: '',
     httpsRedirect: false,
@@ -75,6 +76,7 @@ const RouteEdit: React.FC = () => {
         rateLimiterPolicy: route.rateLimiterPolicy || '',
         corsPolicy: route.corsPolicy || '',
         timeoutPolicy: route.timeoutPolicy || '',
+        retryPolicy: route.retryPolicy || '',
         timeout: route.timeout || '',
         maxRequestBodySize: route.maxRequestBodySize?.toString() || '',
         httpsRedirect: route.httpsRedirect || false,
@@ -104,6 +106,7 @@ const RouteEdit: React.FC = () => {
         rateLimiterPolicy: formData.rateLimiterPolicy || undefined,
         corsPolicy: formData.corsPolicy || undefined,
         timeoutPolicy: formData.timeoutPolicy || undefined,
+        retryPolicy: formData.retryPolicy || undefined,
         timeout: formData.timeout || undefined,
         httpsRedirect: formData.httpsRedirect,
         transforms: formData.transforms.length > 0 ? formData.transforms : undefined,
@@ -511,6 +514,19 @@ const RouteEdit: React.FC = () => {
                   value={formData.timeoutPolicy}
                   onChange={(e) => setFormData({ ...formData, timeoutPolicy: e.target.value })}
                   placeholder="e.g., default-timeout"
+                  className="block w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-gray-400 focus:ring-1 focus:ring-gray-400 transition-colors"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Retry Policy
+                </label>
+                <input
+                  type="text"
+                  value={formData.retryPolicy}
+                  onChange={(e) => setFormData({ ...formData, retryPolicy: e.target.value })}
+                  placeholder="e.g., api-retry-policy"
                   className="block w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-gray-400 focus:ring-1 focus:ring-gray-400 transition-colors"
                 />
               </div>

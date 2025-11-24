@@ -69,11 +69,14 @@ public class MiddlewareGrpcService(SailContext dbContext, IMiddlewareStore middl
         {
             MiddlewareId = middleware.Id.ToString(),
             Name = middleware.Name,
-            Type = middleware.Type == Core.Entities.MiddlewareType.Cors
-                ? Api.V1.MiddlewareType.Cors
-                : middleware.Type == Core.Entities.MiddlewareType.Timeout
-                    ? Api.V1.MiddlewareType.Timeout
-                    : Api.V1.MiddlewareType.RateLimiter,
+            Type = middleware.Type switch
+            {
+                Core.Entities.MiddlewareType.Cors => Api.V1.MiddlewareType.Cors,
+                Core.Entities.MiddlewareType.RateLimiter => Api.V1.MiddlewareType.RateLimiter,
+                Core.Entities.MiddlewareType.Timeout => Api.V1.MiddlewareType.Timeout,
+                Core.Entities.MiddlewareType.Retry => Api.V1.MiddlewareType.Retry,
+                _ => Api.V1.MiddlewareType.Cors
+            },
             Enabled = middleware.Enabled
         };
 
@@ -138,6 +141,22 @@ public class MiddlewareGrpcService(SailContext dbContext, IMiddlewareStore middl
             if (middleware.Timeout.TimeoutStatusCode.HasValue)
             {
                 proto.Timeout.TimeoutStatusCode = middleware.Timeout.TimeoutStatusCode.Value;
+            }
+        }
+
+        if (middleware.Retry != null)
+        {
+            proto.Retry = new Api.V1.Retry
+            {
+                Name = middleware.Retry.Name,
+                MaxRetryAttempts = middleware.Retry.MaxRetryAttempts,
+                RetryDelayMilliseconds = middleware.Retry.RetryDelayMilliseconds,
+                UseExponentialBackoff = middleware.Retry.UseExponentialBackoff
+            };
+
+            if (middleware.Retry.RetryStatusCodes != null)
+            {
+                proto.Retry.RetryStatusCodes.AddRange(middleware.Retry.RetryStatusCodes);
             }
         }
 

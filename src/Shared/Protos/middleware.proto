@@ -28,12 +28,14 @@ message Middleware {
   Cors cors = 6;
   RateLimiter rate_limiter = 7;
   Timeout timeout = 8;
+  Retry retry = 9;
 }
 
 enum MiddlewareType {
   CORS = 0;
   RATE_LIMITER = 1;
   TIMEOUT = 2;
+  RETRY = 3;
 }
 
 message Cors {
@@ -57,4 +59,12 @@ message Timeout {
   string name = 1;
   int32 seconds = 2;
   google.protobuf.Int32Value timeout_status_code = 3;
+}
+
+message Retry {
+  string name = 1;
+  int32 max_retry_attempts = 2;
+  repeated int32 retry_status_codes = 3;
+  int32 retry_delay_milliseconds = 4;
+  bool use_exponential_backoff = 5;
 }

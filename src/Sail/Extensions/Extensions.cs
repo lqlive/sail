@@ -21,5 +21,6 @@ public static class Extensions
 
         services.AddSailCors();
         services.AddSailRateLimiter();
+        services.AddSailRetry();
     }
 }
