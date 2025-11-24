@@ -5,3 +5,4 @@ public enum ServiceDiscoveryType
     Consul = 1,
     Dns = 2
 }
+

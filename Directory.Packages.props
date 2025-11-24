@@ -17,8 +17,7 @@
     <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="$(MicrosoftExtensionsPackageVersion)" />
     <PackageVersion Include="Microsoft.Extensions.ServiceDiscovery" Version="$(MicrosoftExtensionsPackageVersion)" />
     <PackageVersion Include="Microsoft.Extensions.Http.Resilience" Version="$(MicrosoftExtensionsPackageVersion)" />
-    <PackageVersion Include="Microsoft.Extensions.ServiceDiscovery.Abstractions" Version="$(MicrosoftExtensionsPackageVersion)" />
-    <PackageVersion Include="Microsoft.Extensions.ServiceDiscovery.Yarp" Version="$(MicrosoftExtensionsPackageVersion)" />
+	<PackageVersion Include="Microsoft.Extensions.ServiceDiscovery.Dns" Version="$(MicrosoftExtensionsPackageVersion)" />
     <!-- Version together with Asp.Versioning -->
     <PackageVersion Include="Asp.Versioning.Http" Version="$(ApiVersioningVersion)" />
     <PackageVersion Include="Asp.Versioning.Http.Client" Version="$(ApiVersioningVersion)" />
@@ -38,8 +37,7 @@
     <PackageVersion Include="Consul.AspNetCore" Version="1.7.14.5" />
     <PackageVersion Include="System.Reactive" Version="6.0.1" />
     <PackageVersion Include="MongoDB.Driver" Version="3.1.0" />
-    <PackageVersion Include="Microsoft.FluentUI.AspNetCore.Components" Version="4.11.9" />
-    <!-- Test packages -->
+	<!-- Test packages -->
     <PackageVersion Include="coverlet.collector" Version="6.0.2" />
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
     <PackageVersion Include="xunit" Version="2.9.2" />

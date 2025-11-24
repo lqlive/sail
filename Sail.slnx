@@ -15,13 +15,13 @@
     <Project Path="src\Sail.Compass\Sail.Compass.csproj" />
     <Project Path="src\Sail.Core\Sail.Core.csproj" />
     <Project Path="src\Sail.Proxy\Sail.Proxy.csproj" />
-    <Project Path="src\Sail\Sail.csproj" />
     <Project Path="src\Sail.ServiceDiscovery.Consul\Sail.ServiceDiscovery.Consul.csproj" />
+    <Project Path="src\Sail\Sail.csproj" />
     <Project Path="src\Shared\ServiceDefaults\ServiceDefaults.csproj" />
   </Folder>
   <Folder Name="/tests/">
-    <Project Path="tests/Sail.Compass.Tests/Sail.Compass.Tests.csproj" Id="85b438fe-c97c-4ae9-ad52-8e7026fef0e1" />
-    <Project Path="tests/Sail.Core.Tests/Sail.Core.Tests.csproj" Id="2bd65e7f-e6cf-4c94-8af2-4bf2b6d69639" />
+    <Project Path="tests/Sail.Compass.Tests/Sail.Compass.Tests.csproj" />
+    <Project Path="tests/Sail.Core.Tests/Sail.Core.Tests.csproj" />
     <Project Path="tests\Sail.FunctionalTests\Sail.FunctionalTests.csproj" />
   </Folder>
 </Solution>

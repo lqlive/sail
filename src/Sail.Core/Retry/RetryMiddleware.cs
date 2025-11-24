@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Polly;
-using Polly.Retry;
 using Sail.Core.Utilities;
 using Yarp.ReverseProxy.Model;
 
@@ -50,37 +49,62 @@ public class RetryMiddleware
         context.Request.EnableBuffering();
 
         var availableDestinations = reverseProxyFeature.AvailableDestinations;
-        var firstAttempt = true;
+        var resilienceContext = ResilienceContextPool.Shared.Get(context.RequestAborted);
 
-        await policy.Pipeline.ExecuteAsync(async ct =>
+        resilienceContext.Properties.Set(RetryKeys.OnRetryCallback, () =>
         {
-            if (!firstAttempt)
+            PrepareRetryAttempt(context, reverseProxyFeature, availableDestinations);
+        });
+
+        try
+        {
+            await policy.Pipeline.ExecuteAsync(async ctx =>
             {
-                var healthyDestinations = availableDestinations
-                    .Where(m => m != reverseProxyFeature.ProxiedDestination)
-                    .ToList();
+                await _next(context);
+                ThrowIfRetryableStatusCode(context.Response.StatusCode, policy.Config);
+            }, resilienceContext);
+        }
+        finally
+        {
+            ResilienceContextPool.Shared.Return(resilienceContext);
+        }
+    }
 
-                if (healthyDestinations.Count == 0)
-                {
-                    _logger.LogWarning("No healthy destinations available for retry. Route: {RouteId}", reverseProxyFeature.Route.Config.RouteId);
-                    return;
-                }
+    private void PrepareRetryAttempt(
+        HttpContext context,
+        IReverseProxyFeature reverseProxyFeature,
+        IReadOnlyList<DestinationState> availableDestinations)
+    {
+        var healthyDestinations = GetHealthyDestinations(reverseProxyFeature, availableDestinations);
 
-                reverseProxyFeature.AvailableDestinations = healthyDestinations;
-                reverseProxyFeature.ProxiedDestination = null;
-                context.Request.Body.Position = 0;
-            }
+        if (healthyDestinations.Count == 0)
+        {
+            _logger.LogWarning(
+                "No healthy destinations available for retry. Route: {RouteId}",
+                reverseProxyFeature.Route.Config.RouteId);
+            return;
+        }
 
-            firstAttempt = false;
-            await _next(context);
+        reverseProxyFeature.AvailableDestinations = healthyDestinations;
+        reverseProxyFeature.ProxiedDestination = null;
+        context.Request.Body.Position = 0;
+    }
 
-            var statusCode = context.Response.StatusCode;
+    private static List<DestinationState> GetHealthyDestinations(
+        IReverseProxyFeature reverseProxyFeature,
+        IReadOnlyList<DestinationState> availableDestinations)
+    {
+        return availableDestinations
+            .Where(destination => destination != reverseProxyFeature.ProxiedDestination)
+            .ToList();
+    }
 
-            if (policy.Config.RetryStatusCodes.Contains(statusCode))
-            {
-                throw new HttpRequestException($"Request failed with status code {statusCode}");
-            }
-        }, context.RequestAborted);
+    private static void ThrowIfRetryableStatusCode(int statusCode, RetryPolicyConfig config)
+    {
+        if (config.RetryStatusCodes.Contains(statusCode))
+        {
+            throw new RetryableHttpException(statusCode);
+        }
     }
 }
 

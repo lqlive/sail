@@ -16,6 +16,7 @@
         <PackageReference Include="Microsoft.Extensions.Options" />
         <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
         <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" />
+        <PackageReference Include="Microsoft.Extensions.ServiceDiscovery" />
         <PackageReference Include="Polly" />
     </ItemGroup>
     

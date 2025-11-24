@@ -10,13 +10,15 @@
         <PackageReference Include="ErrorOr" />
         <PackageReference Include="Asp.Versioning.Http" />
         <PackageReference Include="Grpc.AspNetCore" />
+        <PackageReference Include="Microsoft.Extensions.ServiceDiscovery" />
+        <PackageReference Include="Microsoft.Extensions.ServiceDiscovery.Dns" />
+        <PackageReference Include="Consul.AspNetCore" />
     </ItemGroup>
     
     <ItemGroup>
         <ProjectReference Include="..\Shared\ServiceDefaults\ServiceDefaults.csproj" />
         <ProjectReference Include="..\Sail.Compass\Sail.Compass.csproj" />
         <ProjectReference Include="..\Sail.Database.MongoDB\Sail.Database.MongoDB.csproj" />
-        <ProjectReference Include="..\Sail.Storage.MongoDB\Sail.Database.MongoDB.csproj" />
     </ItemGroup>
 
     <ItemGroup>

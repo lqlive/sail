@@ -120,7 +120,7 @@ const Clusters: React.FC = () => {
               </Link>
             </div>
       ) : (
-        <div className="space-y-3">
+        <div className="space-y-4">
           {
           clusters.map((cluster) => {
             const destinationCount = cluster.destinations?.length || 0;
@@ -132,69 +132,55 @@ const Clusters: React.FC = () => {
             <Link
               key={cluster.id}
               to={`/clusters/${cluster.id}/edit`}
-              className="block bg-white border border-gray-200 rounded-lg p-5 hover:border-gray-300 hover:shadow-sm transition-all"
+              className="group block"
             >
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 bg-purple-50 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <ServerStackIcon className="h-5 w-5 text-purple-600" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <h3 className="text-base font-medium text-gray-900 truncate">{cluster.name}</h3>
-                  {hasServiceDiscovery && (
-                    <div className="flex items-center gap-1 mt-1">
-                      <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
-                        🔍 {(cluster as any).serviceDiscoveryType}
-                      </span>
-                      <span className="text-xs text-gray-500 truncate">
-                        {(cluster as any).serviceName}
-                      </span>
+              <div className="bg-white border border-gray-200/80 rounded-lg p-5 hover:border-gray-400 hover:shadow-sm transition-all duration-200">
+                <div className="flex items-center gap-4">
+                  <div className="flex-shrink-0 w-11 h-11 bg-purple-50 rounded-lg flex items-center justify-center">
+                    <ServerStackIcon className="h-5 w-5 text-purple-600" />
+                  </div>
+                  
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-3 mb-1.5">
+                      <h3 className="text-base font-semibold text-gray-900 truncate">{cluster.name}</h3>
+                      {hasServiceDiscovery && (
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-blue-500 text-white">
+                          <MagnifyingGlassIcon className="w-3 h-3" />
+                          Consul
+                        </span>
+                      )}
+                      {destinationCount > 0 && (
+                        <div className={`ml-auto flex items-center gap-1.5 px-2 py-0.5 rounded text-xs font-medium ${
+                          isFullyHealthy ? 'bg-green-50 text-green-700' : 
+                          healthyCount > 0 ? 'bg-yellow-50 text-yellow-700' : 
+                          'bg-red-50 text-red-700'
+                        }`}>
+                          <div className={`w-1.5 h-1.5 rounded-full ${
+                            isFullyHealthy ? 'bg-green-500' : 
+                            healthyCount > 0 ? 'bg-yellow-500' : 'bg-red-500'
+                          }`} />
+                          {healthyCount}/{destinationCount}
+                        </div>
+                      )}
                     </div>
-                  )}
-                </div>
-              </div>
-              
-              <div className="space-y-3">
-                <div className="flex items-center justify-between py-2 border-b border-gray-100">
-                  <span className="text-sm text-gray-500">Load Balancing</span>
-                  <span className="text-sm font-medium text-gray-900">{cluster.loadBalancingPolicy || 'RoundRobin'}</span>
-                </div>
-                
-                {!hasServiceDiscovery && (
-                  <div className="flex items-center justify-between py-2 border-b border-gray-100">
-                    <span className="text-sm text-gray-500">Destinations</span>
-                    <span className="text-sm font-medium text-gray-900">{destinationCount}</span>
+                    
+                    <div className="flex items-center gap-4 text-sm text-gray-500">
+                      {hasServiceDiscovery && (
+                        <span className="truncate">{(cluster as any).serviceName}</span>
+                      )}
+                      <span className="text-gray-400">•</span>
+                      <span>Load Balancing: <span className="font-medium text-gray-700">{cluster.loadBalancingPolicy || 'RoundRobin'}</span></span>
+                      {healthCheckEnabled && (
+                        <>
+                          <span className="text-gray-400">•</span>
+                          <div className="flex items-center gap-1 text-green-600">
+                            <CheckCircleIcon className="h-3.5 w-3.5" />
+                            <span className="text-xs font-medium">Health Check</span>
+                          </div>
+                        </>
+                      )}
+                    </div>
                   </div>
-                )}
-                
-                <div className="flex items-center justify-between py-2 border-b border-gray-100">
-                  <span className="text-sm text-gray-500">Healthy</span>
-                  <div className="flex items-center gap-2">
-                    <span className={`text-sm font-medium ${
-                      destinationCount === 0 ? 'text-gray-400' :
-                      isFullyHealthy ? 'text-green-600' : 
-                      healthyCount > 0 ? 'text-yellow-600' : 'text-red-600'
-                    }`}>
-                      {healthyCount}/{destinationCount}
-                    </span>
-                    {destinationCount > 0 && (
-                      <div className={`w-2 h-2 rounded-full ${
-                        isFullyHealthy ? 'bg-green-500' : 
-                        healthyCount > 0 ? 'bg-yellow-500' : 'bg-red-500'
-                      }`} />
-                    )}
-                  </div>
-                </div>
-                
-                <div className="flex items-center justify-between py-2">
-                  <span className="text-sm text-gray-500">Health Check</span>
-                  {healthCheckEnabled ? (
-                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-50 text-green-700 border border-green-100">
-                      <CheckCircleIcon className="h-3.5 w-3.5 mr-1" />
-                      Enabled
-                    </span>
-                  ) : (
-                    <span className="text-sm text-gray-400">Disabled</span>
-                  )}
                 </div>
               </div>
             </Link>

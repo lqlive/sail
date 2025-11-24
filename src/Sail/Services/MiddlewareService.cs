@@ -3,6 +3,7 @@ using Sail.Core.Entities;
 using Sail.Core.Stores;
 using Sail.Models.Middlewares;
 using TimeoutEntity = Sail.Core.Entities.Timeout;
+using RetryEntity = Sail.Core.Entities.Retry;
 
 namespace Sail.Services;
 
@@ -45,10 +46,16 @@ public class MiddlewareService(IMiddlewareStore store)
             return Error.Validation(description: "Timeout configuration is required for Timeout middleware");
         }
 
+        if (request.Type == MiddlewareType.Retry && request.Retry == null)
+        {
+            return Error.Validation(description: "Retry configuration is required for Retry middleware");
+        }
+
         var configCount = 0;
         if (request.Cors != null) configCount++;
         if (request.RateLimiter != null) configCount++;
         if (request.Timeout != null) configCount++;
+        if (request.Retry != null) configCount++;
 
         if (configCount > 1)
         {
@@ -85,6 +92,14 @@ public class MiddlewareService(IMiddlewareStore store)
                 Seconds = request.Timeout.Seconds,
                 TimeoutStatusCode = request.Timeout.TimeoutStatusCode
             } : null,
+            Retry = request.Retry != null ? new RetryEntity
+            {
+                Name = request.Retry.Name,
+                MaxRetryAttempts = request.Retry.MaxRetryAttempts,
+                RetryStatusCodes = request.Retry.RetryStatusCodes,
+                RetryDelayMilliseconds = request.Retry.RetryDelayMilliseconds,
+                UseExponentialBackoff = request.Retry.UseExponentialBackoff
+            } : null,
             CreatedAt = DateTimeOffset.UtcNow,
             UpdatedAt = DateTimeOffset.UtcNow
         };
@@ -116,10 +131,16 @@ public class MiddlewareService(IMiddlewareStore store)
             return Error.Validation(description: "Timeout configuration is required for Timeout middleware");
         }
 
+        if (request.Type == MiddlewareType.Retry && request.Retry == null)
+        {
+            return Error.Validation(description: "Retry configuration is required for Retry middleware");
+        }
+
         var configCount = 0;
         if (request.Cors != null) configCount++;
         if (request.RateLimiter != null) configCount++;
         if (request.Timeout != null) configCount++;
+        if (request.Retry != null) configCount++;
 
         if (configCount > 1)
         {
@@ -155,6 +176,14 @@ public class MiddlewareService(IMiddlewareStore store)
                 Name = request.Timeout.Name,
                 Seconds = request.Timeout.Seconds,
                 TimeoutStatusCode = request.Timeout.TimeoutStatusCode
+            } : null,
+            Retry = request.Retry != null ? new RetryEntity
+            {
+                Name = request.Retry.Name,
+                MaxRetryAttempts = request.Retry.MaxRetryAttempts,
+                RetryStatusCodes = request.Retry.RetryStatusCodes,
+                RetryDelayMilliseconds = request.Retry.RetryDelayMilliseconds,
+                UseExponentialBackoff = request.Retry.UseExponentialBackoff
             } : null,
             CreatedAt = existing.CreatedAt,
             UpdatedAt = DateTimeOffset.UtcNow
@@ -207,6 +236,14 @@ public class MiddlewareService(IMiddlewareStore store)
                 Name = middleware.Timeout.Name,
                 Seconds = middleware.Timeout.Seconds,
                 TimeoutStatusCode = middleware.Timeout.TimeoutStatusCode
+            } : null,
+            Retry = middleware.Retry != null ? new RetryResponse
+            {
+                Name = middleware.Retry.Name,
+                MaxRetryAttempts = middleware.Retry.MaxRetryAttempts,
+                RetryStatusCodes = middleware.Retry.RetryStatusCodes,
+                RetryDelayMilliseconds = middleware.Retry.RetryDelayMilliseconds,
+                UseExponentialBackoff = middleware.Retry.UseExponentialBackoff
             } : null,
             CreatedAt = middleware.CreatedAt,
             UpdatedAt = middleware.UpdatedAt

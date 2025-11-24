@@ -31,9 +31,9 @@ internal sealed class ConsulServiceEndpointProvider(
         foreach (var service in result.Response)
         {
             var address = $"{service.Service.Address}:{service.Service.Port}";
-            if (ServiceNameParts.TryCreateEndPoint(address, out var endPoint))
+            if (ServiceNameParts.TryCreateEndPoint(address, out var endpoint))
             {
-                var serviceEndpoint = ServiceEndpoint.Create(endPoint);
+                var serviceEndpoint = ServiceEndpoint.Create(endpoint);
                 serviceEndpoint.Features.Set<IServiceEndpointProvider>(this);
                 endpoints.Add(serviceEndpoint);
             }

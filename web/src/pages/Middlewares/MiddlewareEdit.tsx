@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { ChevronLeftIcon, CheckIcon, PlusIcon, XMarkIcon, ShieldCheckIcon, BoltIcon, ClockIcon } from '@heroicons/react/24/outline';
+import { ChevronLeftIcon, CheckIcon, PlusIcon, XMarkIcon, ShieldCheckIcon, BoltIcon, ClockIcon, ArrowPathIcon } from '@heroicons/react/24/outline';
 import type { MiddlewareType } from '../../types/gateway';
 import { MiddlewareService } from '../../services/middlewareService';
 
@@ -28,12 +28,18 @@ const MiddlewareEdit: React.FC = () => {
     timeoutName: '',
     timeoutSeconds: '',
     timeoutStatusCode: '',
+    retryName: '',
+    retryMaxRetryAttempts: '3',
+    retryStatusCodes: [] as number[],
+    retryDelayMilliseconds: '1000',
+    retryUseExponentialBackoff: false,
   });
 
   const [originInput, setOriginInput] = useState('');
   const [methodInput, setMethodInput] = useState('');
   const [allowHeaderInput, setAllowHeaderInput] = useState('');
   const [exposeHeaderInput, setExposeHeaderInput] = useState('');
+  const [statusCodeInput, setStatusCodeInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -69,6 +75,11 @@ const MiddlewareEdit: React.FC = () => {
         timeoutName: middleware.timeout?.name || '',
         timeoutSeconds: middleware.timeout?.seconds.toString() || '',
         timeoutStatusCode: middleware.timeout?.timeoutStatusCode?.toString() || '',
+        retryName: middleware.retry?.name || '',
+        retryMaxRetryAttempts: middleware.retry?.maxRetryAttempts.toString() || '3',
+        retryStatusCodes: middleware.retry?.retryStatusCodes || [],
+        retryDelayMilliseconds: middleware.retry?.retryDelayMilliseconds.toString() || '1000',
+        retryUseExponentialBackoff: middleware.retry?.useExponentialBackoff || false,
       });
     } catch (err) {
       console.error('Failed to load middleware:', err);
@@ -114,6 +125,13 @@ const MiddlewareEdit: React.FC = () => {
           name: formData.timeoutName,
           seconds: parseInt(formData.timeoutSeconds) || 0,
           timeoutStatusCode: formData.timeoutStatusCode ? parseInt(formData.timeoutStatusCode) : undefined,
+        } : undefined,
+        retry: formData.type === 'Retry' ? {
+          name: formData.retryName,
+          maxRetryAttempts: parseInt(formData.retryMaxRetryAttempts) || 3,
+          retryStatusCodes: formData.retryStatusCodes,
+          retryDelayMilliseconds: parseInt(formData.retryDelayMilliseconds) || 1000,
+          useExponentialBackoff: formData.retryUseExponentialBackoff,
         } : undefined,
       };
 
@@ -174,6 +192,18 @@ const MiddlewareEdit: React.FC = () => {
 
   const removeExposeHeader = (header: string) => {
     setFormData({ ...formData, corsExposeHeaders: formData.corsExposeHeaders.filter(h => h !== header) });
+  };
+
+  const addStatusCode = () => {
+    const code = parseInt(statusCodeInput);
+    if (code && code >= 400 && code <= 599 && !formData.retryStatusCodes.includes(code)) {
+      setFormData({ ...formData, retryStatusCodes: [...formData.retryStatusCodes, code] });
+      setStatusCodeInput('');
+    }
+  };
+
+  const removeStatusCode = (code: number) => {
+    setFormData({ ...formData, retryStatusCodes: formData.retryStatusCodes.filter(c => c !== code) });
   };
 
   if (loading) {
@@ -242,7 +272,7 @@ const MiddlewareEdit: React.FC = () => {
                 Type <span className="text-red-500">*</span>
               </label>
               {!isEdit ? (
-                <div className="grid grid-cols-3 gap-3">
+                <div className="grid grid-cols-4 gap-3">
                   <button
                     type="button"
                     onClick={() => setFormData({ ...formData, type: 'Cors' })}
@@ -288,6 +318,21 @@ const MiddlewareEdit: React.FC = () => {
                     <div className="text-sm font-medium text-gray-900">Timeout</div>
                     <div className="text-xs text-gray-500 mt-1">Request timeout policy</div>
                   </button>
+                  <button
+                    type="button"
+                    onClick={() => setFormData({ ...formData, type: 'Retry' })}
+                    className={`p-4 border-2 rounded-lg transition-all ${
+                      formData.type === 'Retry'
+                        ? 'border-green-500 bg-green-50'
+                        : 'border-gray-200 hover:border-gray-300'
+                    }`}
+                  >
+                    <ArrowPathIcon className={`h-6 w-6 mx-auto mb-2 ${
+                      formData.type === 'Retry' ? 'text-green-600' : 'text-gray-400'
+                    }`} />
+                    <div className="text-sm font-medium text-gray-900">Retry</div>
+                    <div className="text-xs text-gray-500 mt-1">Automatic retry policy</div>
+                  </button>
                 </div>
               ) : (
                 <div className="flex items-center gap-2 px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg">
@@ -301,10 +346,15 @@ const MiddlewareEdit: React.FC = () => {
                       <BoltIcon className="h-5 w-5 text-indigo-600" />
                       <span className="text-sm font-medium text-gray-900">Rate Limiter</span>
                     </>
-                  ) : (
+                  ) : formData.type === 'Timeout' ? (
                     <>
                       <ClockIcon className="h-5 w-5 text-orange-600" />
                       <span className="text-sm font-medium text-gray-900">Timeout</span>
+                    </>
+                  ) : (
+                    <>
+                      <ArrowPathIcon className="h-5 w-5 text-green-600" />
+                      <span className="text-sm font-medium text-gray-900">Retry</span>
                     </>
                   )}
                   <span className="text-xs text-gray-500 ml-auto">Cannot change type when editing</span>
@@ -660,6 +710,133 @@ const MiddlewareEdit: React.FC = () => {
                   />
                   <p className="text-xs text-gray-500 mt-1">Default is 504 (Gateway Timeout)</p>
                 </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {formData.type === 'Retry' && (
+          <div className="bg-white rounded-lg border border-gray-200 p-6">
+            <h2 className="text-base font-semibold text-gray-900 mb-6">Retry Configuration</h2>
+            <div className="space-y-5">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Policy Name <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={formData.retryName}
+                  onChange={(e) => setFormData({ ...formData, retryName: e.target.value })}
+                  placeholder="e.g., api-retry-policy"
+                  className="block w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-gray-400 focus:ring-1 focus:ring-gray-400 transition-colors"
+                  required={formData.type === 'Retry'}
+                />
+              </div>
+
+              <div className="grid grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Max Retry Attempts <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="number"
+                    min="1"
+                    max="10"
+                    value={formData.retryMaxRetryAttempts}
+                    onChange={(e) => setFormData({ ...formData, retryMaxRetryAttempts: e.target.value })}
+                    placeholder="3"
+                    className="block w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-gray-400 focus:ring-1 focus:ring-gray-400 transition-colors"
+                    required={formData.type === 'Retry'}
+                  />
+                  <p className="text-xs text-gray-500 mt-1">Number of retry attempts (1-10)</p>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Retry Delay (ms) <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="number"
+                    min="100"
+                    value={formData.retryDelayMilliseconds}
+                    onChange={(e) => setFormData({ ...formData, retryDelayMilliseconds: e.target.value })}
+                    placeholder="1000"
+                    className="block w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-gray-400 focus:ring-1 focus:ring-gray-400 transition-colors"
+                    required={formData.type === 'Retry'}
+                  />
+                  <p className="text-xs text-gray-500 mt-1">Delay between retries</p>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Backoff Strategy
+                  </label>
+                  <select
+                    value={formData.retryUseExponentialBackoff ? 'exponential' : 'linear'}
+                    onChange={(e) => setFormData({ ...formData, retryUseExponentialBackoff: e.target.value === 'exponential' })}
+                    className="block w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-gray-400 focus:ring-1 focus:ring-gray-400 transition-colors"
+                  >
+                    <option value="linear">Linear</option>
+                    <option value="exponential">Exponential</option>
+                  </select>
+                  <p className="text-xs text-gray-500 mt-1">Delay calculation method</p>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Retry Status Codes <span className="text-red-500">*</span>
+                </label>
+                <p className="text-xs text-gray-500 mb-2">Add HTTP status codes that should trigger a retry (e.g., 500, 502, 503, 504)</p>
+                <div className="flex gap-2 mb-3">
+                  <input
+                    type="number"
+                    min="400"
+                    max="599"
+                    value={statusCodeInput}
+                    onChange={(e) => setStatusCodeInput(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addStatusCode())}
+                    placeholder="500"
+                    className="block w-32 px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-gray-400 focus:ring-1 focus:ring-gray-400 transition-colors"
+                  />
+                  <button
+                    type="button"
+                    onClick={addStatusCode}
+                    className="inline-flex items-center px-4 py-2 border border-gray-200 text-sm font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 transition-colors"
+                  >
+                    <PlusIcon className="h-4 w-4 mr-2" />
+                    Add
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setFormData({ ...formData, retryStatusCodes: [500, 502, 503, 504] })}
+                    className="inline-flex items-center px-4 py-2 border border-gray-200 text-sm font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 transition-colors"
+                  >
+                    Use Common Codes
+                  </button>
+                </div>
+                {formData.retryStatusCodes.length > 0 && (
+                  <div className="flex flex-wrap gap-2">
+                    {formData.retryStatusCodes.sort((a, b) => a - b).map((code) => (
+                      <span
+                        key={code}
+                        className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-medium bg-gray-100 text-gray-700"
+                      >
+                        {code}
+                        <button
+                          type="button"
+                          onClick={() => removeStatusCode(code)}
+                          className="text-gray-500 hover:text-gray-700"
+                        >
+                          <XMarkIcon className="h-3.5 w-3.5" />
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                )}
+                {formData.retryStatusCodes.length === 0 && (
+                  <p className="text-sm text-red-600">At least one status code is required</p>
+                )}
               </div>
             </div>
           </div>

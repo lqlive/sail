@@ -17,7 +17,6 @@ public class SailContext
     private const string CertificateTableName = "certificates";
     private const string MiddlewareTableName = "middlewares";
     private const string AuthenticationPolicyTableName = "authenticationPolicies";
-    private const string ServiceDiscoveryTableName = "serviceDiscoveries";
 
     public SailContext(IOptions<DatabaseOptions> options)
     {
@@ -34,7 +33,6 @@ public class SailContext
     public IMongoCollection<Certificate> Certificates => _database.GetCollection<Certificate>(CertificateTableName);
     public IMongoCollection<Middleware> Middlewares => _database.GetCollection<Middleware>(MiddlewareTableName);
     public IMongoCollection<AuthenticationPolicy> AuthenticationPolicies => _database.GetCollection<AuthenticationPolicy>(AuthenticationPolicyTableName);
-    public IMongoCollection<ServiceDiscovery> ServiceDiscoveries => _database.GetCollection<ServiceDiscovery>(ServiceDiscoveryTableName);
 
     public async Task InitializeAsync()
     {
@@ -50,7 +48,6 @@ public class SailContext
         await _database.CreateCollectionAsync(CertificateTableName, collectionOptions);
         await _database.CreateCollectionAsync(MiddlewareTableName, collectionOptions);
         await _database.CreateCollectionAsync(AuthenticationPolicyTableName, collectionOptions);
-        await _database.CreateCollectionAsync(ServiceDiscoveryTableName, collectionOptions);
     }
     private static void RegisterClassMaps()
     {
@@ -116,14 +113,5 @@ public class SailContext
             });
         }
 
-        if (!BsonClassMap.IsClassMapRegistered(typeof(ServiceDiscovery)))
-        {
-            BsonClassMap.RegisterClassMap<ServiceDiscovery>(classMap =>
-            {
-                classMap.AutoMap();
-                classMap.MapIdMember(x => x.Id)
-                    .SetSerializer(new GuidSerializer(GuidRepresentation.Standard));
-            });
-        }
     }
 }

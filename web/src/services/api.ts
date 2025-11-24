@@ -26,7 +26,8 @@ export class ApiClient {
     endpoint: string,
     options: RequestInit = {}
   ): Promise<T> {
-    const url = `${this.baseURL}${endpoint}`;
+    const separator = endpoint.includes('?') ? '&' : '?';
+    const url = `${this.baseURL}${endpoint}${separator}api-version=1.0`;
     
     const defaultHeaders = {
       'Content-Type': 'application/json',

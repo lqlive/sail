@@ -11,6 +11,7 @@ public record MiddlewareRequest
     public CorsRequest? Cors { get; init; }
     public RateLimiterRequest? RateLimiter { get; init; }
     public TimeoutRequest? Timeout { get; init; }
+    public RetryRequest? Retry { get; init; }
 }
 
 public record CorsRequest
@@ -37,5 +38,14 @@ public record TimeoutRequest
     public required string Name { get; init; }
     public int Seconds { get; init; }
     public int? TimeoutStatusCode { get; init; }
+}
+
+public record RetryRequest
+{
+    public required string Name { get; init; }
+    public int MaxRetryAttempts { get; init; } = 1;
+    public int[] RetryStatusCodes { get; init; } = [500, 502, 503, 504];
+    public int RetryDelayMilliseconds { get; init; } = 1000;
+    public bool UseExponentialBackoff { get; init; } = false;
 }
 

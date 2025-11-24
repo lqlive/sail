@@ -6,6 +6,7 @@ import {
   BoltIcon,
   ShieldCheckIcon,
   ClockIcon,
+  ArrowPathIcon,
   FunnelIcon,
 } from '@heroicons/react/24/outline';
 import type { Middleware, MiddlewareType } from '../../types/gateway';
@@ -186,14 +187,17 @@ const Middlewares: React.FC = () => {
               <div className="flex items-center gap-3 mb-4">
                 <div className={`w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 ${
                   middleware.type === 'Cors' ? 'bg-blue-50' : 
-                  middleware.type === 'RateLimiter' ? 'bg-indigo-50' : 'bg-orange-50'
+                  middleware.type === 'RateLimiter' ? 'bg-indigo-50' : 
+                  middleware.type === 'Timeout' ? 'bg-orange-50' : 'bg-green-50'
                 }`}>
                   {middleware.type === 'Cors' ? (
                     <ShieldCheckIcon className="h-5 w-5 text-blue-600" />
                   ) : middleware.type === 'RateLimiter' ? (
                     <BoltIcon className="h-5 w-5 text-indigo-600" />
-                  ) : (
+                  ) : middleware.type === 'Timeout' ? (
                     <ClockIcon className="h-5 w-5 text-orange-600" />
+                  ) : (
+                    <ArrowPathIcon className="h-5 w-5 text-green-600" />
                   )}
                 </div>
                 <div className="flex-1 min-w-0">
@@ -204,9 +208,13 @@ const Middlewares: React.FC = () => {
                         ? 'bg-blue-50 text-blue-700'
                         : middleware.type === 'RateLimiter'
                           ? 'bg-indigo-50 text-indigo-700'
-                          : 'bg-orange-50 text-orange-700'
+                          : middleware.type === 'Timeout'
+                            ? 'bg-orange-50 text-orange-700'
+                            : 'bg-green-50 text-green-700'
                     }`}>
-                      {middleware.type === 'Cors' ? 'CORS' : middleware.type === 'RateLimiter' ? 'Rate Limiter' : 'Timeout'}
+                      {middleware.type === 'Cors' ? 'CORS' : 
+                       middleware.type === 'RateLimiter' ? 'Rate Limiter' : 
+                       middleware.type === 'Timeout' ? 'Timeout' : 'Retry'}
                     </span>
                     {middleware.enabled ? (
                       <span className="text-xs text-green-600 font-medium">● Enabled</span>
@@ -252,7 +260,17 @@ const Middlewares: React.FC = () => {
                   </div>
                 )}
 
-                {!middleware.cors && !middleware.rateLimiter && !middleware.timeout && (
+                {middleware.retry && (
+                  <div className="flex items-center justify-between py-2 border-b border-gray-100">
+                    <div className="flex items-center gap-2">
+                      <ArrowPathIcon className="h-4 w-4 text-gray-400" />
+                      <span className="text-sm text-gray-600">Retry</span>
+                    </div>
+                    <span className="text-sm font-medium text-gray-900">{middleware.retry.maxRetryAttempts} attempts</span>
+                  </div>
+                )}
+
+                {!middleware.cors && !middleware.rateLimiter && !middleware.timeout && !middleware.retry && (
                   <div className="text-sm text-gray-400 py-2">No policies configured</div>
                 )}
               </div>
