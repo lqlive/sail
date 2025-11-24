@@ -14,7 +14,6 @@ public static class SailStorageExtensions
         services.AddSingleton<ICertificateStore, CertificateStore>();
         services.AddSingleton<IMiddlewareStore, MiddlewareStore>();
         services.AddSingleton<IAuthenticationPolicyStore, AuthenticationPolicyStore>();
-        services.AddSingleton<IServiceDiscoveryStore, ServiceDiscoveryStore>();
         return services;
     }
 }

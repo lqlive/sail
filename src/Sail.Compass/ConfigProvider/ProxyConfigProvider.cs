@@ -183,6 +183,23 @@ internal sealed class ProxyConfigProvider : IProxyConfigProvider, IDisposable
             })
         };
 
+        if (cluster.EnabledServiceDiscovery)
+        {
+            clusterConfig = clusterConfig with
+            {
+                Destinations = new Dictionary<string, DestinationConfig>
+                {
+                    {
+                        cluster.ServiceName, new DestinationConfig
+                        {
+                            Address = $"http://{cluster.ServiceName}",
+                            Host = cluster.ServiceName
+                        }
+                    }
+                }
+            };
+        }
+
         return clusterConfig;
     }
 

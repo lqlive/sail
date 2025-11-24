@@ -34,7 +34,6 @@ endpoint.MapClusterApiV1();
 endpoint.MapCertificateApiV1();
 endpoint.MapMiddlewareApiV1();
 endpoint.MapAuthenticationPolicyApi();
-endpoint.MapServiceDiscoveryApiV1();
 
 app.UseDefaultOpenApi();
 

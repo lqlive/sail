@@ -5,7 +5,7 @@ namespace Sail.Core.Utilities;
 
 internal static class ClusterConfigExtensions
 {
-    public static T GetMetadata<T>(this ClusterModel cluster, string name)
+    public static T? GetMetadata<T>(this ClusterModel cluster, string name)
     {
         ArgumentNullException.ThrowIfNull(cluster);
 
@@ -13,7 +13,7 @@ internal static class ClusterConfigExtensions
 
         if (metadata is null || !metadata.TryGetValue(name, out var metadataString))
         {
-            throw new KeyNotFoundException($"Metadata '{name}' not found in cluster '{cluster.Config.ClusterId}'.");
+            return default;
         }
 
         return JsonSerializer.Deserialize<T>(metadataString)

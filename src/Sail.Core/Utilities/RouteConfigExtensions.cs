@@ -5,7 +5,7 @@ namespace Sail.Core.Utilities;
 
 internal static class RouteConfigExtensions
 {
-    public static T GetMetadata<T>(this RouteModel route, string name)
+    public static T? GetMetadata<T>(this RouteModel route, string name)
     {
         ArgumentNullException.ThrowIfNull(route);
 
@@ -13,7 +13,7 @@ internal static class RouteConfigExtensions
 
         if (metadata is null || !metadata.TryGetValue(name, out var metadataString))
         {
-            throw new KeyNotFoundException($"Metadata '{name}' not found in route '{route.Config.RouteId}'.");
+            return default;
         }
 
         return JsonSerializer.Deserialize<T>(metadataString)
