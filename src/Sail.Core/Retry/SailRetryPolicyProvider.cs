@@ -89,6 +89,4 @@ public class SailRetryPolicyProvider : IRetryPolicyProvider
 
         return new ResiliencePipelineBuilder().AddRetry(retryStrategyOptions).Build();
     }
-
 }
-

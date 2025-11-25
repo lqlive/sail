@@ -2,6 +2,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
 using Sail.Core;
+using Sail.Core.Entities;
 using Sail.Core.Stores;
 using Sail.Database.MongoDB.Stores;
 
@@ -13,7 +14,9 @@ public static class SailDatabaseBuilderExtensions
     {
         var services = application.Services;
 
-        services.TryAddScoped<MongoDBContext>();
+        services.TryAddScoped<IContext>(provider => provider.GetRequiredService<MongoDBContext>());
+        services.AddDbContext<MongoDBContext>();
+
         services.TryAddTransient<IRouteStore, RouteStore>();
         services.TryAddTransient<IClusterStore, ClusterStore>();
         services.TryAddTransient<ICertificateStore, CertificateStore>();

@@ -1,48 +1,42 @@
-using MongoDB.Driver;
+using Microsoft.EntityFrameworkCore;
 using Sail.Core.Entities;
 using Sail.Core.Stores;
 
 namespace Sail.Database.MongoDB.Stores;
 
-public class AuthenticationPolicyStore : IAuthenticationPolicyStore
+public class AuthenticationPolicyStore(IContext context) : IAuthenticationPolicyStore
 {
-    private readonly MongoDBContext _context;
-
-    public AuthenticationPolicyStore(MongoDBContext context)
-    {
-        _context = context;
-    }
-
     public async Task<AuthenticationPolicy?> GetAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        var filter = Builders<AuthenticationPolicy>.Filter.Eq(x => x.Id, id);
-        return await _context.AuthenticationPolicies
-            .Find(filter)
-            .FirstOrDefaultAsync(cancellationToken);
+        return await context.AuthenticationPolicies
+            .SingleOrDefaultAsync(x => x.Id == id, cancellationToken);
     }
 
     public async Task<List<AuthenticationPolicy>> GetAsync(CancellationToken cancellationToken = default)
     {
-        return await _context.AuthenticationPolicies
-            .Find(Builders<AuthenticationPolicy>.Filter.Empty)
-            .ToListAsync(cancellationToken);
+        return await context.AuthenticationPolicies.ToListAsync(cancellationToken);
     }
 
     public async Task CreateAsync(AuthenticationPolicy policy, CancellationToken cancellationToken = default)
     {
-        await _context.AuthenticationPolicies.InsertOneAsync(policy, cancellationToken: cancellationToken);
+        context.AuthenticationPolicies.Add(policy);
+        await context.SaveChangesAsync(cancellationToken);
     }
 
     public async Task UpdateAsync(AuthenticationPolicy policy, CancellationToken cancellationToken = default)
     {
-        var filter = Builders<AuthenticationPolicy>.Filter.Eq(x => x.Id, policy.Id);
-        await _context.AuthenticationPolicies.ReplaceOneAsync(filter, policy, cancellationToken: cancellationToken);
+        context.AuthenticationPolicies.Update(policy);
+        await context.SaveChangesAsync(cancellationToken);
     }
 
     public async Task DeleteAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        var filter = Builders<AuthenticationPolicy>.Filter.Eq(x => x.Id, id);
-        await _context.AuthenticationPolicies.DeleteOneAsync(filter, cancellationToken);
+        var policy = await context.AuthenticationPolicies.FindAsync([id], cancellationToken);
+        if (policy != null)
+        {
+            context.AuthenticationPolicies.Remove(policy);
+            await context.SaveChangesAsync(cancellationToken);
+        }
     }
 }
 

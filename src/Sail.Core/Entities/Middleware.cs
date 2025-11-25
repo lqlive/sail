@@ -10,50 +10,50 @@ public enum MiddlewareType
 
 public class Middleware
 {
-    public Guid Id { get; init; }
-    public required string Name { get; init; }
-    public string? Description { get; init; }
-    public MiddlewareType Type { get; init; }
-    public bool Enabled { get; init; } = true;
-    public Cors? Cors { get; init; }
-    public RateLimiter? RateLimiter { get; init; }
-    public Timeout? Timeout { get; init; }
-    public Retry? Retry { get; init; }
-    public DateTimeOffset CreatedAt { get; init; } = DateTimeOffset.UtcNow;
-    public DateTimeOffset UpdatedAt { get; init; } = DateTimeOffset.UtcNow;
+    public Guid Id { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public string? Description { get; set; }
+    public MiddlewareType Type { get; set; }
+    public bool Enabled { get; set; } = true;
+    public Cors? Cors { get; set; }
+    public RateLimiter? RateLimiter { get; set; }
+    public Timeout? Timeout { get; set; }
+    public Retry? Retry { get; set; }
+    public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
+    public DateTimeOffset UpdatedAt { get; set; } = DateTimeOffset.UtcNow;
 }
 
 public class Cors
 {
-    public required string Name { get; init; }
-    public List<string>? AllowOrigins { get; init; }
-    public List<string>? AllowMethods { get; init; }
-    public List<string>? AllowHeaders { get; init; }
-    public List<string>? ExposeHeaders { get; init; }
-    public bool AllowCredentials { get; init; }
-    public int? MaxAge { get; init; }
+    public string Name { get; set; } = string.Empty;
+    public List<string>? AllowOrigins { get; set; }
+    public List<string>? AllowMethods { get; set; }
+    public List<string>? AllowHeaders { get; set; }
+    public List<string>? ExposeHeaders { get; set; }
+    public bool AllowCredentials { get; set; }
+    public int? MaxAge { get; set; }
 }
 
 public class RateLimiter
 {
-    public required string Name { get; init; }
-    public int PermitLimit { get; init; }
-    public int Window { get; init; }
-    public int QueueLimit { get; init; }
+    public string Name { get; set; } = string.Empty;
+    public int PermitLimit { get; set; }
+    public int Window { get; set; }
+    public int QueueLimit { get; set; }
 }
 
 public class Timeout
 {
-    public required string Name { get; init; }
-    public int Seconds { get; init; }
-    public int? TimeoutStatusCode { get; init; }
+    public string Name { get; set; } = string.Empty;
+    public int Seconds { get; set; }
+    public int? TimeoutStatusCode { get; set; }
 }
 
 public class Retry
 {
-    public required string Name { get; init; }
-    public int MaxRetryAttempts { get; init; } = 1;
-    public int[] RetryStatusCodes { get; init; } = [500, 502, 503, 504];
-    public int RetryDelayMilliseconds { get; init; } = 1000;
-    public bool UseExponentialBackoff { get; init; } = false;
+    public string Name { get; set; } = string.Empty;
+    public int MaxRetryAttempts { get; set; } = 1;
+    public int[] RetryStatusCodes { get; set; } = [500, 502, 503, 504];
+    public int RetryDelayMilliseconds { get; set; } = 1000;
+    public bool UseExponentialBackoff { get; set; } = false;
 }

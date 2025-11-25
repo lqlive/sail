@@ -111,11 +111,11 @@ public class RouteGrpcService(MongoDBContext dbContext, IRouteStore routeStore) 
             MaxRequestBodySize = route.MaxRequestBodySize,
             Transforms = { route.Transforms?.Select(MapToRouteTransform) ?? [] },
             RateLimiterPolicy = route.RateLimiterPolicy,
-            HttpsRedirect = route.HttpsRedirect
+            HttpsRedirect = route.HttpsRedirect ?? false
         };
     }
 
-    private static RouteTransform MapToRouteTransform(IReadOnlyDictionary<string, string> transform)
+    private static RouteTransform MapToRouteTransform(Dictionary<string, string> transform)
     {
         var result = new RouteTransform();
         foreach (var item in transform)
