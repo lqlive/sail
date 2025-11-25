@@ -24,4 +24,7 @@
     <Project Path="tests/Sail.Core.Tests/Sail.Core.Tests.csproj" />
     <Project Path="tests\Sail.FunctionalTests\Sail.FunctionalTests.csproj" />
   </Folder>
+  <Project Path="docker-compose.dcproj">
+    <Build />
+  </Project>
 </Solution>

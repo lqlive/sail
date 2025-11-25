@@ -4,12 +4,17 @@
         <TargetFramework>net9.0</TargetFramework>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
+        <UserSecretsId>5533c5cf-d1bc-418a-835e-e3cfae875cad</UserSecretsId>
+        <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+        <DockerfileContext>..\..</DockerfileContext>
+        <DockerComposeProjectPath>..\..\docker-compose.dcproj</DockerComposeProjectPath>
     </PropertyGroup>
     
     <ItemGroup>
         <PackageReference Include="ErrorOr" />
         <PackageReference Include="Asp.Versioning.Http" />
         <PackageReference Include="Grpc.AspNetCore" />
+        <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" />
     </ItemGroup>
     
     <ItemGroup>

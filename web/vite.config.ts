@@ -7,7 +7,7 @@ export default defineConfig({
   server: {
     port: 3000,
     proxy: {
-      '/api/runtime': {
+      '/runtime': {
         target: 'http://localhost:80',
         changeOrigin: true,
         secure: false,
