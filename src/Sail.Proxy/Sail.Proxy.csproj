@@ -4,6 +4,10 @@
         <TargetFramework>net9.0</TargetFramework>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
+        <UserSecretsId>137ff5c2-cdf9-4c5d-b8d1-02034032c79d</UserSecretsId>
+        <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+        <DockerfileContext>..\..</DockerfileContext>
+        <DockerComposeProjectPath>..\..\docker-compose.dcproj</DockerComposeProjectPath>
     </PropertyGroup>
 
     <ItemGroup>
@@ -15,6 +19,7 @@
     <ItemGroup>
       <PackageReference Include="Microsoft.Extensions.ServiceDiscovery.Dns" />
       <PackageReference Include="Consul.AspNetCore" />
+      <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" />
     </ItemGroup>
 
 </Project>

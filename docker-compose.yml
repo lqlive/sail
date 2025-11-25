@@ -1,0 +1,77 @@
+services:
+  sail-proxy:
+    image: ${DOCKER_REGISTRY-}sail-proxy
+    build:
+      context: .
+      dockerfile: src/Sail.Proxy/Dockerfile
+    ports:
+      - "80:80"
+      - "443:443"
+    networks:
+      - sail-network
+
+  sail:
+    image: ${DOCKER_REGISTRY-}sail
+    build:
+      context: .
+      dockerfile: src/Sail/Dockerfile
+    ports:
+      - "8100:8100"
+      - "8000:8000"
+    networks:
+      - sail-network
+    depends_on:
+      - mongodb
+
+  sail-ui:
+    image: ${DOCKER_REGISTRY-}sail-web
+    build:
+      context: ./web
+      dockerfile: Dockerfile
+    ports:
+      - "3000:80"
+    networks:
+      - sail-network
+    depends_on:
+      - sail
+      - sail-proxy
+
+  mongodb:
+    image: mongo:7
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password
+    command: >
+      bash -c "
+        mongod --replSet rs0 --bind_ip_all &
+        until mongosh --eval 'db.runCommand({ ping: 1 })' > /dev/null 2>&1; do
+          echo 'Waiting for MongoDB to start...'
+          sleep 2
+        done
+        mongosh --eval '
+          try {
+            rs.status();
+            print(\"Replica set already initialized\");
+          } catch(e) {
+            rs.initiate({
+              _id: \"rs0\",
+              members: [{ _id: 0, host: \"localhost:27017\" }]
+            });
+            print(\"Replica set initialized successfully\");
+          }
+        '
+        wait
+      "
+    volumes:
+      - mongodb-data:/data/db
+    networks:
+      - sail-network
+
+networks:
+  sail-network:
+    driver: bridge
+
+volumes:
+  mongodb-data:

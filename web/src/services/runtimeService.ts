@@ -16,7 +16,7 @@ export interface ClusterRuntimeState {
 export const RuntimeService = {
   async getAllClusters(): Promise<ClusterRuntimeState[]> {
     try {
-      const response = await fetch('/api/runtime/clusters');
+      const response = await fetch('/runtime/clusters');
       
       if (!response.ok) {
         throw new Error('Failed to fetch runtime clusters');
@@ -31,7 +31,7 @@ export const RuntimeService = {
 
   async getClusterDestinations(clusterId: string): Promise<DestinationRuntimeState[]> {
     try {
-      const response = await fetch(`/api/runtime/clusters/${clusterId}/destinations`);
+      const response = await fetch(`/runtime/clusters/${clusterId}/destinations`);
       
       if (!response.ok) {
         if (response.status === 404) {

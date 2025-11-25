@@ -17,7 +17,7 @@
     <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="$(MicrosoftExtensionsPackageVersion)" />
     <PackageVersion Include="Microsoft.Extensions.ServiceDiscovery" Version="$(MicrosoftExtensionsPackageVersion)" />
     <PackageVersion Include="Microsoft.Extensions.Http.Resilience" Version="$(MicrosoftExtensionsPackageVersion)" />
-	<PackageVersion Include="Microsoft.Extensions.ServiceDiscovery.Dns" Version="$(MicrosoftExtensionsPackageVersion)" />
+    <PackageVersion Include="Microsoft.Extensions.ServiceDiscovery.Dns" Version="$(MicrosoftExtensionsPackageVersion)" />
     <!-- Version together with Asp.Versioning -->
     <PackageVersion Include="Asp.Versioning.Http" Version="$(ApiVersioningVersion)" />
     <PackageVersion Include="Asp.Versioning.Http.Client" Version="$(ApiVersioningVersion)" />
@@ -29,6 +29,7 @@
     <PackageVersion Include="Grpc.Tools" Version="2.67.0" />
     <PackageVersion Include="Grpc.AspNetCore.Server.ClientFactory" Version="2.67.0" />
     <!-- Other -->
+    <PackageVersion Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.23.0" />
     <PackageVersion Include="Scalar.AspNetCore" Version="1.2.34" />
     <PackageVersion Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageVersion Include="Polly" Version="8.4.0" />
@@ -37,7 +38,7 @@
     <PackageVersion Include="Consul.AspNetCore" Version="1.7.14.5" />
     <PackageVersion Include="System.Reactive" Version="6.0.1" />
     <PackageVersion Include="MongoDB.Driver" Version="3.1.0" />
-	<!-- Test packages -->
+    <!-- Test packages -->
     <PackageVersion Include="coverlet.collector" Version="6.0.2" />
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
     <PackageVersion Include="xunit" Version="2.9.2" />

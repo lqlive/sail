@@ -6,15 +6,11 @@ public static class RuntimeApi
 {
     public static RouteGroupBuilder MapRuntimeV1(this IEndpointRouteBuilder app)
     {
-        var group = app.MapGroup("/api/runtime");
+        var group = app.MapGroup("/runtime");
 
-        group.MapGet("/clusters", GetAllClusters)
-            .WithName("GetAllClusterRuntimeStates")
-            .WithDescription("Get runtime states of all clusters");
+        group.MapGet("/clusters", GetAllClusters);
 
-        group.MapGet("/clusters/{clusterId}/destinations", GetAllDestinations)
-            .WithName("GetClusterDestinationRuntimeStates")
-            .WithDescription("Get runtime states of all destinations for a specific cluster");
+        group.MapGet("/clusters/{clusterId}/destinations", GetAllDestinations);
 
         return group;
     }
