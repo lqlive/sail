@@ -5,6 +5,7 @@ using Sail.Core.Https;
 using Sail.Proxy.Extensions;
 using Sail.Core.Retry;
 using Sail.Core.ServiceDiscovery;
+using Sail.Proxy.Apis;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -34,6 +35,8 @@ builder.Services.AddTimeoutPolicyUpdater();
 builder.Services.AddRetryPolicyUpdater();
 
 var app = builder.Build();
+
+app.MapRuntimeV1();
 
 app.Services.UseCompassUpdaters();
 

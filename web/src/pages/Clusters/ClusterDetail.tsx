@@ -14,12 +14,14 @@ import {
   ServerStackIcon
 } from '@heroicons/react/24/outline';
 import { ClusterService } from '../../services/clusterService';
+import { RuntimeService, type DestinationRuntimeState } from '../../services/runtimeService';
 import type { Cluster, Destination, DestinationHealth } from '../../types/gateway';
 
 const ClusterDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [cluster, setCluster] = useState<Cluster | null>(null);
+  const [runtimeDestinations, setRuntimeDestinations] = useState<DestinationRuntimeState[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
@@ -32,6 +34,9 @@ const ClusterDetail: React.FC = () => {
       setError(null);
       const data = await ClusterService.getCluster(id);
       setCluster(data);
+      
+      const runtimeData = await RuntimeService.getClusterDestinations(id);
+      setRuntimeDestinations(runtimeData);
     } catch (err) {
       console.error('Failed to load cluster:', err);
       setError('Failed to load cluster information');
@@ -47,6 +52,9 @@ const ClusterDetail: React.FC = () => {
       setRefreshing(true);
       const data = await ClusterService.getCluster(id);
       setCluster(data);
+      
+      const runtimeData = await RuntimeService.getClusterDestinations(id);
+      setRuntimeDestinations(runtimeData);
     } catch (err) {
       console.error('Failed to refresh cluster:', err);
     } finally {
@@ -82,39 +90,53 @@ const ClusterDetail: React.FC = () => {
     return 'unknown';
   };
 
-  const getHealthBadge = (health: DestinationHealth) => {
+  const getHealthBadge = (health: DestinationHealth, label: string) => {
     switch (health) {
       case 'healthy':
         return (
-          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-green-50 text-green-700">
-            <CheckCircleIcon className="h-3.5 w-3.5" />
-            Healthy
-          </span>
+          <div className="inline-flex items-center gap-1.5">
+            <div className="flex items-center gap-1 text-xs font-medium text-green-700">
+              <div className="w-2 h-2 rounded-full bg-green-500"></div>
+              {label}
+            </div>
+            <span className="text-xs text-gray-400">•</span>
+            <span className="text-xs font-medium text-gray-900">Healthy</span>
+          </div>
         );
       case 'unhealthy':
         return (
-          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-red-50 text-red-700">
-            <XCircleIcon className="h-3.5 w-3.5" />
-            Unhealthy
-          </span>
+          <div className="inline-flex items-center gap-1.5">
+            <div className="flex items-center gap-1 text-xs font-medium text-red-700">
+              <div className="w-2 h-2 rounded-full bg-red-500"></div>
+              {label}
+            </div>
+            <span className="text-xs text-gray-400">•</span>
+            <span className="text-xs font-medium text-gray-900">Unhealthy</span>
+          </div>
         );
       default:
         return (
-          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-gray-50 text-gray-700">
-            <QuestionMarkCircleIcon className="h-3.5 w-3.5" />
-            Unknown
-          </span>
+          <div className="inline-flex items-center gap-1.5">
+            <div className="flex items-center gap-1 text-xs font-medium text-gray-600">
+              <div className="w-2 h-2 rounded-full bg-gray-400"></div>
+              {label}
+            </div>
+            <span className="text-xs text-gray-400">•</span>
+            <span className="text-xs font-medium text-gray-900">Unknown</span>
+          </div>
         );
     }
   };
 
   const getHealthStats = () => {
-    if (!cluster?.destinations) return { healthy: 0, unhealthy: 0, unknown: 0, total: 0 };
+    if (!runtimeDestinations || runtimeDestinations.length === 0) {
+      return { healthy: 0, unhealthy: 0, unknown: 0, total: 0 };
+    }
 
-    const stats = { healthy: 0, unhealthy: 0, unknown: 0, total: cluster.destinations.length };
+    const stats = { healthy: 0, unhealthy: 0, unknown: 0, total: runtimeDestinations.length };
     
-    cluster.destinations.forEach(dest => {
-      const health = getHealthStatus(dest.health);
+    runtimeDestinations.forEach(dest => {
+      const health = dest.activeHealth.toLowerCase() as DestinationHealth;
       stats[health]++;
     });
 
@@ -165,21 +187,21 @@ const ClusterDetail: React.FC = () => {
           <button
             onClick={handleRefresh}
             disabled={refreshing}
-            className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 text-sm font-medium text-gray-700 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             <ArrowPathIcon className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
             Refresh
           </button>
           <button
             onClick={() => navigate(`/clusters/${id}/edit`)}
-            className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 text-sm font-medium text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
           >
             <PencilIcon className="h-4 w-4" />
             Edit
           </button>
           <button
             onClick={handleDelete}
-            className="inline-flex items-center gap-2 px-4 py-2 border border-red-300 rounded-lg text-sm font-medium text-red-700 bg-white hover:bg-red-50 transition-colors"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 text-sm font-medium text-red-600 rounded-lg hover:bg-red-50 transition-colors"
           >
             <TrashIcon className="h-4 w-4" />
             Delete
@@ -317,45 +339,47 @@ const ClusterDetail: React.FC = () => {
       <div className="bg-white border border-gray-200 rounded-lg p-5">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-base font-medium text-gray-900">Destinations</h2>
-          <span className="text-xs text-gray-500">{cluster.destinations?.length || 0} total</span>
+          <span className="text-xs text-gray-500">{runtimeDestinations.length || 0} total</span>
         </div>
 
-        {!cluster.destinations || cluster.destinations.length === 0 ? (
+        {!runtimeDestinations || runtimeDestinations.length === 0 ? (
           <div className="text-center py-12">
             <ServerIcon className="h-12 w-12 text-gray-300 mx-auto mb-3" />
             <p className="text-sm text-gray-500">No destinations</p>
           </div>
         ) : (
           <div className="space-y-3">
-            {cluster.destinations.map((dest) => {
-              const health = getHealthStatus(dest.health);
+            {runtimeDestinations.map((dest) => {
+              const activeHealth = dest.activeHealth.toLowerCase() as DestinationHealth;
+              const passiveHealth = dest.passiveHealth.toLowerCase() as DestinationHealth;
               return (
                 <div
-                  key={dest.id}
-                  className="border border-gray-200 rounded-lg p-4 hover:border-gray-300 transition-colors"
+                  key={dest.destinationId}
+                  className="border border-gray-200 rounded-lg p-4 hover:border-gray-300 hover:shadow-sm transition-all"
                 >
-                  <div className="flex items-start justify-between mb-3">
-                    <div className="flex items-center gap-2">
-                      <div className="p-2 bg-purple-50 rounded-lg">
-                        <ServerStackIcon className="h-4 w-4 text-purple-600" />
+                  <div className="flex items-center justify-between gap-4">
+                    <div className="flex-1 min-w-0">
+                      <div className="grid grid-cols-1 gap-2">
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-medium text-gray-600 w-24 flex-shrink-0">Address</span>
+                          <span className="text-xs text-gray-900 font-mono break-all">{dest.address}</span>
+                        </div>
+                        {dest.host && (
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs font-medium text-gray-600 w-24 flex-shrink-0">Host</span>
+                            <span className="text-xs text-gray-900 break-all">{dest.host}</span>
+                          </div>
+                        )}
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-medium text-gray-600 w-24 flex-shrink-0">Destination ID</span>
+                          <span className="text-xs text-gray-500 font-mono break-all">{dest.destinationId}</span>
+                        </div>
                       </div>
-                      {getHealthBadge(health)}
                     </div>
-                  </div>
-                  <div className="space-y-2 text-sm">
-                    <div className="flex items-start gap-2">
-                      <span className="text-xs text-gray-500 w-16 flex-shrink-0">Address:</span>
-                      <span className="text-xs text-gray-900 font-mono break-all">{dest.address}</span>
-                    </div>
-                    {dest.host && (
-                      <div className="flex items-start gap-2">
-                        <span className="text-xs text-gray-500 w-16 flex-shrink-0">Host:</span>
-                        <span className="text-xs text-gray-700 break-all">{dest.host}</span>
-                      </div>
-                    )}
-                    <div className="flex items-start gap-2">
-                      <span className="text-xs text-gray-500 w-16 flex-shrink-0">ID:</span>
-                      <span className="text-xs text-gray-400 font-mono">{dest.id}</span>
+                    
+                    <div className="flex flex-col gap-2 items-end flex-shrink-0">
+                      {getHealthBadge(activeHealth, 'Active')}
+                      {passiveHealth !== 'unknown' && getHealthBadge(passiveHealth, 'Passive')}
                     </div>
                   </div>
                 </div>
