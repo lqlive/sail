@@ -1,5 +1,5 @@
 import { apiClient } from './api';
-import type { Route } from '../types/gateway';
+import type { Route } from '../types';
 
 export interface CreateRouteRequest {
   name: string;

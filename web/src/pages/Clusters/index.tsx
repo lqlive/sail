@@ -9,7 +9,7 @@ import {
   FunnelIcon,
   CpuChipIcon
 } from '@heroicons/react/24/outline';
-import type { Cluster } from '../../types/gateway';
+import type { Cluster } from '../../types';
 import { ClusterService } from '../../services/clusterService';
 
 const Clusters: React.FC = () => {

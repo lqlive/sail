@@ -7,7 +7,7 @@ import {
   PencilIcon,
   TrashIcon,
 } from '@heroicons/react/24/outline';
-import type { Certificate } from '../../types/gateway';
+import type { Certificate } from '../../types';
 import { CertificateService } from '../../services/certificateService';
 
 const Certificates: React.FC = () => {

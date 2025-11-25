@@ -6,7 +6,7 @@ import {
   CheckCircleIcon,
   XCircleIcon,
 } from '@heroicons/react/24/outline';
-import type { Route } from '../../types/gateway';
+import type { Route } from '../../types';
 import { RouteService } from '../../services/routeService';
 
 const Routes: React.FC = () => {

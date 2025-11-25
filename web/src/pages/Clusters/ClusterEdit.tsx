@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { ChevronLeftIcon, PlusIcon, XMarkIcon, CheckIcon } from '@heroicons/react/24/outline';
-import type { Destination } from '../../types/gateway';
+import type { Destination } from '../../types';
 import { ClusterService } from '../../services/clusterService';
 
 const ClusterEdit: React.FC = () => {
