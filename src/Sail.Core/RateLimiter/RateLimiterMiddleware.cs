@@ -3,9 +3,7 @@ using System.Threading.RateLimiting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.Extensions.Logging;
-
 using Sail.Core.Utilities;
-
 using Yarp.ReverseProxy.Model;
 
 namespace Sail.Core.RateLimiter;

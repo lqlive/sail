@@ -7,7 +7,7 @@ import {
   LockClosedIcon,
   FunnelIcon,
 } from '@heroicons/react/24/outline';
-import type { AuthenticationPolicy, AuthenticationSchemeType } from '../../types/gateway';
+import type { AuthenticationPolicy, AuthenticationSchemeType } from '../../types';
 import { AuthenticationPolicyService } from '../../services/authenticationPolicyService';
 
 const AuthenticationPolicies: React.FC = () => {

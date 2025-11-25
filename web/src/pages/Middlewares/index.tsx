@@ -9,7 +9,7 @@ import {
   ArrowPathIcon,
   FunnelIcon,
 } from '@heroicons/react/24/outline';
-import type { Middleware, MiddlewareType } from '../../types/gateway';
+import type { Middleware, MiddlewareType } from '../../types';
 import { MiddlewareService } from '../../services/middlewareService';
 
 const Middlewares: React.FC = () => {

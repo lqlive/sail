@@ -6,7 +6,7 @@ import {
   CheckCircleIcon,
   ExclamationTriangleIcon,
 } from '@heroicons/react/24/outline';
-import type { GatewayStats } from '../types/gateway';
+import type { GatewayStats } from '../types';
 
 const mockStats: GatewayStats = {
   totalRoutes: 45,

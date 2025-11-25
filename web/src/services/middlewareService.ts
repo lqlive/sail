@@ -1,5 +1,5 @@
 import { apiClient } from './api';
-import type { Middleware, MiddlewareType } from '../types/gateway';
+import type { Middleware, MiddlewareType } from '../types';
 
 export interface CreateMiddlewareRequest {
   name: string;

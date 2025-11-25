@@ -1,60 +1,58 @@
 using ErrorOr;
 using Sail.Core.Entities;
-using MongoDB.Driver;
+using Sail.Core.Stores;
 using Sail.Models.Clusters;
-using Sail.Database.MongoDB;
 
 namespace Sail.Services;
-public class ClusterService(SailContext context)
+
+public class ClusterService(IClusterStore clusterStore)
 {
-    public async Task<ClusterResponse> GetAsync(Guid id, CancellationToken cancellationToken = default)
+    public async Task<ClusterResponse?> GetAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        var filter = Builders<Cluster>.Filter.Where(x => x.Id == id);
-        var routes = await context.Clusters.FindAsync(filter, cancellationToken: cancellationToken);
-        var result = await routes.SingleOrDefaultAsync(cancellationToken: cancellationToken);
-        return MapToCluster(result);
+        var cluster = await clusterStore.GetByIdAsync(id, cancellationToken);
+        return cluster != null ? MapToCluster(cluster) : null;
     }
 
     public async Task<IEnumerable<ClusterResponse>> ListAsync(string keywords,
         CancellationToken cancellationToken = default)
     {
-        var filter = Builders<Cluster>.Filter.Empty;
-        var routes = await context.Clusters.FindAsync(filter, cancellationToken: cancellationToken);
-        var items = await routes.ToListAsync(cancellationToken: cancellationToken);
-        return items.Select(MapToCluster);
+        var clusters = await clusterStore.GetAsync(cancellationToken);
+        return clusters.Select(MapToCluster);
     }
 
     public async Task<ErrorOr<Created>> CreateAsync(ClusterRequest request,
         CancellationToken cancellationToken = default)
     {
         var cluster = CreateClusterFromRequest(request);
-        await context.Clusters.InsertOneAsync(cluster, cancellationToken: cancellationToken);
+        await clusterStore.CreateAsync(cluster, cancellationToken);
         return Result.Created;
     }
 
     public async Task<ErrorOr<Updated>> UpdateAsync(Guid id, ClusterRequest request,
         CancellationToken cancellationToken = default)
     {
-        var filter = Builders<Cluster>.Filter.And(Builders<Cluster>.Filter.Where(x => x.Id == id));
+        var cluster = await clusterStore.GetByIdAsync(id, cancellationToken);
+        if (cluster is null)
+        {
+            return Error.NotFound(description: "Cluster not found");
+        }
 
-        var update = Builders<Cluster>.Update
-            .Set(x => x.Name, request.Name)
-            .Set(x => x.ServiceName, request.ServiceName)
-            .Set(x => x.ServiceDiscoveryType, request.ServiceDiscoveryType)
-            .Set(x => x.LoadBalancingPolicy, request.LoadBalancingPolicy)
-            .Set(x => x.Destinations, request.Destinations.Select(CreateDestinationFromRequest).ToList())
-            .Set(x => x.HealthCheck, CreateHealthCheckFromRequest(request.HealthCheck))
-            .Set(x => x.SessionAffinity, CreateSessionAffinityFromRequest(request.SessionAffinity))
-            .Set(x => x.UpdatedAt, DateTimeOffset.UtcNow);
+        cluster.Name = request.Name;
+        cluster.ServiceName = request.ServiceName;
+        cluster.ServiceDiscoveryType = request.ServiceDiscoveryType;
+        cluster.LoadBalancingPolicy = request.LoadBalancingPolicy;
+        cluster.Destinations = request.Destinations.Select(CreateDestinationFromRequest).ToList();
+        cluster.HealthCheck = CreateHealthCheckFromRequest(request.HealthCheck);
+        cluster.SessionAffinity = CreateSessionAffinityFromRequest(request.SessionAffinity);
+        cluster.UpdatedAt = DateTimeOffset.UtcNow;
 
-        await context.Clusters.FindOneAndUpdateAsync(filter, update, cancellationToken: cancellationToken);
+        await clusterStore.UpdateAsync(cluster, cancellationToken);
         return Result.Updated;
     }
 
     public async Task<ErrorOr<Deleted>> DeleteAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        var filter = Builders<Cluster>.Filter.And(Builders<Cluster>.Filter.Where(x => x.Id == id));
-        await context.Clusters.DeleteOneAsync(filter, cancellationToken);
+        await clusterStore.DeleteAsync(id, cancellationToken);
         return Result.Deleted;
     }
 

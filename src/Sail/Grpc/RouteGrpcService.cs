@@ -10,7 +10,7 @@ using RouteResponse = Sail.Api.V1.Route;
 
 namespace Sail.Grpc;
 
-public class RouteGrpcService(SailContext dbContext, IRouteStore routeStore) : RouteService.RouteServiceBase
+public class RouteGrpcService(MongoDBContext dbContext, IRouteStore routeStore) : RouteService.RouteServiceBase
 {
     public override async Task<ListRouteResponse> List(Empty request, ServerCallContext context)
     {
@@ -111,11 +111,11 @@ public class RouteGrpcService(SailContext dbContext, IRouteStore routeStore) : R
             MaxRequestBodySize = route.MaxRequestBodySize,
             Transforms = { route.Transforms?.Select(MapToRouteTransform) ?? [] },
             RateLimiterPolicy = route.RateLimiterPolicy,
-            HttpsRedirect = route.HttpsRedirect
+            HttpsRedirect = route.HttpsRedirect ?? false
         };
     }
 
-    private static RouteTransform MapToRouteTransform(IReadOnlyDictionary<string, string> transform)
+    private static RouteTransform MapToRouteTransform(Dictionary<string, string> transform)
     {
         var result = new RouteTransform();
         foreach (var item in transform)

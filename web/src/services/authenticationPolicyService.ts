@@ -1,5 +1,5 @@
 import { apiClient } from './api';
-import type { AuthenticationPolicy, AuthenticationSchemeType, JwtBearerConfig, OpenIdConnectConfig } from '../types/gateway';
+import type { AuthenticationPolicy, AuthenticationSchemeType, JwtBearerConfig, OpenIdConnectConfig } from '../types';
 
 export interface CreateAuthenticationPolicyRequest {
   name: string;

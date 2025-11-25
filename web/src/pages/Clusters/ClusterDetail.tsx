@@ -15,7 +15,7 @@ import {
 } from '@heroicons/react/24/outline';
 import { ClusterService } from '../../services/clusterService';
 import { RuntimeService, type DestinationRuntimeState } from '../../services/runtimeService';
-import type { Cluster, Destination, DestinationHealth } from '../../types/gateway';
+import type { Cluster, Destination, DestinationHealth } from '../../types';
 
 const ClusterDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();

@@ -1,13 +1,16 @@
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Sail.Core.Cors;
 
 namespace Sail.Compass.Cors;
 
-internal sealed class CorsPolicyUpdater : IDisposable
+internal sealed class CorsPolicyUpdater : IHostedService, IDisposable
 {
     private readonly ILogger<CorsPolicyUpdater> _logger;
+    private readonly SailCorsPolicyProvider _corsPolicyProvider;
+    private readonly IObservable<IReadOnlyList<CorsPolicyConfig>> _corsPolicyStream;
     private readonly CompositeDisposable _subscriptions = new();
 
     public CorsPolicyUpdater(
@@ -16,24 +19,35 @@ internal sealed class CorsPolicyUpdater : IDisposable
         IObservable<IReadOnlyList<CorsPolicyConfig>> corsPolicyStream)
     {
         _logger = logger;
+        _corsPolicyProvider = corsPolicyProvider;
+        _corsPolicyStream = corsPolicyStream;
+    }
 
-        var subscription = corsPolicyStream
+    public Task StartAsync(CancellationToken cancellationToken)
+    {
+        var subscription = _corsPolicyStream
             .Subscribe(
-                async policies => await UpdateCorsPolicies(corsPolicyProvider, policies),
+                async policies => await UpdateCorsPolicies(policies),
                 ex => _logger.LogError(ex, "Error in CORS policy stream"),
                 () => _logger.LogInformation("CORS policy stream completed"));
 
         _subscriptions.Add(subscription);
+
+        return Task.CompletedTask;
     }
 
-    private async Task UpdateCorsPolicies(
-        SailCorsPolicyProvider corsPolicyProvider,
-        IReadOnlyList<CorsPolicyConfig> policies)
+    public Task StopAsync(CancellationToken cancellationToken)
+    {
+        _subscriptions?.Dispose();
+        return Task.CompletedTask;
+    }
+
+    private async Task UpdateCorsPolicies(IReadOnlyList<CorsPolicyConfig> policies)
     {
         try
         {
             _logger.LogInformation("Updating CORS policies, count: {Count}", policies.Count);
-            await corsPolicyProvider.UpdateAsync(policies, CancellationToken.None);
+            await _corsPolicyProvider.UpdateAsync(policies, CancellationToken.None);
         }
         catch (Exception ex)
         {

@@ -1,39 +1,41 @@
+using Microsoft.EntityFrameworkCore;
 using Sail.Core.Entities;
 using Sail.Core.Stores;
-using MongoDB.Driver;
 
 namespace Sail.Database.MongoDB.Stores;
 
-public class MiddlewareStore(SailContext context) : IMiddlewareStore
+public class MiddlewareStore(IContext context) : IMiddlewareStore
 {
     public async Task<List<Middleware>> GetAsync(CancellationToken cancellationToken = default)
     {
-        var filter = Builders<Middleware>.Filter.Empty;
-        var middlewares = await context.Middlewares.FindAsync(filter, cancellationToken: cancellationToken);
-        return await middlewares.ToListAsync(cancellationToken: cancellationToken);
+        return await context.Middlewares.ToListAsync(cancellationToken);
     }
 
     public async Task<Middleware?> GetAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        var filter = Builders<Middleware>.Filter.Eq(m => m.Id, id);
-        var middleware = await context.Middlewares.FindAsync(filter, cancellationToken: cancellationToken);
-        return await middleware.FirstOrDefaultAsync(cancellationToken: cancellationToken);
+        return await context.Middlewares
+            .SingleOrDefaultAsync(m => m.Id == id, cancellationToken);
     }
 
     public async Task CreateAsync(Middleware middleware, CancellationToken cancellationToken = default)
     {
-        await context.Middlewares.InsertOneAsync(middleware, cancellationToken: cancellationToken);
+        context.Middlewares.Add(middleware);
+        await context.SaveChangesAsync(cancellationToken);
     }
 
     public async Task UpdateAsync(Middleware middleware, CancellationToken cancellationToken = default)
     {
-        var filter = Builders<Middleware>.Filter.Eq(m => m.Id, middleware.Id);
-        await context.Middlewares.ReplaceOneAsync(filter, middleware, cancellationToken: cancellationToken);
+        context.Middlewares.Update(middleware);
+        await context.SaveChangesAsync(cancellationToken);
     }
 
     public async Task DeleteAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        var filter = Builders<Middleware>.Filter.Eq(m => m.Id, id);
-        await context.Middlewares.DeleteOneAsync(filter, cancellationToken: cancellationToken);
+        var middleware = await context.Middlewares.FindAsync([id], cancellationToken);
+        if (middleware != null)
+        {
+            context.Middlewares.Remove(middleware);
+            await context.SaveChangesAsync(cancellationToken);
+        }
     }
 }

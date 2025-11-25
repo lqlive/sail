@@ -2,9 +2,9 @@ namespace Sail.Core.Entities;
 
 public class SessionAffinity
 {
-    public bool? Enabled { get; init; }
-    public string? Policy { get; init; }
-    public string? FailurePolicy { get; init; }
-    public string? AffinityKeyName { get; init; }
-    public SessionAffinityCookie? Cookie { get; init; }
+    public bool? Enabled { get; set; }
+    public string? Policy { get; set; }
+    public string? FailurePolicy { get; set; }
+    public string? AffinityKeyName { get; set; }
+    public SessionAffinityCookie? Cookie { get; set; }
 }

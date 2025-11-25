@@ -3,9 +3,9 @@ namespace Sail.Core.Entities;
 public class Certificate
 {
     public Guid Id { get; set; }
-    public string? Cert { get; init; }
-    public string? Key { get; init; }
-    public List<SNI>? SNIs { get; init; }
-    public DateTimeOffset CreatedAt { get; init; } = DateTimeOffset.UtcNow;
-    public DateTimeOffset UpdatedAt { get; init; } = DateTimeOffset.UtcNow;
+    public string? Cert { get; set; }
+    public string? Key { get; set; }
+    public List<SNI>? SNIs { get; set; }
+    public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
+    public DateTimeOffset UpdatedAt { get; set; } = DateTimeOffset.UtcNow;
 }

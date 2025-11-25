@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeftIcon, PlusIcon, TrashIcon } from '@heroicons/react/24/outline';
-import type { SNI } from '../../types/gateway';
+import type { SNI } from '../../types';
 import { CertificateService, CreateCertificateRequest, CreateSNIRequest } from '../../services/certificateService';
 
 const CertificateEdit: React.FC = () => {

@@ -3,16 +3,16 @@ namespace Sail.Core.Entities;
 public class AuthenticationPolicy
 {
     public Guid Id { get; set; }
-    public required string Name { get; init; }
-    public AuthenticationSchemeType Type { get; init; }
-    public bool Enabled { get; init; } = true;
-    public string? Description { get; init; }
+    public string Name { get; set; } = string.Empty;
+    public AuthenticationSchemeType Type { get; set; }
+    public bool Enabled { get; set; } = true;
+    public string? Description { get; set; }
 
-    public JwtBearerConfig? JwtBearer { get; init; }
-    public OpenIdConnectConfig? OpenIdConnect { get; init; }
+    public JwtBearerConfig? JwtBearer { get; set; }
+    public OpenIdConnectConfig? OpenIdConnect { get; set; }
 
-    public DateTimeOffset CreatedAt { get; init; } = DateTimeOffset.UtcNow;
-    public DateTimeOffset UpdatedAt { get; init; } = DateTimeOffset.UtcNow;
+    public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
+    public DateTimeOffset UpdatedAt { get; set; } = DateTimeOffset.UtcNow;
 }
 
 public enum AuthenticationSchemeType
@@ -23,29 +23,29 @@ public enum AuthenticationSchemeType
 
 public class JwtBearerConfig
 {
-    public required string Authority { get; init; }
-    public required string Audience { get; init; }
-    public bool RequireHttpsMetadata { get; init; } = true;
-    public bool SaveToken { get; init; }
-    public List<string>? ValidIssuers { get; init; }
-    public List<string>? ValidAudiences { get; init; }
-    public bool ValidateIssuer { get; init; } = true;
-    public bool ValidateAudience { get; init; } = true;
-    public bool ValidateLifetime { get; init; } = true;
-    public bool ValidateIssuerSigningKey { get; init; } = true;
-    public int? ClockSkew { get; init; }
+    public string Authority { get; set; } = string.Empty;
+    public string Audience { get; set; } = string.Empty;
+    public bool RequireHttpsMetadata { get; set; } = true;
+    public bool SaveToken { get; set; }
+    public List<string>? ValidIssuers { get; set; }
+    public List<string>? ValidAudiences { get; set; }
+    public bool ValidateIssuer { get; set; } = true;
+    public bool ValidateAudience { get; set; } = true;
+    public bool ValidateLifetime { get; set; } = true;
+    public bool ValidateIssuerSigningKey { get; set; } = true;
+    public int? ClockSkew { get; set; }
 }
 
 public class OpenIdConnectConfig
 {
-    public required string Authority { get; init; }
-    public required string ClientId { get; init; }
-    public required string ClientSecret { get; init; }
-    public string? ResponseType { get; init; } = "code";
-    public bool RequireHttpsMetadata { get; init; } = true;
-    public bool SaveTokens { get; init; } = true;
-    public bool GetClaimsFromUserInfoEndpoint { get; init; } = true;
-    public List<string>? Scope { get; init; }
-    public int? ClockSkew { get; init; }
+    public string Authority { get; set; } = string.Empty;
+    public string ClientId { get; set; } = string.Empty;
+    public string ClientSecret { get; set; } = string.Empty;
+    public string? ResponseType { get; set; } = "code";
+    public bool RequireHttpsMetadata { get; set; } = true;
+    public bool SaveTokens { get; set; } = true;
+    public bool GetClaimsFromUserInfoEndpoint { get; set; } = true;
+    public List<string>? Scope { get; set; }
+    public int? ClockSkew { get; set; }
 }
 

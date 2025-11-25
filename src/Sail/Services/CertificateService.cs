@@ -1,19 +1,16 @@
 using ErrorOr;
 using Sail.Core.Entities;
-using Sail.Database.MongoDB;
-using MongoDB.Driver;
+using Sail.Core.Stores;
 using Sail.Models.Certificates;
 
 namespace Sail.Services;
 
-public class CertificateService(SailContext context)
+public class CertificateService(ICertificateStore certificateStore)
 {
     public async Task<IEnumerable<CertificateResponse>> GetAsync(CancellationToken cancellationToken = default)
     {
-        var filter = Builders<Certificate>.Filter.Empty;
-        var certificates = await context.Certificates.FindAsync(filter, cancellationToken: cancellationToken);
-        var items = await certificates.ToListAsync(cancellationToken: cancellationToken);
-        return items.Select(MapToCertificate);
+        var certificates = await certificateStore.GetAsync(cancellationToken);
+        return certificates.Select(MapToCertificate);
     }
 
     public async Task<ErrorOr<Created>> CreateAsync(CertificateRequest request,
@@ -33,37 +30,37 @@ public class CertificateService(SailContext context)
             }).ToList()
         };
 
-        await context.Certificates.InsertOneAsync(certificate, cancellationToken: cancellationToken);
+        await certificateStore.CreateAsync(certificate, cancellationToken);
         return Result.Created;
     }
 
     public async Task<ErrorOr<Updated>> UpdateAsync(Guid id, CertificateRequest request,
         CancellationToken cancellationToken = default)
     {
-        var filter = Builders<Certificate>.Filter.And(Builders<Certificate>.Filter.Where(x => x.Id == id));
+        var certificate = await certificateStore.GetByIdAsync(id, cancellationToken);
+        if (certificate is null)
+        {
+            return Error.NotFound(description: "Certificate not found");
+        }
 
-        var update = Builders<Certificate>.Update
-            .Set(x => x.Cert, request.Cert)
-            .Set(x => x.Key, request.Key)
-            .Set(x => x.UpdatedAt, DateTimeOffset.UtcNow);
+        certificate.Cert = request.Cert;
+        certificate.Key = request.Key;
+        certificate.UpdatedAt = DateTimeOffset.UtcNow;
 
-        await context.Certificates.FindOneAndUpdateAsync(filter, update, cancellationToken: cancellationToken);
+        await certificateStore.UpdateAsync(certificate, cancellationToken);
         return Result.Updated;
     }
 
     public async Task<ErrorOr<Deleted>> DeleteAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        var filter = Builders<Certificate>.Filter.And(Builders<Certificate>.Filter.Where(x => x.Id == id));
-        await context.Certificates.DeleteOneAsync(filter, cancellationToken);
+        await certificateStore.DeleteAsync(id, cancellationToken);
         return Result.Deleted;
     }
 
     public async Task<IEnumerable<SNIResponse>> GetSNIsAsync(Guid certificateId,
         CancellationToken cancellationToken = default)
     {
-        var filter = Builders<Certificate>.Filter.And(Builders<Certificate>.Filter.Where(x => x.Id == certificateId));
-        var items = await context.Certificates.FindAsync(filter, cancellationToken: cancellationToken);
-        var certificate = await items.SingleOrDefaultAsync(cancellationToken: cancellationToken);
+        var certificate = await certificateStore.GetByIdAsync(certificateId, cancellationToken);
         if (certificate is null)
         {
             return [];
@@ -75,37 +72,72 @@ public class CertificateService(SailContext context)
     public async Task<ErrorOr<Created>> CreateSNIAsync(Guid certificateId, SNIRequest request,
         CancellationToken cancellationToken = default)
     {
-        var filter = Builders<Certificate>.Filter.And(Builders<Certificate>.Filter.Where(x => x.Id == certificateId));
+        var certificate = await certificateStore.GetByIdAsync(certificateId, cancellationToken);
+        if (certificate is null)
+        {
+            return Error.NotFound(description: "Certificate not found");
+        }
 
         var sni = new SNI
         {
+            Id = Guid.NewGuid(),
             Name = request.Name,
-            HostName = request.HostName
+            HostName = request.HostName,
+            CreatedAt = DateTimeOffset.UtcNow,
+            UpdatedAt = DateTimeOffset.UtcNow
         };
-        var update = Builders<Certificate>.Update.Push(x => x.SNIs, sni);
-        await context.Certificates.FindOneAndUpdateAsync(filter, update, cancellationToken: cancellationToken);
+
+        certificate.SNIs ??= new List<SNI>();
+        certificate.SNIs.Add(sni);
+        certificate.UpdatedAt = DateTimeOffset.UtcNow;
+
+        await certificateStore.UpdateAsync(certificate, cancellationToken);
         return Result.Created;
     }
 
     public async Task<ErrorOr<Updated>> UpdateSNIAsync(Guid certificateId, Guid id, SNIRequest request,
         CancellationToken cancellationToken = default)
     {
-        var filter = Builders<Certificate>.Filter.And(Builders<Certificate>.Filter.Where(x => x.Id == certificateId),
-            Builders<Certificate>.Filter.ElemMatch(x => x.SNIs, f => f.Id == id));
+        var certificate = await certificateStore.GetByIdAsync(certificateId, cancellationToken);
+        if (certificate is null)
+        {
+            return Error.NotFound(description: "Certificate not found");
+        }
 
-        var update = Builders<Certificate>.Update.Set(x => x.SNIs[-1], new SNI());
-        await context.Certificates.FindOneAndUpdateAsync(filter, update, cancellationToken: cancellationToken);
+        var sni = certificate.SNIs?.SingleOrDefault(s => s.Id == id);
+        if (sni is null)
+        {
+            return Error.NotFound(description: "SNI not found");
+        }
+
+        sni.Name = request.Name;
+        sni.HostName = request.HostName;
+        sni.UpdatedAt = DateTimeOffset.UtcNow;
+        certificate.UpdatedAt = DateTimeOffset.UtcNow;
+
+        await certificateStore.UpdateAsync(certificate, cancellationToken);
         return Result.Updated;
     }
 
     public async Task<ErrorOr<Deleted>> DeleteSNIAsync(Guid certificateId, Guid id,
         CancellationToken cancellationToken = default)
     {
+        var certificate = await certificateStore.GetByIdAsync(certificateId, cancellationToken);
+        if (certificate is null)
+        {
+            return Error.NotFound(description: "Certificate not found");
+        }
 
-        var filter = Builders<Certificate>.Filter.And(Builders<Certificate>.Filter.Where(x => x.Id == certificateId),
-            Builders<Certificate>.Filter.ElemMatch(x => x.SNIs, f => f.Id == id));
+        var sni = certificate.SNIs?.SingleOrDefault(s => s.Id == id);
+        if (sni is null)
+        {
+            return Error.NotFound(description: "SNI not found");
+        }
 
-        await context.Certificates.DeleteOneAsync(filter, cancellationToken: cancellationToken);
+        certificate.SNIs!.Remove(sni);
+        certificate.UpdatedAt = DateTimeOffset.UtcNow;
+
+        await certificateStore.UpdateAsync(certificate, cancellationToken);
         return Result.Deleted;
     }
 

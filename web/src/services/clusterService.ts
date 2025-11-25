@@ -1,5 +1,5 @@
 import { apiClient } from './api';
-import type { Cluster, Destination } from '../types/gateway';
+import type { Cluster, Destination } from '../types';
 
 export interface ClusterHealthCheck {
   availableDestinationsPolicy?: string;

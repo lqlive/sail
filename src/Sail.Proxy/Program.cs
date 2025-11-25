@@ -38,8 +38,6 @@ var app = builder.Build();
 
 app.MapRuntimeV1();
 
-app.Services.UseCompassUpdaters();
-
 app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();

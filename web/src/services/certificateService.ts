@@ -1,5 +1,5 @@
 import { apiClient } from './api';
-import type { Certificate, SNI } from '../types/gateway';
+import type { Certificate, SNI } from '../types';
 
 export interface CreateCertificateRequest {
   cert: string;

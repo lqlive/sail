@@ -1,15 +1,45 @@
-using MongoDB.Driver;
+using Microsoft.EntityFrameworkCore;
 using Sail.Core.Entities;
 using Sail.Core.Stores;
 
 namespace Sail.Database.MongoDB.Stores;
 
-public class ClusterStore(SailContext context) : IClusterStore
+public class ClusterStore(IContext context) : IClusterStore
 {
     public async Task<List<Cluster>> GetAsync(CancellationToken cancellationToken = default)
     {
-        var filter = Builders<Cluster>.Filter.Empty;
-        var clusters = await context.Clusters.FindAsync(filter, cancellationToken: cancellationToken);
-        return await clusters.ToListAsync(cancellationToken: cancellationToken);
+        return await context.Clusters
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<Cluster?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
+    {
+    
+        return await context.Clusters
+            .SingleAsync(c => c.Id == id, cancellationToken);
+    }
+
+    public async Task<Cluster> CreateAsync(Cluster cluster, CancellationToken cancellationToken = default)
+    {
+        context.Clusters.Add(cluster);
+        await context.SaveChangesAsync(cancellationToken);
+        return cluster;
+    }
+
+    public async Task<Cluster> UpdateAsync(Cluster cluster, CancellationToken cancellationToken = default)
+    {
+        context.Clusters.Update(cluster);
+        await context.SaveChangesAsync(cancellationToken);
+        return cluster;
+    }
+
+    public async Task DeleteAsync(Guid id, CancellationToken cancellationToken = default)
+    {
+        var cluster = await context.Clusters.FindAsync([id], cancellationToken);
+        if (cluster != null)
+        {
+            context.Clusters.Remove(cluster);
+            await context.SaveChangesAsync(cancellationToken);
+        }
     }
 }

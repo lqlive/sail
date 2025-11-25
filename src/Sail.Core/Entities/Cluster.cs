@@ -2,14 +2,14 @@ namespace Sail.Core.Entities;
 
 public class Cluster
 {
-    public Guid Id { get; init; }
-    public string? Name { get; init; }
-    public string? ServiceName { get; init; }
-    public ServiceDiscoveryType? ServiceDiscoveryType { get; init; }
-    public string? LoadBalancingPolicy { get; init; }
-    public HealthCheck? HealthCheck { get; init; }
-    public SessionAffinity? SessionAffinity { get; init; }
-    public List<Destination>? Destinations { get; init; }
-    public DateTimeOffset CreatedAt { get; init; } = DateTimeOffset.UtcNow;
-    public DateTimeOffset UpdatedAt { get; init; } = DateTimeOffset.UtcNow;
+    public Guid Id { get; set; }
+    public string? Name { get; set; }
+    public string? ServiceName { get; set; }
+    public ServiceDiscoveryType? ServiceDiscoveryType { get; set; }
+    public string? LoadBalancingPolicy { get; set; }
+    public HealthCheck? HealthCheck { get; set; }
+    public SessionAffinity? SessionAffinity { get; set; }
+    public List<Destination>? Destinations { get; set; }
+    public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
+    public DateTimeOffset UpdatedAt { get; set; } = DateTimeOffset.UtcNow;
 }

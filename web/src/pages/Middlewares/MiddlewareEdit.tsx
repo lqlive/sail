@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { ChevronLeftIcon, CheckIcon, PlusIcon, XMarkIcon, ShieldCheckIcon, BoltIcon, ClockIcon, ArrowPathIcon } from '@heroicons/react/24/outline';
-import type { MiddlewareType } from '../../types/gateway';
+import type { MiddlewareType } from '../../types';
 import { MiddlewareService } from '../../services/middlewareService';
 
 const MiddlewareEdit: React.FC = () => {

@@ -1,67 +1,62 @@
 using ErrorOr;
-using MongoDB.Driver;
 using Sail.Core.Entities;
-using Sail.Database.MongoDB;
+using Sail.Core.Stores;
 using Sail.Models.Routes;
 using Route = Sail.Core.Entities.Route;
 
 namespace Sail.Services;
 
-public class RouteService(SailContext context)
+public class RouteService(IRouteStore routeStore)
 {
-
-    public async Task<RouteResponse> GetAsync(Guid id, CancellationToken cancellationToken = default)
+    public async Task<RouteResponse?> GetAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        var filter = Builders<Route>.Filter.Where(x => x.Id == id);
-        var routes = await context.Routes.FindAsync(filter, cancellationToken: cancellationToken);
-        var result = await routes.SingleOrDefaultAsync(cancellationToken: cancellationToken);
-        return MapToRoute(result);
+        var route = await routeStore.GetByIdAsync(id, cancellationToken);
+        return route != null ? MapToRoute(route) : null;
     }
-
 
     public async Task<IEnumerable<RouteResponse>> ListAsync(string? keywords,
         CancellationToken cancellationToken = default)
     {
-        var filter = Builders<Route>.Filter.Empty;
-        var routes = await context.Routes.FindAsync(filter, cancellationToken: cancellationToken);
-        var items = await routes.ToListAsync(cancellationToken: cancellationToken);
-        return items.Select(MapToRoute);
+        var routes = await routeStore.GetAsync(cancellationToken);
+        return routes.Select(MapToRoute);
     }
 
     public async Task<ErrorOr<Created>> CreateAsync(RouteRequest request, CancellationToken cancellationToken = default)
     {
         var route = CreateRouteFromRequest(request);
-        await context.Routes.InsertOneAsync(route, cancellationToken: cancellationToken);
+        await routeStore.CreateAsync(route, cancellationToken);
         return Result.Created;
     }
 
     public async Task<ErrorOr<Updated>> UpdateAsync(Guid id, RouteRequest request,
         CancellationToken cancellationToken = default)
     {
-        var filter = Builders<Route>.Filter.And(Builders<Route>.Filter.Where(x => x.Id == id));
+        var route = await routeStore.GetByIdAsync(id, cancellationToken);
+        if (route is null)
+        {
+            return Error.NotFound(description: "Route not found");
+        }
 
-        var update = Builders<Route>.Update
-            .Set(x => x.Name, request.Name)
-            .Set(x => x.ClusterId, request.ClusterId)
-            .Set(x => x.Match, CreateRouteMatchFromRequest(request.Match))
-            .Set(x => x.AuthorizationPolicy, request.AuthorizationPolicy)
-            .Set(x => x.RateLimiterPolicy, request.RateLimiterPolicy)
-            .Set(x => x.CorsPolicy, request.CorsPolicy)
-            .Set(x => x.TimeoutPolicy, request.TimeoutPolicy)
-            .Set(x => x.Timeout, request.Timeout)
-            .Set(x => x.MaxRequestBodySize, request.MaxRequestBodySize)
-            .Set(x => x.HttpsRedirect, request.HttpsRedirect)
-            .Set(x => x.Transforms, request.Transforms)
-            .Set(x => x.UpdatedAt, DateTimeOffset.UtcNow);
+        route.Name = request.Name;
+        route.ClusterId = request.ClusterId;
+        route.Match = CreateRouteMatchFromRequest(request.Match);
+        route.AuthorizationPolicy = request.AuthorizationPolicy;
+        route.RateLimiterPolicy = request.RateLimiterPolicy;
+        route.CorsPolicy = request.CorsPolicy;
+        route.TimeoutPolicy = request.TimeoutPolicy;
+        route.Timeout = request.Timeout;
+        route.MaxRequestBodySize = request.MaxRequestBodySize;
+        route.HttpsRedirect = request.HttpsRedirect;
+        route.Transforms = request.Transforms;
+        route.UpdatedAt = DateTimeOffset.UtcNow;
 
-        await context.Routes.FindOneAndUpdateAsync(filter, update, cancellationToken: cancellationToken);
+        await routeStore.UpdateAsync(route, cancellationToken);
         return Result.Updated;
     }
 
     public async Task<ErrorOr<Deleted>> DeleteAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        var filter = Builders<Route>.Filter.And(Builders<Route>.Filter.Where(x => x.Id == id));
-        await context.Routes.DeleteOneAsync(filter, cancellationToken);
+        await routeStore.DeleteAsync(id, cancellationToken);
         return Result.Deleted;
     }
 

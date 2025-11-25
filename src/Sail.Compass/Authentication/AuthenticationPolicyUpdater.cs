@@ -1,4 +1,5 @@
 using System.Reactive.Disposables;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Sail.Core.Authentication;
 using Sail.Core.Authentication.JwtBearer;
@@ -7,9 +8,12 @@ using Sail.Core.Entities;
 
 namespace Sail.Compass.Authentication;
 
-internal sealed class AuthenticationPolicyUpdater : IDisposable
+internal sealed class AuthenticationPolicyUpdater : IHostedService, IDisposable
 {
     private readonly ILogger<AuthenticationPolicyUpdater> _logger;
+    private readonly JwtBearerAuthenticationOptionsProvider _jwtBearerProvider;
+    private readonly OpenIdConnectAuthenticationOptionsProvider _oidcProvider;
+    private readonly IObservable<IReadOnlyList<AuthenticationPolicyConfig>> _policyStream;
     private readonly CompositeDisposable _subscriptions = new();
 
     public AuthenticationPolicyUpdater(
@@ -19,20 +23,31 @@ internal sealed class AuthenticationPolicyUpdater : IDisposable
         IObservable<IReadOnlyList<AuthenticationPolicyConfig>> policyStream)
     {
         _logger = logger;
+        _jwtBearerProvider = jwtBearerProvider;
+        _oidcProvider = oidcProvider;
+        _policyStream = policyStream;
+    }
 
-        var subscription = policyStream
+    public Task StartAsync(CancellationToken cancellationToken)
+    {
+        var subscription = _policyStream
             .Subscribe(
-                async policies => await UpdateAuthenticationPolicies(jwtBearerProvider, oidcProvider, policies),
+                async policies => await UpdateAuthenticationPolicies(policies),
                 ex => _logger.LogError(ex, "Error in authentication policy stream"),
                 () => _logger.LogInformation("Authentication policy stream completed"));
 
         _subscriptions.Add(subscription);
+
+        return Task.CompletedTask;
     }
 
-    private async Task UpdateAuthenticationPolicies(
-        JwtBearerAuthenticationOptionsProvider jwtBearerProvider,
-        OpenIdConnectAuthenticationOptionsProvider oidcProvider,
-        IReadOnlyList<AuthenticationPolicyConfig> policies)
+    public Task StopAsync(CancellationToken cancellationToken)
+    {
+        _subscriptions?.Dispose();
+        return Task.CompletedTask;
+    }
+
+    private async Task UpdateAuthenticationPolicies(IReadOnlyList<AuthenticationPolicyConfig> policies)
     {
         try
         {
@@ -46,9 +61,8 @@ internal sealed class AuthenticationPolicyUpdater : IDisposable
                 .Where(p => p.Type == AuthenticationSchemeType.OpenIdConnect && p.OpenIdConnect != null)
                 .ToDictionary(p => p.Name, p => p.OpenIdConnect!);
 
-            // Update authentication schemes and authorization policies
-            await jwtBearerProvider.UpdateAsync(jwtBearerConfigs, CancellationToken.None);
-            await oidcProvider.UpdateAsync(oidcConfigs, CancellationToken.None);
+            await _jwtBearerProvider.UpdateAsync(jwtBearerConfigs, CancellationToken.None);
+            await _oidcProvider.UpdateAsync(oidcConfigs, CancellationToken.None);
         }
         catch (Exception ex)
         {

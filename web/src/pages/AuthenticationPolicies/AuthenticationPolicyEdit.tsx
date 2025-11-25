@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { ChevronLeftIcon, CheckIcon, PlusIcon, XMarkIcon, KeyIcon, LockClosedIcon } from '@heroicons/react/24/outline';
-import type { AuthenticationSchemeType } from '../../types/gateway';
+import type { AuthenticationSchemeType } from '../../types';
 import { AuthenticationPolicyService } from '../../services/authenticationPolicyService';
 
 const AuthenticationPolicyEdit: React.FC = () => {
