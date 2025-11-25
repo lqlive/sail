@@ -21,7 +21,7 @@ internal sealed class ConsulServiceEndpointProvider(
     protected override TimeSpan DefaultRefreshPeriod { get; } = options.CurrentValue.DefaultRefreshPeriod;
 
     public string HostName { get; } = hostName;
-
+    public override string ToString() => "Cousul";
     protected override async Task ResolveAsyncCore()
     {
         var endpoints = new List<ServiceEndpoint>();

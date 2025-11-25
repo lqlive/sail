@@ -70,21 +70,13 @@ export interface ClusterListResponse {
 }
 
 export class ClusterService {
-  private static readonly API_VERSION = '1.0';
   private static readonly BASE_PATH = '/api/clusters';
 
   static async getClusters(keywords: string = ''): Promise<Cluster[]> {
     try {
-      const queryParams = new URLSearchParams({
-        'api-version': this.API_VERSION,
-      });
-      
-      if (keywords) {
-        queryParams.append('keywords', keywords);
-      }
-
+      const queryParams = keywords ? `?keywords=${encodeURIComponent(keywords)}` : '';
       const response = await apiClient.get<Cluster[] | ClusterListResponse>(
-        `${this.BASE_PATH}?${queryParams.toString()}`
+        `${this.BASE_PATH}${queryParams}`
       );
       
       if (Array.isArray(response)) {
@@ -100,14 +92,7 @@ export class ClusterService {
 
   static async getCluster(id: string): Promise<Cluster> {
     try {
-      const queryParams = new URLSearchParams({
-        'api-version': this.API_VERSION,
-      });
-
-      const cluster = await apiClient.get<Cluster>(
-        `${this.BASE_PATH}/${id}?${queryParams.toString()}`
-      );
-      
+      const cluster = await apiClient.get<Cluster>(`${this.BASE_PATH}/${id}`);
       return cluster;
     } catch (error) {
       console.error(`Failed to fetch cluster ${id}:`, error);
@@ -117,15 +102,7 @@ export class ClusterService {
 
   static async createCluster(data: CreateClusterRequest): Promise<Cluster> {
     try {
-      const queryParams = new URLSearchParams({
-        'api-version': this.API_VERSION,
-      });
-
-      const cluster = await apiClient.post<Cluster>(
-        `${this.BASE_PATH}?${queryParams.toString()}`,
-        data
-      );
-      
+      const cluster = await apiClient.post<Cluster>(this.BASE_PATH, data);
       return cluster;
     } catch (error) {
       console.error('Failed to create cluster:', error);
@@ -135,15 +112,7 @@ export class ClusterService {
 
   static async updateCluster(id: string, data: UpdateClusterRequest): Promise<Cluster> {
     try {
-      const queryParams = new URLSearchParams({
-        'api-version': this.API_VERSION,
-      });
-
-      const cluster = await apiClient.put<Cluster>(
-        `${this.BASE_PATH}/${id}?${queryParams.toString()}`,
-        data
-      );
-      
+      const cluster = await apiClient.put<Cluster>(`${this.BASE_PATH}/${id}`, data);
       return cluster;
     } catch (error) {
       console.error(`Failed to update cluster ${id}:`, error);
@@ -153,13 +122,7 @@ export class ClusterService {
 
   static async deleteCluster(id: string): Promise<void> {
     try {
-      const queryParams = new URLSearchParams({
-        'api-version': this.API_VERSION,
-      });
-
-      await apiClient.delete(
-        `${this.BASE_PATH}/${id}?${queryParams.toString()}`
-      );
+      await apiClient.delete(`${this.BASE_PATH}/${id}`);
     } catch (error) {
       console.error(`Failed to delete cluster ${id}:`, error);
       throw error;
