@@ -1,5 +1,5 @@
 services:
-  sail.proxy:
+  sail-proxy:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_HTTP_PORTS=8080
