@@ -6,7 +6,7 @@ using Sail.Models.Certificates;
 
 namespace Sail.Services;
 
-public class CertificateService(SailContext context)
+public class CertificateService(MongoDBContext context)
 {
     public async Task<IEnumerable<CertificateResponse>> GetAsync(CancellationToken cancellationToken = default)
     {

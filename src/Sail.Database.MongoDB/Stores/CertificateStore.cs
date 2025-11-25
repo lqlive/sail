@@ -4,7 +4,7 @@ using Sail.Core.Stores;
 
 namespace Sail.Database.MongoDB.Stores;
 
-public class CertificateStore(SailContext context) : ICertificateStore
+public class CertificateStore(MongoDBContext context) : ICertificateStore
 {
     public async Task<List<Certificate>> GetAsync(CancellationToken cancellationToken)
     {

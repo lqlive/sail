@@ -9,7 +9,6 @@ public static class RuntimeApi
         var group = app.MapGroup("/runtime");
 
         group.MapGet("/clusters", GetAllClusters);
-
         group.MapGet("/clusters/{clusterId}/destinations", GetAllDestinations);
 
         return group;
@@ -21,13 +20,13 @@ public static class RuntimeApi
 
         var result = clusters.Select(cluster => new
         {
-            ClusterId = cluster.ClusterId,
+            cluster.ClusterId,
             DestinationCount = cluster.Destinations.Count,
             Destinations = cluster.Destinations.Values.Select(dest => new
             {
-                DestinationId = dest.DestinationId,
-                Address = dest.Model.Config.Address,
-                Host = dest.Model.Config.Host,
+                dest.DestinationId,
+                dest.Model.Config.Address,
+                dest.Model.Config.Host,
                 ActiveHealth = dest.Health.Active.ToString(),
                 PassiveHealth = dest.Health.Passive.ToString()
             })
@@ -51,10 +50,10 @@ public static class RuntimeApi
 
         var destinations = cluster.Destinations.Values.Select(dest => new
         {
-            ClusterId = cluster.ClusterId,
-            DestinationId = dest.DestinationId,
-            Address = dest.Model.Config.Address,
-            Host = dest.Model.Config.Host,
+            cluster.ClusterId,
+            dest.DestinationId,
+            dest.Model.Config.Address,
+            dest.Model.Config.Host,
             ActiveHealth = dest.Health.Active.ToString(),
             PassiveHealth = dest.Health.Passive.ToString()
         });

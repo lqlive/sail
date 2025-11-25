@@ -12,7 +12,7 @@ using Destination = Sail.Api.V1.Destination;
 
 namespace Sail.Grpc;
 
-public class ClusterGrpcService(SailContext dbContext, IClusterStore clusterStore) : ClusterService.ClusterServiceBase
+public class ClusterGrpcService(MongoDBContext dbContext, IClusterStore clusterStore) : ClusterService.ClusterServiceBase
 {
     public override async Task<ListClusterResponse> List(Empty request, ServerCallContext context)
     {

@@ -7,7 +7,7 @@ using Route = Sail.Core.Entities.Route;
 
 namespace Sail.Services;
 
-public class RouteService(SailContext context)
+public class RouteService(MongoDBContext context)
 {
 
     public async Task<RouteResponse> GetAsync(Guid id, CancellationToken cancellationToken = default)

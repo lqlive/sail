@@ -8,7 +8,7 @@ using MongoDB.Bson.Serialization.Serializers;
 
 namespace Sail.Database.MongoDB;
 
-public class SailContext
+public class MongoDBContext
 {
     private readonly IMongoDatabase _database;
 
@@ -18,13 +18,13 @@ public class SailContext
     private const string MiddlewareTableName = "middlewares";
     private const string AuthenticationPolicyTableName = "authenticationPolicies";
 
-    public SailContext(IOptions<DatabaseOptions> options)
+    public MongoDBContext(IOptions<DatabaseOptions> options)
     {
         var client = new MongoClient(options.Value.ConnectionString);
         _database = client.GetDatabase(options.Value.DatabaseName);
     }
 
-    static SailContext()
+    static MongoDBContext()
     {
         RegisterClassMaps();
     }

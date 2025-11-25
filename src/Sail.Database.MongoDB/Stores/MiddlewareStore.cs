@@ -4,7 +4,7 @@ using MongoDB.Driver;
 
 namespace Sail.Database.MongoDB.Stores;
 
-public class MiddlewareStore(SailContext context) : IMiddlewareStore
+public class MiddlewareStore(MongoDBContext context) : IMiddlewareStore
 {
     public async Task<List<Middleware>> GetAsync(CancellationToken cancellationToken = default)
     {

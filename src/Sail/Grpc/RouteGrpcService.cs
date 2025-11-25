@@ -10,7 +10,7 @@ using RouteResponse = Sail.Api.V1.Route;
 
 namespace Sail.Grpc;
 
-public class RouteGrpcService(SailContext dbContext, IRouteStore routeStore) : RouteService.RouteServiceBase
+public class RouteGrpcService(MongoDBContext dbContext, IRouteStore routeStore) : RouteService.RouteServiceBase
 {
     public override async Task<ListRouteResponse> List(Empty request, ServerCallContext context)
     {

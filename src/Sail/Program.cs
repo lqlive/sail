@@ -46,7 +46,7 @@ app.MapGrpcService<AuthenticationPolicyGrpcService>();
 
 using (var scope = app.Services.CreateScope())
 {
-    var context = scope.ServiceProvider.GetRequiredService<SailContext>();
+    var context = scope.ServiceProvider.GetRequiredService<MongoDBContext>();
     await context.InitializeAsync();
 }
 await app.RunAsync();

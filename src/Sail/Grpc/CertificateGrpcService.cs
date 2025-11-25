@@ -10,7 +10,7 @@ using CertificateResponse = Sail.Api.V1.Certificate;
 
 namespace Sail.Grpc;
 
-public class CertificateGrpcService(SailContext dbContext, ICertificateStore certificateStore)
+public class CertificateGrpcService(MongoDBContext dbContext, ICertificateStore certificateStore)
     : CertificateService.CertificateServiceBase
 {
     public override async Task<ListCertificateResponse> List(Empty request, ServerCallContext context)

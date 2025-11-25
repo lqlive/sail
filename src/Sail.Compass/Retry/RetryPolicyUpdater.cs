@@ -1,13 +1,16 @@
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Sail.Core.Retry;
 
 namespace Sail.Compass.Retry;
 
-internal sealed class RetryPolicyUpdater : IDisposable
+internal sealed class RetryPolicyUpdater : IHostedService, IDisposable
 {
     private readonly ILogger<RetryPolicyUpdater> _logger;
+    private readonly SailRetryPolicyProvider _retryPolicyProvider;
+    private readonly IObservable<IReadOnlyList<RetryPolicyConfig>> _retryPolicyStream;
     private readonly CompositeDisposable _subscriptions = new();
 
     public RetryPolicyUpdater(
@@ -16,24 +19,35 @@ internal sealed class RetryPolicyUpdater : IDisposable
         IObservable<IReadOnlyList<RetryPolicyConfig>> retryPolicyStream)
     {
         _logger = logger;
+        _retryPolicyProvider = retryPolicyProvider;
+        _retryPolicyStream = retryPolicyStream;
+    }
 
-        var subscription = retryPolicyStream
+    public Task StartAsync(CancellationToken cancellationToken)
+    {
+        var subscription = _retryPolicyStream
             .Subscribe(
-                async policies => await UpdateRetryPolicies(retryPolicyProvider, policies),
+                async policies => await UpdateRetryPolicies(policies),
                 ex => _logger.LogError(ex, "Error in Retry policy stream"),
                 () => _logger.LogInformation("Retry policy stream completed"));
 
         _subscriptions.Add(subscription);
+
+        return Task.CompletedTask;
     }
 
-    private async Task UpdateRetryPolicies(
-        SailRetryPolicyProvider retryPolicyProvider,
-        IReadOnlyList<RetryPolicyConfig> policies)
+    public Task StopAsync(CancellationToken cancellationToken)
+    {
+        _subscriptions?.Dispose();
+        return Task.CompletedTask;
+    }
+
+    private async Task UpdateRetryPolicies(IReadOnlyList<RetryPolicyConfig> policies)
     {
         try
         {
             _logger.LogInformation("Updating Retry policies, count: {Count}", policies.Count);
-            await retryPolicyProvider.UpdateAsync(policies, CancellationToken.None);
+            await _retryPolicyProvider.UpdateAsync(policies, CancellationToken.None);
         }
         catch (Exception ex)
         {

@@ -8,7 +8,7 @@ using Sail.Database.MongoDB.Extensions;
 
 namespace Sail.Grpc;
 
-public class AuthenticationPolicyGrpcService(SailContext dbContext, IAuthenticationPolicyStore policyStore)
+public class AuthenticationPolicyGrpcService(MongoDBContext dbContext, IAuthenticationPolicyStore policyStore)
     : Api.V1.AuthenticationPolicyService.AuthenticationPolicyServiceBase
 {
     public override async Task<ListAuthenticationPolicyResponse> List(Empty request, ServerCallContext context)

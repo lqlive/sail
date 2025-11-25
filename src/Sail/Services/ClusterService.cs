@@ -5,7 +5,7 @@ using Sail.Models.Clusters;
 using Sail.Database.MongoDB;
 
 namespace Sail.Services;
-public class ClusterService(SailContext context)
+public class ClusterService(MongoDBContext context)
 {
     public async Task<ClusterResponse> GetAsync(Guid id, CancellationToken cancellationToken = default)
     {

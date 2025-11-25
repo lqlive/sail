@@ -9,7 +9,7 @@ using Sail.Database.MongoDB.Extensions;
 
 namespace Sail.Grpc;
 
-public class MiddlewareGrpcService(SailContext dbContext, IMiddlewareStore middlewareStore) : Api.V1.MiddlewareService.MiddlewareServiceBase
+public class MiddlewareGrpcService(MongoDBContext dbContext, IMiddlewareStore middlewareStore) : Api.V1.MiddlewareService.MiddlewareServiceBase
 {
     public override async Task<ListMiddlewareResponse> List(Empty request, ServerCallContext context)
     {

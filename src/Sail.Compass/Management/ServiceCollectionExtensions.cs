@@ -74,7 +74,7 @@ public static class ServiceCollectionExtensions
             return CertificateStreamBuilder.BuildCertificateStream(certificateObserver);
         });
 
-        services.AddSingleton<ServerCertificateUpdater>();
+        services.AddHostedService<ServerCertificateUpdater>();
 
         return services;
     }
@@ -88,7 +88,7 @@ public static class ServiceCollectionExtensions
             return CorsPolicyStreamBuilder.BuildCorsPolicyStream(middlewareObserver);
         });
 
-        services.AddSingleton<CorsPolicyUpdater>();
+        services.AddHostedService<CorsPolicyUpdater>();
 
         return services;
     }
@@ -102,7 +102,7 @@ public static class ServiceCollectionExtensions
             return RateLimiterPolicyStreamBuilder.BuildRateLimiterPolicyStream(middlewareObserver);
         });
 
-        services.AddSingleton<RateLimiterPolicyUpdater>();
+        services.AddHostedService<RateLimiterPolicyUpdater>();
 
         return services;
     }
@@ -116,7 +116,7 @@ public static class ServiceCollectionExtensions
             return AuthenticationPolicyStreamBuilder.Build(policyObserver);
         });
 
-        services.AddSingleton<AuthenticationPolicyUpdater>();
+        services.AddHostedService<AuthenticationPolicyUpdater>();
 
         return services;
     }
@@ -130,7 +130,7 @@ public static class ServiceCollectionExtensions
             return TimeoutPolicyStreamBuilder.BuildTimeoutPolicyStream(middlewareObserver);
         });
 
-        services.AddSingleton<TimeoutPolicyUpdater>();
+        services.AddHostedService<TimeoutPolicyUpdater>();
 
         return services;
     }
@@ -144,18 +144,8 @@ public static class ServiceCollectionExtensions
             return RetryPolicyStreamBuilder.BuildRetryPolicyStream(middlewareObserver);
         });
 
-        services.AddSingleton<RetryPolicyUpdater>();
+        services.AddHostedService<RetryPolicyUpdater>();
 
         return services;
-    }
-
-    public static void UseCompassUpdaters(this IServiceProvider serviceProvider)
-    {
-        _ = serviceProvider.GetRequiredService<ServerCertificateUpdater>();
-        _ = serviceProvider.GetRequiredService<CorsPolicyUpdater>();
-        _ = serviceProvider.GetRequiredService<RateLimiterPolicyUpdater>();
-        _ = serviceProvider.GetRequiredService<AuthenticationPolicyUpdater>();
-        _ = serviceProvider.GetRequiredService<TimeoutPolicyUpdater>();
-        _ = serviceProvider.GetRequiredService<RetryPolicyUpdater>();
     }
 }

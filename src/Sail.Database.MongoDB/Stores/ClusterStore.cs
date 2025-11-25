@@ -4,7 +4,7 @@ using Sail.Core.Stores;
 
 namespace Sail.Database.MongoDB.Stores;
 
-public class ClusterStore(SailContext context) : IClusterStore
+public class ClusterStore(MongoDBContext context) : IClusterStore
 {
     public async Task<List<Cluster>> GetAsync(CancellationToken cancellationToken = default)
     {

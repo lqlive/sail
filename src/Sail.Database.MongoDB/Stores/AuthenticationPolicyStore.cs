@@ -6,9 +6,9 @@ namespace Sail.Database.MongoDB.Stores;
 
 public class AuthenticationPolicyStore : IAuthenticationPolicyStore
 {
-    private readonly SailContext _context;
+    private readonly MongoDBContext _context;
 
-    public AuthenticationPolicyStore(SailContext context)
+    public AuthenticationPolicyStore(MongoDBContext context)
     {
         _context = context;
     }

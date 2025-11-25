@@ -4,7 +4,7 @@ using MongoDB.Driver;
 
 namespace Sail.Database.MongoDB.Stores;
 
-public class RouteStore(SailContext context) : IRouteStore
+public class RouteStore(MongoDBContext context) : IRouteStore
 {
     public async Task<List<Route>> GetAsync(CancellationToken cancellationToken = default)
     {
