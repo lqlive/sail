@@ -1,16 +1,14 @@
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Sail.Core.Cors;
 
 namespace Sail.Compass.Cors;
 
-internal sealed class CorsPolicyUpdater : IHostedService, IDisposable
+internal sealed class CorsPolicyUpdater : IDisposable
 {
     private readonly ILogger<CorsPolicyUpdater> _logger;
     private readonly SailCorsPolicyProvider _corsPolicyProvider;
-    private readonly IObservable<IReadOnlyList<CorsPolicyConfig>> _corsPolicyStream;
     private readonly CompositeDisposable _subscriptions = new();
 
     public CorsPolicyUpdater(
@@ -20,26 +18,16 @@ internal sealed class CorsPolicyUpdater : IHostedService, IDisposable
     {
         _logger = logger;
         _corsPolicyProvider = corsPolicyProvider;
-        _corsPolicyStream = corsPolicyStream;
-    }
 
-    public Task StartAsync(CancellationToken cancellationToken)
-    {
-        var subscription = _corsPolicyStream
+        var subscription = corsPolicyStream
             .Subscribe(
                 async policies => await UpdateCorsPolicies(policies),
                 ex => _logger.LogError(ex, "Error in CORS policy stream"),
                 () => _logger.LogInformation("CORS policy stream completed"));
 
         _subscriptions.Add(subscription);
-
-        return Task.CompletedTask;
-    }
-
-    public Task StopAsync(CancellationToken cancellationToken)
-    {
-        _subscriptions?.Dispose();
-        return Task.CompletedTask;
+        
+        _logger.LogInformation("CorsPolicyUpdater initialized and subscribed to policy stream");
     }
 
     private async Task UpdateCorsPolicies(IReadOnlyList<CorsPolicyConfig> policies)

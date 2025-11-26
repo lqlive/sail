@@ -31,37 +31,6 @@ public class MiddlewareService(IMiddlewareStore store)
 
     public async Task<ErrorOr<Guid>> CreateAsync(MiddlewareRequest request, CancellationToken cancellationToken)
     {
-        if (request.Type == MiddlewareType.Cors && request.Cors == null)
-        {
-            return Error.Validation(description: "Cors configuration is required for CORS middleware");
-        }
-
-        if (request.Type == MiddlewareType.RateLimiter && request.RateLimiter == null)
-        {
-            return Error.Validation(description: "RateLimiter configuration is required for RateLimiter middleware");
-        }
-
-        if (request.Type == MiddlewareType.Timeout && request.Timeout == null)
-        {
-            return Error.Validation(description: "Timeout configuration is required for Timeout middleware");
-        }
-
-        if (request.Type == MiddlewareType.Retry && request.Retry == null)
-        {
-            return Error.Validation(description: "Retry configuration is required for Retry middleware");
-        }
-
-        var configCount = 0;
-        if (request.Cors != null) configCount++;
-        if (request.RateLimiter != null) configCount++;
-        if (request.Timeout != null) configCount++;
-        if (request.Retry != null) configCount++;
-
-        if (configCount > 1)
-        {
-            return Error.Validation(description: "Only one middleware configuration is allowed");
-        }
-
         var middleware = new Middleware
         {
             Id = Guid.NewGuid(),
@@ -116,80 +85,45 @@ public class MiddlewareService(IMiddlewareStore store)
             return Error.NotFound(description: "Middleware not found");
         }
 
-        if (request.Type == MiddlewareType.Cors && request.Cors == null)
+        // Update the tracked entity directly
+        existing.Name = request.Name;
+        existing.Description = request.Description;
+        existing.Type = request.Type;
+        existing.Enabled = request.Enabled;
+        existing.Cors = request.Cors != null ? new Cors
         {
-            return Error.Validation(description: "Cors configuration is required for CORS middleware");
-        }
-
-        if (request.Type == MiddlewareType.RateLimiter && request.RateLimiter == null)
+            Name = request.Cors.Name,
+            AllowOrigins = request.Cors.AllowOrigins,
+            AllowMethods = request.Cors.AllowMethods,
+            AllowHeaders = request.Cors.AllowHeaders,
+            ExposeHeaders = request.Cors.ExposeHeaders,
+            AllowCredentials = request.Cors.AllowCredentials,
+            MaxAge = request.Cors.MaxAge
+        } : null;
+        existing.RateLimiter = request.RateLimiter != null ? new RateLimiter
         {
-            return Error.Validation(description: "RateLimiter configuration is required for RateLimiter middleware");
-        }
-
-        if (request.Type == MiddlewareType.Timeout && request.Timeout == null)
+            Name = request.RateLimiter.Name,
+            PermitLimit = request.RateLimiter.PermitLimit,
+            Window = request.RateLimiter.Window,
+            QueueLimit = request.RateLimiter.QueueLimit
+        } : null;
+        existing.Timeout = request.Timeout != null ? new TimeoutEntity
         {
-            return Error.Validation(description: "Timeout configuration is required for Timeout middleware");
-        }
-
-        if (request.Type == MiddlewareType.Retry && request.Retry == null)
+            Name = request.Timeout.Name,
+            Seconds = request.Timeout.Seconds,
+            TimeoutStatusCode = request.Timeout.TimeoutStatusCode
+        } : null;
+        existing.Retry = request.Retry != null ? new RetryEntity
         {
-            return Error.Validation(description: "Retry configuration is required for Retry middleware");
-        }
+            Name = request.Retry.Name,
+            MaxRetryAttempts = request.Retry.MaxRetryAttempts,
+            RetryStatusCodes = request.Retry.RetryStatusCodes,
+            RetryDelayMilliseconds = request.Retry.RetryDelayMilliseconds,
+            UseExponentialBackoff = request.Retry.UseExponentialBackoff
+        } : null;
+        existing.UpdatedAt = DateTimeOffset.UtcNow;
 
-        var configCount = 0;
-        if (request.Cors != null) configCount++;
-        if (request.RateLimiter != null) configCount++;
-        if (request.Timeout != null) configCount++;
-        if (request.Retry != null) configCount++;
-
-        if (configCount > 1)
-        {
-            return Error.Validation(description: "Only one middleware configuration is allowed");
-        }
-
-        var middleware = new Middleware
-        {
-            Id = id,
-            Name = request.Name,
-            Description = request.Description,
-            Type = request.Type,
-            Enabled = request.Enabled,
-            Cors = request.Cors != null ? new Cors
-            {
-                Name = request.Cors.Name,
-                AllowOrigins = request.Cors.AllowOrigins,
-                AllowMethods = request.Cors.AllowMethods,
-                AllowHeaders = request.Cors.AllowHeaders,
-                ExposeHeaders = request.Cors.ExposeHeaders,
-                AllowCredentials = request.Cors.AllowCredentials,
-                MaxAge = request.Cors.MaxAge
-            } : null,
-            RateLimiter = request.RateLimiter != null ? new RateLimiter
-            {
-                Name = request.RateLimiter.Name,
-                PermitLimit = request.RateLimiter.PermitLimit,
-                Window = request.RateLimiter.Window,
-                QueueLimit = request.RateLimiter.QueueLimit
-            } : null,
-            Timeout = request.Timeout != null ? new TimeoutEntity
-            {
-                Name = request.Timeout.Name,
-                Seconds = request.Timeout.Seconds,
-                TimeoutStatusCode = request.Timeout.TimeoutStatusCode
-            } : null,
-            Retry = request.Retry != null ? new RetryEntity
-            {
-                Name = request.Retry.Name,
-                MaxRetryAttempts = request.Retry.MaxRetryAttempts,
-                RetryStatusCodes = request.Retry.RetryStatusCodes,
-                RetryDelayMilliseconds = request.Retry.RetryDelayMilliseconds,
-                UseExponentialBackoff = request.Retry.UseExponentialBackoff
-            } : null,
-            CreatedAt = existing.CreatedAt,
-            UpdatedAt = DateTimeOffset.UtcNow
-        };
-
-        await store.UpdateAsync(middleware, cancellationToken);
+        await store.UpdateAsync(existing, cancellationToken);
         return Result.Updated;
     }
 

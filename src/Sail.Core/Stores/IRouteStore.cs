@@ -9,4 +9,5 @@ public interface IRouteStore
     Task<Route> CreateAsync(Route route, CancellationToken cancellationToken = default);
     Task<Route> UpdateAsync(Route route, CancellationToken cancellationToken = default);
     Task DeleteAsync(Guid id, CancellationToken cancellationToken = default);
+    IAsyncEnumerable<ChangeStreamEvent<Route>> WatchAsync(CancellationToken cancellationToken = default);
 }

@@ -1,16 +1,14 @@
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Sail.Core.RateLimiter;
 
 namespace Sail.Compass.RateLimiter;
 
-internal sealed class RateLimiterPolicyUpdater : IHostedService, IDisposable
+internal sealed class RateLimiterPolicyUpdater : IDisposable
 {
     private readonly ILogger<RateLimiterPolicyUpdater> _logger;
     private readonly SailRateLimiterPolicyProvider _rateLimiterPolicyProvider;
-    private readonly IObservable<IReadOnlyList<RateLimiterPolicyConfig>> _rateLimiterPolicyStream;
     private readonly CompositeDisposable _subscriptions = new();
 
     public RateLimiterPolicyUpdater(
@@ -20,26 +18,16 @@ internal sealed class RateLimiterPolicyUpdater : IHostedService, IDisposable
     {
         _logger = logger;
         _rateLimiterPolicyProvider = rateLimiterPolicyProvider;
-        _rateLimiterPolicyStream = rateLimiterPolicyStream;
-    }
 
-    public Task StartAsync(CancellationToken cancellationToken)
-    {
-        var subscription = _rateLimiterPolicyStream
+        var subscription = rateLimiterPolicyStream
             .Subscribe(
                 async policies => await UpdateRateLimiterPolicies(policies),
                 ex => _logger.LogError(ex, "Error in rate limiter policy stream"),
                 () => _logger.LogInformation("Rate limiter policy stream completed"));
 
         _subscriptions.Add(subscription);
-
-        return Task.CompletedTask;
-    }
-
-    public Task StopAsync(CancellationToken cancellationToken)
-    {
-        _subscriptions?.Dispose();
-        return Task.CompletedTask;
+        
+        _logger.LogInformation("RateLimiterPolicyUpdater initialized and subscribed to policy stream");
     }
 
     private async Task UpdateRateLimiterPolicies(IReadOnlyList<RateLimiterPolicyConfig> policies)

@@ -1,15 +1,12 @@
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
-using MongoDB.Driver;
 using Sail.Api.V1;
 using Sail.Core.Entities;
 using Sail.Core.Stores;
-using Sail.Database.MongoDB;
-using Sail.Database.MongoDB.Extensions;
 
 namespace Sail.Grpc;
 
-public class MiddlewareGrpcService(MongoDBContext dbContext, IMiddlewareStore middlewareStore) : Api.V1.MiddlewareService.MiddlewareServiceBase
+public class MiddlewareGrpcService(IMiddlewareStore middlewareStore) : Api.V1.MiddlewareService.MiddlewareServiceBase
 {
     public override async Task<ListMiddlewareResponse> List(Empty request, ServerCallContext context)
     {
@@ -26,40 +23,23 @@ public class MiddlewareGrpcService(MongoDBContext dbContext, IMiddlewareStore mi
 
     public override async Task Watch(Empty request, IServerStreamWriter<WatchMiddlewareResponse> responseStream, ServerCallContext context)
     {
-        var options = new ChangeStreamOptions
+        await foreach (var changeEvent in middlewareStore.WatchAsync(context.CancellationToken))
         {
-            FullDocument = ChangeStreamFullDocumentOption.Required,
-            FullDocumentBeforeChange = ChangeStreamFullDocumentBeforeChangeOption.Required
-        };
-
-        while (!context.CancellationToken.IsCancellationRequested)
-        {
-            var watch = await dbContext.Middlewares.WatchAsync(options, context.CancellationToken);
-
-            await foreach (var changeStreamDocument in watch.ToAsyncEnumerable())
+            var eventType = changeEvent.OperationType switch
             {
-                var document = changeStreamDocument.FullDocument;
-                if (changeStreamDocument.OperationType == ChangeStreamOperationType.Delete)
-                {
-                    document = changeStreamDocument.FullDocumentBeforeChange;
-                }
+                ChangeStreamType.Insert => EventType.Create,
+                ChangeStreamType.Update => EventType.Update,
+                ChangeStreamType.Delete => EventType.Delete,
+                _ => EventType.Unknown
+            };
 
-                var eventType = changeStreamDocument.OperationType switch
-                {
-                    ChangeStreamOperationType.Insert => EventType.Create,
-                    ChangeStreamOperationType.Update => EventType.Update,
-                    ChangeStreamOperationType.Delete => EventType.Delete,
-                    _ => EventType.Unknown
-                };
+            var response = new WatchMiddlewareResponse
+            {
+                Middleware = ConvertToProto(changeEvent.Document),
+                EventType = eventType
+            };
 
-                var response = new WatchMiddlewareResponse
-                {
-                    Middleware = ConvertToProto(document),
-                    EventType = eventType
-                };
-
-                await responseStream.WriteAsync(response);
-            }
+            await responseStream.WriteAsync(response);
         }
     }
 

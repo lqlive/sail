@@ -9,4 +9,5 @@ public interface IClusterStore
     Task<Cluster> CreateAsync(Cluster cluster, CancellationToken cancellationToken = default);
     Task<Cluster> UpdateAsync(Cluster cluster, CancellationToken cancellationToken = default);
     Task DeleteAsync(Guid id, CancellationToken cancellationToken = default);
+    IAsyncEnumerable<ChangeStreamEvent<Cluster>> WatchAsync(CancellationToken cancellationToken = default);
 }

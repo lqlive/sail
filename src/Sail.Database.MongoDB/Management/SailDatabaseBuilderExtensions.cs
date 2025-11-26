@@ -1,5 +1,12 @@
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
+using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Storage;
+using Microsoft.EntityFrameworkCore.Update;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+
+using MongoDB.EntityFrameworkCore.Storage;
 
 using Sail.Core;
 using Sail.Core.Entities;
@@ -15,13 +22,25 @@ public static class SailDatabaseBuilderExtensions
         var services = application.Services;
 
         services.TryAddScoped<IContext>(provider => provider.GetRequiredService<MongoDBContext>());
+     
         services.AddDbContext<MongoDBContext>();
+
+        services.AddScoped<IMongoDatabaseCreator>(provider =>
+        {
+            var clientWrapper = provider.GetRequiredService<IMongoClientWrapper>();
+            var designTimeModel = provider.GetRequiredService<IDesignTimeModel>();
+            var updateAdapterFactory = provider.GetRequiredService<IUpdateAdapterFactory>();
+            var database = provider.GetRequiredService<IDatabase>();
+            var logger = provider.GetRequiredService<IDiagnosticsLogger<DbLoggerCategory.Database>>();
+            return new SailMongoDatabaseCreator(clientWrapper, designTimeModel, updateAdapterFactory, database, logger);
+        });
 
         services.TryAddTransient<IRouteStore, RouteStore>();
         services.TryAddTransient<IClusterStore, ClusterStore>();
         services.TryAddTransient<ICertificateStore, CertificateStore>();
         services.TryAddTransient<IMiddlewareStore, MiddlewareStore>();
         services.TryAddTransient<IAuthenticationPolicyStore, AuthenticationPolicyStore>();
+        
         return application;
     }
 }

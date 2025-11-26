@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Sail.Core.Entities;
 using Sail.Core.Stores;
+using Sail.Database.MongoDB.Extensions;
 
 namespace Sail.Database.MongoDB.Stores;
 
@@ -37,5 +38,10 @@ public class MiddlewareStore(IContext context) : IMiddlewareStore
             context.Middlewares.Remove(middleware);
             await context.SaveChangesAsync(cancellationToken);
         }
+    }
+
+    public IAsyncEnumerable<ChangeStreamEvent<Middleware>> WatchAsync(CancellationToken cancellationToken = default)
+    {
+        return context.Middlewares.WatchAsync( cancellationToken);
     }
 }

@@ -13,7 +13,8 @@ public static class MiddlewareApi
 
         api.MapGet("/", List);
         api.MapGet("/{id:guid}", Get);
-        api.MapPost("/", Create);
+        api.MapPost("/", Create)
+           .AddRequestValidation<MiddlewareRequest>(); ;
         api.MapPut("/{id:guid}", Update);
         api.MapDelete("/{id:guid}", Delete);
         return api;

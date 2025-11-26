@@ -88,7 +88,7 @@ public static class ServiceCollectionExtensions
             return CorsPolicyStreamBuilder.BuildCorsPolicyStream(middlewareObserver);
         });
 
-        services.AddHostedService<CorsPolicyUpdater>();
+        services.AddSingleton<CorsPolicyUpdater>();
 
         return services;
     }
@@ -102,7 +102,7 @@ public static class ServiceCollectionExtensions
             return RateLimiterPolicyStreamBuilder.BuildRateLimiterPolicyStream(middlewareObserver);
         });
 
-        services.AddHostedService<RateLimiterPolicyUpdater>();
+        services.AddSingleton<RateLimiterPolicyUpdater>();
 
         return services;
     }
@@ -116,7 +116,7 @@ public static class ServiceCollectionExtensions
             return AuthenticationPolicyStreamBuilder.Build(policyObserver);
         });
 
-        services.AddHostedService<AuthenticationPolicyUpdater>();
+        services.AddSingleton<AuthenticationPolicyUpdater>();
 
         return services;
     }
@@ -130,7 +130,7 @@ public static class ServiceCollectionExtensions
             return TimeoutPolicyStreamBuilder.BuildTimeoutPolicyStream(middlewareObserver);
         });
 
-        services.AddHostedService<TimeoutPolicyUpdater>();
+        services.AddSingleton<TimeoutPolicyUpdater>();
 
         return services;
     }
@@ -144,8 +144,17 @@ public static class ServiceCollectionExtensions
             return RetryPolicyStreamBuilder.BuildRetryPolicyStream(middlewareObserver);
         });
 
-        services.AddHostedService<RetryPolicyUpdater>();
+        services.AddSingleton<RetryPolicyUpdater>();
 
         return services;
+    }
+
+    public static void UseCompassUpdaters(this IServiceProvider serviceProvider)
+    {
+        _ = serviceProvider.GetService<CorsPolicyUpdater>();
+        _ = serviceProvider.GetService<RateLimiterPolicyUpdater>();
+        _ = serviceProvider.GetService<AuthenticationPolicyUpdater>();
+        _ = serviceProvider.GetService<TimeoutPolicyUpdater>();
+        _ = serviceProvider.GetService<RetryPolicyUpdater>();
     }
 }

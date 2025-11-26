@@ -1,16 +1,14 @@
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Sail.Core.Timeout;
 
 namespace Sail.Compass.Timeout;
 
-internal sealed class TimeoutPolicyUpdater : IHostedService, IDisposable
+internal sealed class TimeoutPolicyUpdater : IDisposable
 {
     private readonly ILogger<TimeoutPolicyUpdater> _logger;
     private readonly SailTimeoutPolicyProvider _timeoutPolicyProvider;
-    private readonly IObservable<IReadOnlyList<TimeoutPolicyConfig>> _timeoutPolicyStream;
     private readonly CompositeDisposable _subscriptions = new();
 
     public TimeoutPolicyUpdater(
@@ -20,26 +18,16 @@ internal sealed class TimeoutPolicyUpdater : IHostedService, IDisposable
     {
         _logger = logger;
         _timeoutPolicyProvider = timeoutPolicyProvider;
-        _timeoutPolicyStream = timeoutPolicyStream;
-    }
 
-    public Task StartAsync(CancellationToken cancellationToken)
-    {
-        var subscription = _timeoutPolicyStream
+        var subscription = timeoutPolicyStream
             .Subscribe(
                 async policies => await UpdateTimeoutPolicies(policies),
                 ex => _logger.LogError(ex, "Error in Timeout policy stream"),
                 () => _logger.LogInformation("Timeout policy stream completed"));
 
         _subscriptions.Add(subscription);
-
-        return Task.CompletedTask;
-    }
-
-    public Task StopAsync(CancellationToken cancellationToken)
-    {
-        _subscriptions?.Dispose();
-        return Task.CompletedTask;
+        
+        _logger.LogInformation("TimeoutPolicyUpdater initialized and subscribed to policy stream");
     }
 
     private async Task UpdateTimeoutPolicies(IReadOnlyList<TimeoutPolicyConfig> policies)

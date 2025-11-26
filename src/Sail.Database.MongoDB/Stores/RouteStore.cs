@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Sail.Core.Entities;
 using Sail.Core.Stores;
+using Sail.Database.MongoDB.Extensions;
 
 namespace Sail.Database.MongoDB.Stores;
 
@@ -39,5 +40,10 @@ public class RouteStore(IContext context) : IRouteStore
             context.Routes.Remove(route);
             await context.SaveChangesAsync(cancellationToken);
         }
+    }
+
+    public IAsyncEnumerable<ChangeStreamEvent<Route>> WatchAsync(CancellationToken cancellationToken = default)
+    {
+        return context.Routes.WatchAsync(cancellationToken);
     }
 }

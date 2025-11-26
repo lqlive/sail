@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Sail.Core.Entities;
 using Sail.Core.Stores;
+using Sail.Database.MongoDB.Extensions;
 
 namespace Sail.Database.MongoDB.Stores;
 
@@ -37,6 +38,11 @@ public class AuthenticationPolicyStore(IContext context) : IAuthenticationPolicy
             context.AuthenticationPolicies.Remove(policy);
             await context.SaveChangesAsync(cancellationToken);
         }
+    }
+
+    public IAsyncEnumerable<ChangeStreamEvent<AuthenticationPolicy>> WatchAsync(CancellationToken cancellationToken = default)
+    {
+        return context.AuthenticationPolicies.WatchAsync(cancellationToken);
     }
 }
 
