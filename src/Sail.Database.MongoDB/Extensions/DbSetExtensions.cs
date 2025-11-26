@@ -1,13 +1,10 @@
-﻿using System.Runtime.CompilerServices;
-
+﻿using MongoDB.Driver;
+using Sail.Core.Stores;
+using System.Runtime.CompilerServices;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-
-using MongoDB.Driver;
 using MongoDB.EntityFrameworkCore.Extensions;
 using MongoDB.EntityFrameworkCore.Storage;
-
-using Sail.Core.Stores;
 
 namespace Sail.Database.MongoDB.Extensions;
 

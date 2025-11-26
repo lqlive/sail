@@ -7,8 +7,6 @@ using Sail.Core.Authentication.JwtBearer;
 using Sail.Core.Authentication.OpenIdConnect;
 using Sail.Core.Timeout;
 using Sail.Core.Retry;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.AspNetCore.Authorization;
@@ -64,7 +62,6 @@ public static class SailServiceCollectionExtensions
         services.AddAuthentication();
         services.AddAuthorization();
 
-        // Register custom authorization policy provider
         services.AddSingleton<SailAuthorizationPolicyProvider>();
         services.AddSingleton<IAuthorizationPolicyProvider>(sp =>
             sp.GetRequiredService<SailAuthorizationPolicyProvider>());

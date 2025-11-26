@@ -32,7 +32,7 @@ internal sealed class ServiceDiscoveryDestinationResolver : IDestinationResolver
         }
 
         await Task.WhenAll(tasks).ConfigureAwait(false);
-        
+
         var changeTokens = new List<IChangeToken>();
         foreach (var task in tasks)
         {
@@ -89,7 +89,7 @@ internal sealed class ServiceDiscoveryDestinationResolver : IDestinationResolver
             uriBuilder.Port = uri.Port;
             var resolvedAddress = uriBuilder.Uri.ToString();
             var healthAddress = originalConfig.Health;
-            
+
             if (healthUriBuilder is not null)
             {
                 healthUriBuilder.Host = uri.Host;
@@ -135,7 +135,7 @@ internal sealed class ServiceDiscoveryDestinationResolver : IDestinationResolver
 
             throw new InvalidOperationException($"None of the specified schemes ('{string.Join(", ", specifiedSchemes)}') are allowed by configuration.");
         }
-        
+
         return originalUri.Scheme;
     }
 }
