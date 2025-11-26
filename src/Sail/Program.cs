@@ -4,7 +4,6 @@ using Sail.Core.Management;
 using Sail.Database.MongoDB.Management;
 using Sail.Extensions;
 using Sail.Grpc;
-using Sail.Database.MongoDB;
 using ServiceDefaults;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -25,8 +24,6 @@ builder.Services.AddGrpc();
 
 var app = builder.Build();
 
-app.UseCors();
-
 var endpoint = app.NewVersionedApi();
 
 endpoint.MapRouteApiV1();
@@ -39,14 +36,8 @@ app.UseDefaultOpenApi();
 
 app.MapGrpcService<RouteGrpcService>();
 app.MapGrpcService<ClusterGrpcService>();
-app.MapGrpcService<DestinationGrpcService>();
 app.MapGrpcService<CertificateGrpcService>();
 app.MapGrpcService<MiddlewareGrpcService>();
 app.MapGrpcService<AuthenticationPolicyGrpcService>();
 
-using (var scope = app.Services.CreateScope())
-{
-    var context = scope.ServiceProvider.GetRequiredService<MongoDBContext>();
-    await context.Database.EnsureCreatedAsync();
-}
 await app.RunAsync();

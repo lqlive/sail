@@ -9,4 +9,5 @@ public interface IAuthenticationPolicyStore
     Task CreateAsync(AuthenticationPolicy policy, CancellationToken cancellationToken = default);
     Task UpdateAsync(AuthenticationPolicy policy, CancellationToken cancellationToken = default);
     Task DeleteAsync(Guid id, CancellationToken cancellationToken = default);
+    IAsyncEnumerable<ChangeStreamEvent<AuthenticationPolicy>> WatchAsync(CancellationToken cancellationToken = default);
 }

@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Sail.Core.Entities;
 using Sail.Core.Stores;
+using Sail.Database.MongoDB.Extensions;
 
 namespace Sail.Database.MongoDB.Stores;
 
@@ -39,5 +40,10 @@ public class CertificateStore(IContext context) : ICertificateStore
             context.Certificates.Remove(certificate);
             await context.SaveChangesAsync(cancellationToken);
         }
+    }
+
+    public IAsyncEnumerable<ChangeStreamEvent<Certificate>> WatchAsync(CancellationToken cancellationToken = default)
+    {
+        return context.Certificates.WatchAsync(cancellationToken);
     }
 }

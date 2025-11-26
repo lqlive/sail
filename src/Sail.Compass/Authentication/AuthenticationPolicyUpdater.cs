@@ -1,5 +1,4 @@
 using System.Reactive.Disposables;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Sail.Core.Authentication;
 using Sail.Core.Authentication.JwtBearer;
@@ -8,12 +7,11 @@ using Sail.Core.Entities;
 
 namespace Sail.Compass.Authentication;
 
-internal sealed class AuthenticationPolicyUpdater : IHostedService, IDisposable
+internal sealed class AuthenticationPolicyUpdater : IDisposable
 {
     private readonly ILogger<AuthenticationPolicyUpdater> _logger;
     private readonly JwtBearerAuthenticationOptionsProvider _jwtBearerProvider;
     private readonly OpenIdConnectAuthenticationOptionsProvider _oidcProvider;
-    private readonly IObservable<IReadOnlyList<AuthenticationPolicyConfig>> _policyStream;
     private readonly CompositeDisposable _subscriptions = new();
 
     public AuthenticationPolicyUpdater(
@@ -25,26 +23,16 @@ internal sealed class AuthenticationPolicyUpdater : IHostedService, IDisposable
         _logger = logger;
         _jwtBearerProvider = jwtBearerProvider;
         _oidcProvider = oidcProvider;
-        _policyStream = policyStream;
-    }
 
-    public Task StartAsync(CancellationToken cancellationToken)
-    {
-        var subscription = _policyStream
+        var subscription = policyStream
             .Subscribe(
                 async policies => await UpdateAuthenticationPolicies(policies),
                 ex => _logger.LogError(ex, "Error in authentication policy stream"),
                 () => _logger.LogInformation("Authentication policy stream completed"));
 
         _subscriptions.Add(subscription);
-
-        return Task.CompletedTask;
-    }
-
-    public Task StopAsync(CancellationToken cancellationToken)
-    {
-        _subscriptions?.Dispose();
-        return Task.CompletedTask;
+        
+        _logger.LogInformation("AuthenticationPolicyUpdater initialized and subscribed to policy stream");
     }
 
     private async Task UpdateAuthenticationPolicies(IReadOnlyList<AuthenticationPolicyConfig> policies)

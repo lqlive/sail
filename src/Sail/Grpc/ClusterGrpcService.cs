@@ -1,18 +1,15 @@
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
-using MongoDB.Driver;
 using Sail.Api.V1;
 using Sail.Core.Entities;
 using Sail.Core.Stores;
-using Sail.Database.MongoDB;
-using Sail.Database.MongoDB.Extensions;
 using Cluster = Sail.Core.Entities.Cluster;
 using ClusterResponse = Sail.Api.V1.Cluster;
 using Destination = Sail.Api.V1.Destination;
 
 namespace Sail.Grpc;
 
-public class ClusterGrpcService(MongoDBContext dbContext, IClusterStore clusterStore) : ClusterService.ClusterServiceBase
+public class ClusterGrpcService(IClusterStore clusterStore) : ClusterService.ClusterServiceBase
 {
     public override async Task<ListClusterResponse> List(Empty request, ServerCallContext context)
     {
@@ -25,39 +22,23 @@ public class ClusterGrpcService(MongoDBContext dbContext, IClusterStore clusterS
     public override async Task Watch(Empty request, IServerStreamWriter<WatchClusterResponse> responseStream,
         ServerCallContext context)
     {
-        var options = new ChangeStreamOptions
+        await foreach (var changeEvent in clusterStore.WatchAsync(context.CancellationToken))
         {
-            FullDocument = ChangeStreamFullDocumentOption.Required,
-            FullDocumentBeforeChange = ChangeStreamFullDocumentBeforeChangeOption.Required
-        };
-
-        while (!context.CancellationToken.IsCancellationRequested)
-        {
-            var watch = await dbContext.Clusters.WatchAsync(options);
-
-            await foreach (var changeStreamDocument in watch.ToAsyncEnumerable())
+            var eventType = changeEvent.OperationType switch
             {
-                var document = changeStreamDocument.FullDocument;
-                if (changeStreamDocument.OperationType == ChangeStreamOperationType.Delete)
-                {
-                    document = changeStreamDocument.FullDocumentBeforeChange;
-                }
+                ChangeStreamType.Insert => EventType.Create,
+                ChangeStreamType.Update => EventType.Update,
+                ChangeStreamType.Delete => EventType.Delete,
+                _ => EventType.Unknown
+            };
 
-                var eventType = changeStreamDocument.OperationType switch
-                {
-                    ChangeStreamOperationType.Insert => EventType.Create,
-                    ChangeStreamOperationType.Update => EventType.Update,
-                    ChangeStreamOperationType.Delete => EventType.Delete,
-                    _ => EventType.Unknown
-                };
-                var cluster = MapToClusterResponse(document);
-                var response = new WatchClusterResponse
-                {
-                    Cluster = cluster,
-                    EventType = eventType
-                };
-                await responseStream.WriteAsync(response);
-            }
+            var cluster = MapToClusterResponse(changeEvent.Document);
+            var response = new WatchClusterResponse
+            {
+                Cluster = cluster,
+                EventType = eventType
+            };
+            await responseStream.WriteAsync(response);
         }
     }
 

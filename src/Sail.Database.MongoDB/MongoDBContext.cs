@@ -1,11 +1,19 @@
 using Sail.Core.Entities;
 using Microsoft.EntityFrameworkCore;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization;
+using MongoDB.Bson.Serialization.Serializers;
 using MongoDB.EntityFrameworkCore.Extensions;
 
 namespace Sail.Database.MongoDB;
 
 public class MongoDBContext : AbstractContext<MongoDBContext>
 {
+    static MongoDBContext()
+    {
+        BsonSerializer.RegisterSerializer(new GuidSerializer(GuidRepresentation.Standard));
+    }
+
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         optionsBuilder.UseMongoDB("mongodb://localhost:27017", "sail");

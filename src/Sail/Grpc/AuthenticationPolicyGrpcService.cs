@@ -1,14 +1,11 @@
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
-using MongoDB.Driver;
 using Sail.Api.V1;
 using Sail.Core.Stores;
-using Sail.Database.MongoDB;
-using Sail.Database.MongoDB.Extensions;
 
 namespace Sail.Grpc;
 
-public class AuthenticationPolicyGrpcService(MongoDBContext dbContext, IAuthenticationPolicyStore policyStore)
+public class AuthenticationPolicyGrpcService(IAuthenticationPolicyStore policyStore)
     : Api.V1.AuthenticationPolicyService.AuthenticationPolicyServiceBase
 {
     public override async Task<ListAuthenticationPolicyResponse> List(Empty request, ServerCallContext context)
@@ -26,40 +23,23 @@ public class AuthenticationPolicyGrpcService(MongoDBContext dbContext, IAuthenti
 
     public override async Task Watch(Empty request, IServerStreamWriter<WatchAuthenticationPolicyResponse> responseStream, ServerCallContext context)
     {
-        var options = new ChangeStreamOptions
+        await foreach (var changeEvent in policyStore.WatchAsync(context.CancellationToken))
         {
-            FullDocument = ChangeStreamFullDocumentOption.Required,
-            FullDocumentBeforeChange = ChangeStreamFullDocumentBeforeChangeOption.Required
-        };
-
-        while (!context.CancellationToken.IsCancellationRequested)
-        {
-            var watch = await dbContext.AuthenticationPolicies.WatchAsync(options, context.CancellationToken);
-
-            await foreach (var changeStreamDocument in watch.ToAsyncEnumerable())
+            var eventType = changeEvent.OperationType switch
             {
-                var document = changeStreamDocument.FullDocument;
-                if (changeStreamDocument.OperationType == ChangeStreamOperationType.Delete)
-                {
-                    document = changeStreamDocument.FullDocumentBeforeChange;
-                }
+                ChangeStreamType.Insert => EventType.Create,
+                ChangeStreamType.Update => EventType.Update,
+                ChangeStreamType.Delete => EventType.Delete,
+                _ => EventType.Unknown
+            };
 
-                var eventType = changeStreamDocument.OperationType switch
-                {
-                    ChangeStreamOperationType.Insert => EventType.Create,
-                    ChangeStreamOperationType.Update => EventType.Update,
-                    ChangeStreamOperationType.Delete => EventType.Delete,
-                    _ => EventType.Unknown
-                };
+            var response = new WatchAuthenticationPolicyResponse
+            {
+                Policy = ConvertToProto(changeEvent.Document),
+                EventType = eventType
+            };
 
-                var response = new WatchAuthenticationPolicyResponse
-                {
-                    Policy = ConvertToProto(document),
-                    EventType = eventType
-                };
-
-                await responseStream.WriteAsync(response);
-            }
+            await responseStream.WriteAsync(response);
         }
     }
 

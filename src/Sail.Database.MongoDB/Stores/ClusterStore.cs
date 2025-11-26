@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Sail.Core.Entities;
 using Sail.Core.Stores;
+using Sail.Database.MongoDB.Extensions;
 
 namespace Sail.Database.MongoDB.Stores;
 
@@ -41,5 +42,10 @@ public class ClusterStore(IContext context) : IClusterStore
             context.Clusters.Remove(cluster);
             await context.SaveChangesAsync(cancellationToken);
         }
+    }
+
+    public IAsyncEnumerable<ChangeStreamEvent<Cluster>> WatchAsync(CancellationToken cancellationToken = default)
+    {
+        return context.Clusters.WatchAsync(cancellationToken);
     }
 }

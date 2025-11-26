@@ -1,21 +1,13 @@
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
-
-using Microsoft.EntityFrameworkCore;
-
-using MongoDB.Driver;
-using MongoDB.Driver.Linq;
-
 using Sail.Api.V1;
 using Sail.Core.Stores;
-using Sail.Database.MongoDB;
-using Sail.Database.MongoDB.Extensions;
 using Certificate = Sail.Core.Entities.Certificate;
 using CertificateResponse = Sail.Api.V1.Certificate;
 
 namespace Sail.Grpc;
 
-public class CertificateGrpcService(MongoDBContext dbContext, ICertificateStore certificateStore)
+public class CertificateGrpcService(ICertificateStore certificateStore)
     : CertificateService.CertificateServiceBase
 {
     public override async Task<ListCertificateResponse> List(Empty request, ServerCallContext context)
@@ -28,39 +20,23 @@ public class CertificateGrpcService(MongoDBContext dbContext, ICertificateStore 
     public override async Task Watch(Empty request, IServerStreamWriter<WatchCertificateResponse> responseStream,
         ServerCallContext context)
     {
-        var options = new ChangeStreamOptions
+        await foreach (var changeEvent in certificateStore.WatchAsync(context.CancellationToken))
         {
-            FullDocument = ChangeStreamFullDocumentOption.Required,
-            FullDocumentBeforeChange = ChangeStreamFullDocumentBeforeChangeOption.Required
-        };
-
-        while (!context.CancellationToken.IsCancellationRequested)
-        {
-            var watch = await dbContext.Certificates.WatchAsync(options, context.CancellationToken);
-
-            await foreach (var changeStreamDocument in watch.ToAsyncEnumerable())
+            var eventType = changeEvent.OperationType switch
             {
-                var document = changeStreamDocument.FullDocument;
-                if (changeStreamDocument.OperationType == ChangeStreamOperationType.Delete)
-                {
-                    document = changeStreamDocument.FullDocumentBeforeChange;
-                }
+                ChangeStreamType.Insert => EventType.Create,
+                ChangeStreamType.Update => EventType.Update,
+                ChangeStreamType.Delete => EventType.Delete,
+                _ => EventType.Unknown
+            };
 
-                var eventType = changeStreamDocument.OperationType switch
-                {
-                    ChangeStreamOperationType.Insert => EventType.Create,
-                    ChangeStreamOperationType.Update => EventType.Update,
-                    ChangeStreamOperationType.Delete => EventType.Delete,
-                    _ => EventType.Unknown
-                };
-                var certificate = MapToCertificateResponse(document);
-                var response = new WatchCertificateResponse
-                {
-                    Certificate = certificate,
-                    EventType = eventType
-                };
-                await responseStream.WriteAsync(response);
-            }
+            var certificate = MapToCertificateResponse(changeEvent.Document);
+            var response = new WatchCertificateResponse
+            {
+                Certificate = certificate,
+                EventType = eventType
+            };
+            await responseStream.WriteAsync(response);
         }
     }
 

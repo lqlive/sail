@@ -1,8 +1,13 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Runtime.CompilerServices;
+
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+
 using MongoDB.Driver;
 using MongoDB.EntityFrameworkCore.Extensions;
 using MongoDB.EntityFrameworkCore.Storage;
+
+using Sail.Core.Stores;
 
 namespace Sail.Database.MongoDB.Extensions;
 
@@ -22,5 +27,47 @@ public static class DbSetExtensions
         var collection = mongoClientWrapper.GetCollection<T>(collectionName);
 
         return collection.WatchAsync(options, cancellationToken);
+    }
+
+    public static async IAsyncEnumerable<ChangeStreamEvent<T>> WatchAsync<T>(
+        this DbSet<T> dbSet,
+        [EnumeratorCancellation] CancellationToken cancellationToken = default)
+        where T : class
+    {
+        var options = new ChangeStreamOptions
+        {
+            FullDocument = ChangeStreamFullDocumentOption.Required,
+            FullDocumentBeforeChange = ChangeStreamFullDocumentBeforeChangeOption.Required
+        };
+
+        while (!cancellationToken.IsCancellationRequested)
+        {
+            var watch = await dbSet.WatchAsync(options, cancellationToken);
+
+            await foreach (var changeStreamDocument in watch.ToAsyncEnumerable().WithCancellation(cancellationToken))
+            {
+                var document = changeStreamDocument.FullDocument;
+                if (changeStreamDocument.OperationType == ChangeStreamOperationType.Delete)
+                {
+                    document = changeStreamDocument.FullDocumentBeforeChange;
+                }
+
+                var operationType = changeStreamDocument.OperationType switch
+                {
+                    ChangeStreamOperationType.Insert => ChangeStreamType.Insert,
+                    ChangeStreamOperationType.Update => ChangeStreamType.Update,
+                    ChangeStreamOperationType.Delete => ChangeStreamType.Delete,
+                    ChangeStreamOperationType.Replace => ChangeStreamType.Replace,
+                    ChangeStreamOperationType.Invalidate => ChangeStreamType.Invalidate,
+                    _ => ChangeStreamType.Insert
+                };
+
+                yield return new ChangeStreamEvent<T>
+                {
+                    Document = document,
+                    OperationType = operationType
+                };
+            }
+        }
     }
 }

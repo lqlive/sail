@@ -9,4 +9,5 @@ public interface ICertificateStore
     Task<Certificate> CreateAsync(Certificate certificate, CancellationToken cancellationToken = default);
     Task<Certificate> UpdateAsync(Certificate certificate, CancellationToken cancellationToken = default);
     Task DeleteAsync(Guid id, CancellationToken cancellationToken = default);
+    IAsyncEnumerable<ChangeStreamEvent<Certificate>> WatchAsync(CancellationToken cancellationToken = default);
 }

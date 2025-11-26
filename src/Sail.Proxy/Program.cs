@@ -36,6 +36,8 @@ builder.Services.AddRetryPolicyUpdater();
 
 var app = builder.Build();
 
+app.Services.UseCompassUpdaters();
+
 app.MapRuntimeV1();
 
 app.UseCors();

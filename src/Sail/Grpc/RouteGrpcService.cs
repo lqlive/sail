@@ -1,16 +1,13 @@
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
-using MongoDB.Driver;
 using Sail.Api.V1;
 using Sail.Core.Stores;
-using Sail.Database.MongoDB;
-using Sail.Database.MongoDB.Extensions;
 using Route = Sail.Core.Entities.Route;
 using RouteResponse = Sail.Api.V1.Route;
 
 namespace Sail.Grpc;
 
-public class RouteGrpcService(MongoDBContext dbContext, IRouteStore routeStore) : RouteService.RouteServiceBase
+public class RouteGrpcService(IRouteStore routeStore) : RouteService.RouteServiceBase
 {
     public override async Task<ListRouteResponse> List(Empty request, ServerCallContext context)
     {
@@ -22,41 +19,24 @@ public class RouteGrpcService(MongoDBContext dbContext, IRouteStore routeStore) 
     public override async Task Watch(Empty request, IServerStreamWriter<WatchRouteResponse> responseStream,
         ServerCallContext context)
     {
-        var options = new ChangeStreamOptions
+        await foreach (var changeEvent in routeStore.WatchAsync(context.CancellationToken))
         {
-            FullDocument = ChangeStreamFullDocumentOption.Required,
-            FullDocumentBeforeChange = ChangeStreamFullDocumentBeforeChangeOption.Required
-        };
-
-        while (!context.CancellationToken.IsCancellationRequested)
-        {
-            var watch = await dbContext.Routes.WatchAsync(options);
-
-            await foreach (var changeStreamDocument in watch.ToAsyncEnumerable())
+            var eventType = changeEvent.OperationType switch
             {
-                var document = changeStreamDocument.FullDocument;
+                ChangeStreamType.Insert => EventType.Create,
+                ChangeStreamType.Update => EventType.Update,
+                ChangeStreamType.Delete => EventType.Delete,
+                _ => EventType.Unknown
+            };
 
-                if (changeStreamDocument.OperationType == ChangeStreamOperationType.Delete)
-                {
-                    document = changeStreamDocument.FullDocumentBeforeChange;
-                }
+            var route = MapToRouteResponse(changeEvent.Document);
 
-                var eventType = changeStreamDocument.OperationType switch
-                {
-                    ChangeStreamOperationType.Insert => EventType.Create,
-                    ChangeStreamOperationType.Update => EventType.Update,
-                    ChangeStreamOperationType.Delete => EventType.Delete,
-                    _ => EventType.Unknown
-                };
-                var route = MapToRouteResponse(document);
-
-                var response = new WatchRouteResponse
-                {
-                    Route = route,
-                    EventType = eventType
-                };
-                await responseStream.WriteAsync(response);
-            }
+            var response = new WatchRouteResponse
+            {
+                Route = route,
+                EventType = eventType
+            };
+            await responseStream.WriteAsync(response);
         }
     }
 
