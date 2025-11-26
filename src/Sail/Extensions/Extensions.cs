@@ -1,3 +1,4 @@
+using FluentValidation;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Sail.Core.Options;
 using Sail.Services;
@@ -17,6 +18,8 @@ public static class Extensions
         services.TryAddScoped<CertificateService>();
         services.TryAddScoped<MiddlewareService>();
         services.TryAddScoped<AuthenticationPolicyService>();
+
+        services.AddValidatorsFromAssemblyContaining<Program>();
 
         services.AddSailCors();
         services.AddSailRateLimiter();

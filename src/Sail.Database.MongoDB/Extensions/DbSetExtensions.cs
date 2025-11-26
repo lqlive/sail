@@ -1,7 +1,7 @@
 ﻿using MongoDB.Driver;
 using Sail.Core.Stores;
-using System.Runtime.CompilerServices;
 using Microsoft.EntityFrameworkCore;
+using System.Runtime.CompilerServices;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using MongoDB.EntityFrameworkCore.Extensions;
 using MongoDB.EntityFrameworkCore.Storage;
@@ -33,7 +33,7 @@ public static class DbSetExtensions
     {
         var options = new ChangeStreamOptions
         {
-            FullDocument = ChangeStreamFullDocumentOption.Required,
+            FullDocument = ChangeStreamFullDocumentOption.UpdateLookup,
             FullDocumentBeforeChange = ChangeStreamFullDocumentBeforeChangeOption.Required
         };
 

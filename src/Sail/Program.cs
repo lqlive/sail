@@ -1,10 +1,13 @@
+using System.Text.Json.Serialization;
+using MongoDB.EntityFrameworkCore.Storage;
 using Sail.Apis;
 using Sail.Core.Management;
+using Sail.Database.MongoDB;
+using Sail.Database.MongoDB.Extensions;
 using Sail.Database.MongoDB.Management;
 using Sail.Extensions;
 using Sail.Grpc;
 using ServiceDefaults;
-using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,6 +26,13 @@ builder.Services.AddSailCore()
 builder.Services.AddGrpc();
 
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<MongoDBContext>();
+    var creator = scope.ServiceProvider.GetRequiredService<IMongoDatabaseCreator>();
+    await context.Database.EnsureCreatedAsync(creator);
+}
 
 var endpoint = app.NewVersionedApi();
 

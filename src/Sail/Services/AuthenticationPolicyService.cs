@@ -45,45 +45,40 @@ public class AuthenticationPolicyService
             throw new InvalidOperationException($"Authentication policy with ID {id} not found.");
         }
 
-        var updatedPolicy = new AuthenticationPolicy
+        existingPolicy.Name = request.Name;
+        existingPolicy.Type = request.Type;
+        existingPolicy.Enabled = request.Enabled;
+        existingPolicy.Description = request.Description;
+        existingPolicy.JwtBearer = request.JwtBearer == null ? null : new JwtBearerConfig
         {
-            Id = id,
-            Name = request.Name,
-            Type = request.Type,
-            Enabled = request.Enabled,
-            Description = request.Description,
-            JwtBearer = request.JwtBearer == null ? null : new JwtBearerConfig
-            {
-                Authority = request.JwtBearer.Authority,
-                Audience = request.JwtBearer.Audience,
-                RequireHttpsMetadata = request.JwtBearer.RequireHttpsMetadata,
-                SaveToken = request.JwtBearer.SaveToken,
-                ValidIssuers = request.JwtBearer.ValidIssuers,
-                ValidAudiences = request.JwtBearer.ValidAudiences,
-                ValidateIssuer = request.JwtBearer.ValidateIssuer,
-                ValidateAudience = request.JwtBearer.ValidateAudience,
-                ValidateLifetime = request.JwtBearer.ValidateLifetime,
-                ValidateIssuerSigningKey = request.JwtBearer.ValidateIssuerSigningKey,
-                ClockSkew = request.JwtBearer.ClockSkew
-            },
-            OpenIdConnect = request.OpenIdConnect == null ? null : new OpenIdConnectConfig
-            {
-                Authority = request.OpenIdConnect.Authority,
-                ClientId = request.OpenIdConnect.ClientId,
-                ClientSecret = request.OpenIdConnect.ClientSecret,
-                ResponseType = request.OpenIdConnect.ResponseType,
-                RequireHttpsMetadata = request.OpenIdConnect.RequireHttpsMetadata,
-                SaveTokens = request.OpenIdConnect.SaveTokens,
-                GetClaimsFromUserInfoEndpoint = request.OpenIdConnect.GetClaimsFromUserInfoEndpoint,
-                Scope = request.OpenIdConnect.Scope,
-                ClockSkew = request.OpenIdConnect.ClockSkew
-            },
-            CreatedAt = existingPolicy.CreatedAt,
-            UpdatedAt = DateTimeOffset.UtcNow
+            Authority = request.JwtBearer.Authority,
+            Audience = request.JwtBearer.Audience,
+            RequireHttpsMetadata = request.JwtBearer.RequireHttpsMetadata,
+            SaveToken = request.JwtBearer.SaveToken,
+            ValidIssuers = request.JwtBearer.ValidIssuers,
+            ValidAudiences = request.JwtBearer.ValidAudiences,
+            ValidateIssuer = request.JwtBearer.ValidateIssuer,
+            ValidateAudience = request.JwtBearer.ValidateAudience,
+            ValidateLifetime = request.JwtBearer.ValidateLifetime,
+            ValidateIssuerSigningKey = request.JwtBearer.ValidateIssuerSigningKey,
+            ClockSkew = request.JwtBearer.ClockSkew
         };
+        existingPolicy.OpenIdConnect = request.OpenIdConnect == null ? null : new OpenIdConnectConfig
+        {
+            Authority = request.OpenIdConnect.Authority,
+            ClientId = request.OpenIdConnect.ClientId,
+            ClientSecret = request.OpenIdConnect.ClientSecret,
+            ResponseType = request.OpenIdConnect.ResponseType,
+            RequireHttpsMetadata = request.OpenIdConnect.RequireHttpsMetadata,
+            SaveTokens = request.OpenIdConnect.SaveTokens,
+            GetClaimsFromUserInfoEndpoint = request.OpenIdConnect.GetClaimsFromUserInfoEndpoint,
+            Scope = request.OpenIdConnect.Scope,
+            ClockSkew = request.OpenIdConnect.ClockSkew
+        };
+        existingPolicy.UpdatedAt = DateTimeOffset.UtcNow;
 
-        await _store.UpdateAsync(updatedPolicy, cancellationToken);
-        return MapToResponse(updatedPolicy);
+        await _store.UpdateAsync(existingPolicy, cancellationToken);
+        return MapToResponse(existingPolicy);
     }
 
     public async Task DeleteAsync(Guid id, CancellationToken cancellationToken = default)

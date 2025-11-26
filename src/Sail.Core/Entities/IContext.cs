@@ -1,9 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 
 namespace Sail.Core.Entities;
 
 public interface IContext
 {
+    DatabaseFacade Database { get; }
     public DbSet<Cluster> Clusters { get; init; }
     public DbSet<Route> Routes { get; init; }
     public DbSet<Middleware> Middlewares { get; init; }

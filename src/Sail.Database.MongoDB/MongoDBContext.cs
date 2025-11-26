@@ -1,6 +1,6 @@
+using MongoDB.Bson;
 using Sail.Core.Entities;
 using Microsoft.EntityFrameworkCore;
-using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Serializers;
 using MongoDB.EntityFrameworkCore.Extensions;
