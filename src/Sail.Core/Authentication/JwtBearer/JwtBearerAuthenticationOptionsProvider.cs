@@ -1,8 +1,8 @@
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace Sail.Core.Authentication.JwtBearer;
 
@@ -37,7 +37,6 @@ public class JwtBearerAuthenticationOptionsProvider
 
         var newSchemeNames = configurations.Keys.ToHashSet();
 
-        // Remove obsolete schemes and policies
         foreach (var schemeName in currentSchemes.Except(newSchemeNames))
         {
             _schemeProvider.RemoveScheme(schemeName);
@@ -46,7 +45,6 @@ public class JwtBearerAuthenticationOptionsProvider
             _logger.LogInformation("Removed JWT Bearer scheme and authorization policy: {SchemeName}", schemeName);
         }
 
-        // Update schemes and ensure authorization policies
         foreach (var (name, config) in configurations)
         {
             if (!currentSchemes.Contains(name))

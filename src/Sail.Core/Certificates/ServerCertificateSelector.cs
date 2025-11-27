@@ -1,9 +1,9 @@
-using System.Runtime.InteropServices;
-using System.Security.Cryptography.X509Certificates;
-using Microsoft.AspNetCore.Connections;
+using Sail.Core.Options;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Sail.Core.Options;
+using Microsoft.AspNetCore.Connections;
+using System.Runtime.InteropServices;
+using System.Security.Cryptography.X509Certificates;
 
 namespace Sail.Core.Certificates;
 

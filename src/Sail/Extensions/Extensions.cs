@@ -1,7 +1,6 @@
 using FluentValidation;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Sail.Core.Options;
-using Sail.Services;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Sail.Extensions;
 
@@ -13,11 +12,11 @@ public static class Extensions
         services.AddOptions<DatabaseOptions>()
             .BindConfiguration(DatabaseOptions.Name);
 
-        services.TryAddScoped<RouteService>();
-        services.TryAddScoped<ClusterService>();
-        services.TryAddScoped<CertificateService>();
-        services.TryAddScoped<MiddlewareService>();
-        services.TryAddScoped<AuthenticationPolicyService>();
+        services.TryAddScoped<Route.RouteService>();
+        services.TryAddScoped<Cluster.ClusterService>();
+        services.TryAddScoped<Certificate.CertificateService>();
+        services.TryAddScoped<Middleware.MiddlewareService>();
+        services.TryAddScoped<AuthenticationPolicy.AuthenticationPolicyService>();
 
         services.AddValidatorsFromAssemblyContaining<Program>();
 

@@ -1,0 +1,117 @@
+using Google.Protobuf.WellKnownTypes;
+using Grpc.Core;
+using Sail.Api.V1;
+using Sail.Core.Entities;
+using Sail.Core.Stores;
+using ClusterEntity = Sail.Core.Entities.Cluster;
+using ClusterResponse = Sail.Api.V1.Cluster;
+using Destination = Sail.Api.V1.Destination;
+using GrpcClusterService = Sail.Api.V1.ClusterService;
+
+namespace Sail.Cluster.Grpc;
+
+public class ClusterGrpcService(IClusterStore clusterStore) : GrpcClusterService.ClusterServiceBase
+{
+    public override async Task<ListClusterResponse> List(Empty request, ServerCallContext context)
+    {
+        var clusters = await clusterStore.GetAsync(CancellationToken.None);
+        var response = MapToClusterItemsResponse(clusters);
+        return response;
+
+    }
+
+    public override async Task Watch(Empty request, IServerStreamWriter<WatchClusterResponse> responseStream,
+        ServerCallContext context)
+    {
+        await foreach (var changeEvent in clusterStore.WatchAsync(context.CancellationToken))
+        {
+            var eventType = changeEvent.OperationType switch
+            {
+                ChangeStreamType.Insert => EventType.Create,
+                ChangeStreamType.Update => EventType.Update,
+                ChangeStreamType.Delete => EventType.Delete,
+                _ => EventType.Unknown
+            };
+
+            var cluster = MapToClusterResponse(changeEvent.Document);
+            var response = new WatchClusterResponse
+            {
+                Cluster = cluster,
+                EventType = eventType
+            };
+            await responseStream.WriteAsync(response);
+        }
+    }
+
+    private static ListClusterResponse MapToClusterItemsResponse(List<ClusterEntity> clusters)
+    {
+        var items = clusters.Select(MapToClusterResponse);
+
+        var response = new ListClusterResponse
+        {
+            Items = { items }
+        };
+        return response;
+    }
+
+    private static ClusterResponse MapToClusterResponse(ClusterEntity cluster)
+    {
+        return new ClusterResponse
+        {
+            ClusterId = cluster.Id.ToString(),
+            ServiceName = cluster.ServiceName,
+            EnabledServiceDiscovery = IsServiceDiscoveryEnabled(cluster.ServiceName, cluster.ServiceDiscoveryType),
+            LoadBalancingPolicy = cluster.LoadBalancingPolicy,
+            HealthCheck = new ClusterHealthCheck
+            {
+                AvailableDestinationsPolicy = cluster.HealthCheck?.AvailableDestinationsPolicy,
+                Active = new ClusterHealthCheck.Types.ActiveHealthCheck
+                {
+                    Enabled = cluster.HealthCheck?.Active?.Enabled ?? false,
+                    Interval = cluster.HealthCheck?.Active?.Interval?.ToString(),
+                    Timeout = cluster.HealthCheck?.Active?.Timeout?.ToString(),
+                    Policy = cluster.HealthCheck?.Active?.Policy,
+                    Path = cluster.HealthCheck?.Active?.Path,
+                    Query = cluster.HealthCheck?.Active?.Query
+                },
+                Passive = new ClusterHealthCheck.Types.PassiveHealthCheck
+                {
+                    Enabled = cluster.HealthCheck?.Passive?.Enabled ?? false,
+                    Policy = cluster.HealthCheck?.Passive?.Policy,
+                    ReactivationPeriod = cluster.HealthCheck?.Passive?.ReactivationPeriod?.ToString()
+                }
+            },
+            SessionAffinity = new ClusterSessionAffinity
+            {
+                Enabled = cluster.SessionAffinity?.Enabled ?? false,
+                Policy = cluster.SessionAffinity?.Policy,
+                FailurePolicy = cluster.SessionAffinity?.FailurePolicy,
+                AffinityKeyName = cluster.SessionAffinity?.AffinityKeyName,
+                Cookie = new ClusterSessionAffinity.Types.SessionAffinityCookie
+                {
+                    Path = cluster.SessionAffinity?.Cookie?.Path,
+                    Domain = cluster.SessionAffinity?.Cookie?.Domain,
+                    HttpOnly = cluster.SessionAffinity?.Cookie?.HttpOnly ?? false,
+                    Expiration = cluster.SessionAffinity?.Cookie?.Expiration?.ToString(),
+                    MaxAge = cluster.SessionAffinity?.Cookie?.MaxAge?.ToString(),
+                    IsEssential = cluster.SessionAffinity?.Cookie?.IsEssential ?? false
+                }
+            },
+            Destinations =
+            {
+                cluster.Destinations?.Select(d => new Destination
+                {
+                    DestinationId = d.Id.ToString(),
+                    Address = d.Address,
+                    Health = d.Health,
+                    Host = d.Host
+                })
+            }
+        };
+    }
+
+    private static bool IsServiceDiscoveryEnabled(string? serviceName, ServiceDiscoveryType? serviceDiscoveryType)
+    {
+        return !string.IsNullOrEmpty(serviceName) && serviceDiscoveryType is not null;
+    }
+}
