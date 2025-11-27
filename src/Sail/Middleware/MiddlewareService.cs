@@ -1,10 +1,11 @@
 using ErrorOr;
 using Sail.Core.Entities;
 using Sail.Core.Stores;
-using MiddlewareEntity = Sail.Core.Entities.Middleware;
+using Sail.Middleware.Errors;
 using Sail.Middleware.Models;
-using TimeoutEntity = Sail.Core.Entities.Timeout;
+using MiddlewareEntity = Sail.Core.Entities.Middleware;
 using RetryEntity = Sail.Core.Entities.Retry;
+using TimeoutEntity = Sail.Core.Entities.Timeout;
 
 namespace Sail.Middleware;
 
@@ -69,9 +70,7 @@ public class MiddlewareService(IMiddlewareStore store)
                 RetryStatusCodes = request.Retry.RetryStatusCodes,
                 RetryDelayMilliseconds = request.Retry.RetryDelayMilliseconds,
                 UseExponentialBackoff = request.Retry.UseExponentialBackoff
-            } : null,
-            CreatedAt = DateTimeOffset.UtcNow,
-            UpdatedAt = DateTimeOffset.UtcNow
+            } : null
         };
 
         await store.CreateAsync(middleware, cancellationToken);
@@ -83,10 +82,9 @@ public class MiddlewareService(IMiddlewareStore store)
         var existing = await store.GetAsync(id, cancellationToken);
         if (existing == null)
         {
-            return Error.NotFound(description: "Middleware not found");
+            return MiddlewareErrors.MiddlewareNotFound;
         }
 
-        // Update the tracked entity directly
         existing.Name = request.Name;
         existing.Description = request.Description;
         existing.Type = request.Type;
@@ -133,7 +131,7 @@ public class MiddlewareService(IMiddlewareStore store)
         var existing = await store.GetAsync(id, cancellationToken);
         if (existing == null)
         {
-            return Error.NotFound(description: "Middleware not found");
+            return MiddlewareErrors.MiddlewareNotFound;
         }
 
         await store.DeleteAsync(id, cancellationToken);

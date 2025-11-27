@@ -1,5 +1,4 @@
 using ErrorOr;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace Sail.Extensions;
