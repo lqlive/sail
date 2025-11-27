@@ -25,16 +25,6 @@ public static class SailDatabaseBuilderExtensions
      
         services.AddDbContext<MongoDBContext>();
 
-        services.AddScoped<IMongoDatabaseCreator>(provider =>
-        {
-            var clientWrapper = provider.GetRequiredService<IMongoClientWrapper>();
-            var designTimeModel = provider.GetRequiredService<IDesignTimeModel>();
-            var updateAdapterFactory = provider.GetRequiredService<IUpdateAdapterFactory>();
-            var database = provider.GetRequiredService<IDatabase>();
-            var logger = provider.GetRequiredService<IDiagnosticsLogger<DbLoggerCategory.Database>>();
-            return new SailMongoDatabaseCreator(clientWrapper, designTimeModel, updateAdapterFactory, database, logger);
-        });
-
         services.TryAddTransient<IRouteStore, RouteStore>();
         services.TryAddTransient<IClusterStore, ClusterStore>();
         services.TryAddTransient<ICertificateStore, CertificateStore>();
