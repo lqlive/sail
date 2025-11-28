@@ -1,5 +1,6 @@
 using FluentValidation;
 using Sail.Certificate.Models;
+using Sail.Certificate.Errors;
 using System.Text.RegularExpressions;
 
 namespace Sail.Certificate.Validators;
@@ -14,17 +15,21 @@ public class SNIRequestValidator : AbstractValidator<SNIRequest>
     {
         RuleFor(x => x.Name)
             .NotEmpty()
-            .WithMessage("SNI name is required")
+            .WithMessage(SNIErrors.NameRequired.Description)
+            .WithErrorCode(SNIErrors.NameRequired.Code)
             .MaximumLength(200)
-            .WithMessage("SNI name must not exceed 200 characters");
+            .WithMessage(SNIErrors.NameTooLong.Description)
+            .WithErrorCode(SNIErrors.NameTooLong.Code);
 
         RuleFor(x => x.HostName)
             .NotEmpty()
-            .WithMessage("SNI hostname is required")
+            .WithMessage(SNIErrors.HostNameRequired.Description)
+            .WithErrorCode(SNIErrors.HostNameRequired.Code)
             .MaximumLength(255)
-            .WithMessage("Hostname must not exceed 255 characters")
+            .WithMessage(SNIErrors.HostNameTooLong.Description)
+            .WithErrorCode(SNIErrors.HostNameTooLong.Code)
             .Must(hostname => HostnameRegex.IsMatch(hostname))
-            .WithMessage("Hostname must be a valid domain name or wildcard domain (e.g., example.com or *.example.com)");
+            .WithMessage(SNIErrors.HostNameInvalid.Description)
+            .WithErrorCode(SNIErrors.HostNameInvalid.Code);
     }
 }
-

@@ -16,8 +16,14 @@ public class ValidationFilter<T>(IValidator<T> validator) : IEndpointFilter
 
         if (!validationResult.IsValid)
         {
+            var errors = validationResult.Errors
+                .GroupBy(e => e.PropertyName)
+                .ToDictionary(
+                    g => g.Key,
+                    g => g.Select(e => $"[{e.ErrorCode}] {e.ErrorMessage}").ToArray());
+
             return Results.ValidationProblem(
-                validationResult.ToDictionary(),
+                errors,
                 statusCode: StatusCodes.Status422UnprocessableEntity);
         }
 

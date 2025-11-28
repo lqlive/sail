@@ -1,5 +1,6 @@
 using FluentValidation;
 using Sail.Middleware.Models;
+using Sail.Middleware.Errors;
 
 namespace Sail.Middleware.Validators;
 
@@ -9,21 +10,25 @@ public class RateLimiterRequestValidator : AbstractValidator<RateLimiterRequest>
     {
         RuleFor(x => x.Name)
             .NotEmpty()
-            .WithMessage("Rate limiter policy name is required")
+            .WithMessage(RateLimiterErrors.NameRequired.Description)
+            .WithErrorCode(RateLimiterErrors.NameRequired.Code)
             .MaximumLength(200)
-            .WithMessage("Rate limiter policy name must not exceed 200 characters");
+            .WithMessage(RateLimiterErrors.NameTooLong.Description)
+            .WithErrorCode(RateLimiterErrors.NameTooLong.Code);
 
         RuleFor(x => x.PermitLimit)
             .GreaterThan(0)
-            .WithMessage("Rate limiter permit limit must be greater than 0");
+            .WithMessage(RateLimiterErrors.PermitLimitInvalid.Description)
+            .WithErrorCode(RateLimiterErrors.PermitLimitInvalid.Code);
 
         RuleFor(x => x.Window)
             .GreaterThan(0)
-            .WithMessage("Rate limiter window must be greater than 0 seconds");
+            .WithMessage(RateLimiterErrors.WindowInvalid.Description)
+            .WithErrorCode(RateLimiterErrors.WindowInvalid.Code);
 
         RuleFor(x => x.QueueLimit)
             .GreaterThanOrEqualTo(0)
-            .WithMessage("Rate limiter queue limit must be greater than or equal to 0");
+            .WithMessage(RateLimiterErrors.QueueLimitInvalid.Description)
+            .WithErrorCode(RateLimiterErrors.QueueLimitInvalid.Code);
     }
 }
-

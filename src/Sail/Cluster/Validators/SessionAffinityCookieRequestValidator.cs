@@ -1,5 +1,6 @@
 using FluentValidation;
 using Sail.Cluster.Models;
+using Sail.Cluster.Errors;
 
 namespace Sail.Cluster.Validators;
 
@@ -10,22 +11,25 @@ public class SessionAffinityCookieRequestValidator : AbstractValidator<SessionAf
         RuleFor(x => x.SecurePolicy)
             .IsInEnum()
             .When(x => x.SecurePolicy.HasValue)
-            .WithMessage("Invalid cookie secure policy");
+            .WithMessage(SessionAffinityCookieErrors.SecurePolicyInvalid.Description)
+            .WithErrorCode(SessionAffinityCookieErrors.SecurePolicyInvalid.Code);
 
         RuleFor(x => x.SameSite)
             .IsInEnum()
             .When(x => x.SameSite.HasValue)
-            .WithMessage("Invalid cookie SameSite mode");
+            .WithMessage(SessionAffinityCookieErrors.SameSiteInvalid.Description)
+            .WithErrorCode(SessionAffinityCookieErrors.SameSiteInvalid.Code);
 
         RuleFor(x => x.Expiration)
             .GreaterThan(TimeSpan.Zero)
             .When(x => x.Expiration.HasValue)
-            .WithMessage("Cookie expiration must be greater than zero");
+            .WithMessage(SessionAffinityCookieErrors.ExpirationInvalid.Description)
+            .WithErrorCode(SessionAffinityCookieErrors.ExpirationInvalid.Code);
 
         RuleFor(x => x.MaxAge)
             .GreaterThan(TimeSpan.Zero)
             .When(x => x.MaxAge.HasValue)
-            .WithMessage("Cookie max age must be greater than zero");
+            .WithMessage(SessionAffinityCookieErrors.MaxAgeInvalid.Description)
+            .WithErrorCode(SessionAffinityCookieErrors.MaxAgeInvalid.Code);
     }
 }
-

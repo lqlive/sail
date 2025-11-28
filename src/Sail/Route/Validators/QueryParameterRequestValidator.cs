@@ -1,5 +1,6 @@
 using FluentValidation;
 using Sail.Route.Models;
+using Sail.Route.Errors;
 
 namespace Sail.Route.Validators;
 
@@ -9,21 +10,26 @@ public class QueryParameterRequestValidator : AbstractValidator<QueryParameterRe
     {
         RuleFor(x => x.Name)
             .NotEmpty()
-            .WithMessage("Query parameter name is required")
+            .WithMessage(QueryParameterErrors.NameRequired.Description)
+            .WithErrorCode(QueryParameterErrors.NameRequired.Code)
             .MaximumLength(100)
-            .WithMessage("Query parameter name must not exceed 100 characters");
+            .WithMessage(QueryParameterErrors.NameTooLong.Description)
+            .WithErrorCode(QueryParameterErrors.NameTooLong.Code);
 
         RuleFor(x => x.Values)
             .NotNull()
-            .WithMessage("Query parameter values are required")
+            .WithMessage(QueryParameterErrors.ValuesRequired.Description)
+            .WithErrorCode(QueryParameterErrors.ValuesRequired.Code)
             .Must(values => values.Any())
-            .WithMessage("At least one query parameter value must be provided")
+            .WithMessage(QueryParameterErrors.ValuesEmpty.Description)
+            .WithErrorCode(QueryParameterErrors.ValuesEmpty.Code)
             .Must(values => values.All(v => !string.IsNullOrWhiteSpace(v)))
-            .WithMessage("Query parameter values must not be empty");
+            .WithMessage(QueryParameterErrors.ValuesContainEmpty.Description)
+            .WithErrorCode(QueryParameterErrors.ValuesContainEmpty.Code);
 
         RuleFor(x => x.Mode)
             .IsInEnum()
-            .WithMessage("Invalid query parameter match mode");
+            .WithMessage(QueryParameterErrors.ModeInvalid.Description)
+            .WithErrorCode(QueryParameterErrors.ModeInvalid.Code);
     }
 }
-

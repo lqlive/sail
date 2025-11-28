@@ -1,5 +1,6 @@
 using FluentValidation;
 using Sail.Route.Models;
+using Sail.Route.Errors;
 
 namespace Sail.Route.Validators;
 
@@ -9,19 +10,23 @@ public class RouteMatchRequestValidator : AbstractValidator<RouteMatchRequest>
     {
         RuleFor(x => x.Path)
             .NotEmpty()
-            .WithMessage("Route path is required")
+            .WithMessage(RouteMatchErrors.PathRequired.Description)
+            .WithErrorCode(RouteMatchErrors.PathRequired.Code)
             .Must(path => path.StartsWith('/'))
-            .WithMessage("Route path must start with '/'");
+            .WithMessage(RouteMatchErrors.PathInvalid.Description)
+            .WithErrorCode(RouteMatchErrors.PathInvalid.Code);
 
         RuleFor(x => x.Methods)
             .Must(methods => methods == null || methods.All(m => !string.IsNullOrWhiteSpace(m)))
             .When(x => x.Methods != null && x.Methods.Any())
-            .WithMessage("HTTP methods must not be empty");
+            .WithMessage(RouteMatchErrors.MethodsContainEmpty.Description)
+            .WithErrorCode(RouteMatchErrors.MethodsContainEmpty.Code);
 
         RuleFor(x => x.Hosts)
             .Must(hosts => hosts == null || hosts.All(h => !string.IsNullOrWhiteSpace(h)))
             .When(x => x.Hosts != null && x.Hosts.Any())
-            .WithMessage("Host names must not be empty");
+            .WithMessage(RouteMatchErrors.HostsContainEmpty.Description)
+            .WithErrorCode(RouteMatchErrors.HostsContainEmpty.Code);
 
         RuleForEach(x => x.QueryParameters)
             .SetValidator(new QueryParameterRequestValidator())
@@ -32,4 +37,3 @@ public class RouteMatchRequestValidator : AbstractValidator<RouteMatchRequest>
             .When(x => x.Headers != null && x.Headers.Any());
     }
 }
-

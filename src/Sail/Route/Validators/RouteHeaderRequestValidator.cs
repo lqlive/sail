@@ -1,5 +1,6 @@
 using FluentValidation;
 using Sail.Route.Models;
+using Sail.Route.Errors;
 
 namespace Sail.Route.Validators;
 
@@ -9,21 +10,26 @@ public class RouteHeaderRequestValidator : AbstractValidator<RouteHeaderRequest>
     {
         RuleFor(x => x.Name)
             .NotEmpty()
-            .WithMessage("Header name is required")
+            .WithMessage(RouteHeaderErrors.NameRequired.Description)
+            .WithErrorCode(RouteHeaderErrors.NameRequired.Code)
             .MaximumLength(100)
-            .WithMessage("Header name must not exceed 100 characters");
+            .WithMessage(RouteHeaderErrors.NameTooLong.Description)
+            .WithErrorCode(RouteHeaderErrors.NameTooLong.Code);
 
         RuleFor(x => x.Values)
             .NotNull()
-            .WithMessage("Header values are required")
+            .WithMessage(RouteHeaderErrors.ValuesRequired.Description)
+            .WithErrorCode(RouteHeaderErrors.ValuesRequired.Code)
             .Must(values => values.Any())
-            .WithMessage("At least one header value must be provided")
+            .WithMessage(RouteHeaderErrors.ValuesEmpty.Description)
+            .WithErrorCode(RouteHeaderErrors.ValuesEmpty.Code)
             .Must(values => values.All(v => !string.IsNullOrWhiteSpace(v)))
-            .WithMessage("Header values must not be empty");
+            .WithMessage(RouteHeaderErrors.ValuesContainEmpty.Description)
+            .WithErrorCode(RouteHeaderErrors.ValuesContainEmpty.Code);
 
         RuleFor(x => x.Mode)
             .IsInEnum()
-            .WithMessage("Invalid header match mode");
+            .WithMessage(RouteHeaderErrors.ModeInvalid.Description)
+            .WithErrorCode(RouteHeaderErrors.ModeInvalid.Code);
     }
 }
-
