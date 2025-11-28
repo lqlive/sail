@@ -75,7 +75,7 @@ const Certificates: React.FC = () => {
           </div>
           <Link
             to="/certificates/new"
-            className="inline-flex items-center px-4 py-2 bg-black text-white text-sm font-medium rounded-lg hover:bg-gray-800 transition-colors"
+            className="btn-primary"
           >
             <PlusIcon className="h-4 w-4 mr-2" />
             Add Certificate
@@ -122,7 +122,7 @@ const Certificates: React.FC = () => {
           <p className="text-sm text-gray-500 mb-4">Get started by adding a new certificate</p>
           <Link
             to="/certificates/new"
-            className="inline-flex items-center px-4 py-2 bg-black text-white text-sm font-medium rounded-lg hover:bg-gray-800 transition-colors"
+            className="btn-primary"
           >
             <PlusIcon className="h-4 w-4 mr-2" />
             Add Certificate

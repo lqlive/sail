@@ -72,7 +72,7 @@ const Routes: React.FC = () => {
           </div>
           <Link 
             to="/routes/new" 
-            className="inline-flex items-center px-4 py-2 bg-black text-white text-sm font-medium rounded-lg hover:bg-gray-800 transition-colors"
+            className="btn-primary"
           >
             <PlusIcon className="h-4 w-4 mr-2" />
             Create Route
@@ -131,7 +131,7 @@ const Routes: React.FC = () => {
           <p className="text-sm text-gray-500 mb-4">Get started by creating your first route</p>
           <Link
             to="/routes/new"
-            className="inline-flex items-center px-4 py-2 bg-black text-white text-sm font-medium rounded-lg hover:bg-gray-800 transition-colors"
+            className="btn-primary"
           >
             <PlusIcon className="h-4 w-4 mr-2" />
             Create Route

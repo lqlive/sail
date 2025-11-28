@@ -3,6 +3,12 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { ChevronLeftIcon, PlusIcon, XMarkIcon, CheckIcon } from '@heroicons/react/24/outline';
 import type { Route, Cluster } from '../../types';
 import { RouteService } from '../../services/routeService';
+import { PolicySelect } from '../../components/PolicySelect';
+import { Select } from '../../components/Select';
+import { FormField } from '../../components/FormField';
+import { Checkbox } from '../../components/Checkbox';
+import { Alert } from '../../components/Alert';
+import { usePolicyOptions } from '../../hooks/usePolicyOptions';
 import { ClusterService } from '../../services/clusterService';
 
 const RouteEdit: React.FC = () => {
@@ -34,11 +40,22 @@ const RouteEdit: React.FC = () => {
   const [transformType, setTransformType] = useState('RequestHeader');
   const [transformKey, setTransformKey] = useState('');
   const [transformValue, setTransformValue] = useState('');
+  const [transformError, setTransformError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [clusters, setClusters] = useState<Cluster[]>([]);
   const [activeTab, setActiveTab] = useState('basic');
+  
+  // Load policy options
+  const {
+    authPolicies,
+    corsPolicies,
+    rateLimiterPolicies,
+    timeoutPolicies,
+    retryPolicies,
+    loading: policiesLoading,
+  } = usePolicyOptions();
 
   useEffect(() => {
     loadClusters();
@@ -155,29 +172,45 @@ const RouteEdit: React.FC = () => {
   };
 
   const addTransform = () => {
+    setTransformError(null);
     const newTransform: Record<string, string> = {};
     
     switch (transformType) {
       case 'RequestHeader':
-        if (!transformKey || !transformValue) return;
+        if (!transformKey || !transformValue) {
+          setTransformError('Please enter both header name and value');
+          return;
+        }
         newTransform['RequestHeader'] = transformKey;
         newTransform['Set'] = transformValue;
         break;
       case 'ResponseHeader':
-        if (!transformKey || !transformValue) return;
+        if (!transformKey || !transformValue) {
+          setTransformError('Please enter both header name and value');
+          return;
+        }
         newTransform['ResponseHeader'] = transformKey;
         newTransform['Set'] = transformValue;
         break;
       case 'PathPrefix':
-        if (!transformValue) return;
+        if (!transformValue) {
+          setTransformError('Please enter a path prefix');
+          return;
+        }
         newTransform['PathPrefix'] = transformValue;
         break;
       case 'PathRemovePrefix':
-        if (!transformValue) return;
+        if (!transformValue) {
+          setTransformError('Please enter a path prefix to remove');
+          return;
+        }
         newTransform['PathRemovePrefix'] = transformValue;
         break;
       case 'QueryParameter':
-        if (!transformKey || !transformValue) return;
+        if (!transformKey || !transformValue) {
+          setTransformError('Please enter both parameter name and value');
+          return;
+        }
         newTransform['QueryParameter'] = transformKey;
         newTransform['Set'] = transformValue;
         break;
@@ -306,29 +339,25 @@ const RouteEdit: React.FC = () => {
             </div>
 
             <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Target Cluster <span className="text-red-500">*</span>
-                </label>
-                <select
+              <FormField
+                label="Target Cluster"
+                required={true}
+              >
+                <Select
                   value={formData.clusterId}
-                  onChange={(e) => setFormData({ ...formData, clusterId: e.target.value })}
-                  className="block w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-gray-400 focus:ring-1 focus:ring-gray-400 transition-colors"
-                  required
-                >
-                  <option value="">Select a cluster</option>
-                  {clusters.map(cluster => (
-                    <option key={cluster.id} value={cluster.id}>
-                      {cluster.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
+                  onChange={(value) => setFormData({ ...formData, clusterId: value })}
+                  options={clusters.map(cluster => ({
+                    value: cluster.id,
+                    label: cluster.name,
+                  }))}
+                  placeholder="Select a cluster"
+                />
+              </FormField>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Order
-                </label>
+              <FormField
+                label="Order"
+                hint="Lower values have higher priority"
+              >
                 <input
                   type="number"
                   value={formData.order}
@@ -336,22 +365,14 @@ const RouteEdit: React.FC = () => {
                   min="0"
                   className="block w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-gray-400 focus:ring-1 focus:ring-gray-400 transition-colors"
                 />
-                <p className="mt-1 text-xs text-gray-500">Lower values have higher priority</p>
-              </div>
+              </FormField>
             </div>
 
-            <div className="flex items-center">
-              <input
-                type="checkbox"
-                id="enabled"
-                checked={formData.enabled}
-                onChange={(e) => setFormData({ ...formData, enabled: e.target.checked })}
-                className="h-3.5 w-3.5 text-gray-900 focus:ring-gray-900 border-gray-300 rounded"
-              />
-              <label htmlFor="enabled" className="ml-2 block text-xs text-gray-700">
-                Enable this route immediately
-              </label>
-            </div>
+            <Checkbox
+              checked={formData.enabled}
+              onChange={(checked) => setFormData({ ...formData, enabled: checked })}
+              label="Enable this route immediately"
+            />
 
             {/* Matching Rules Section */}
             <div className="pt-6 border-t border-gray-200">
@@ -466,70 +487,50 @@ const RouteEdit: React.FC = () => {
             {activeTab === 'policies' && (
               <div className="space-y-5">
             <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Authorization Policy
-                </label>
-                <input
-                  type="text"
-                  value={formData.authorizationPolicy}
-                  onChange={(e) => setFormData({ ...formData, authorizationPolicy: e.target.value })}
-                  placeholder="e.g., default, admin-only"
-                  className="block w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-gray-400 focus:ring-1 focus:ring-gray-400 transition-colors"
-                />
-              </div>
+              <PolicySelect
+                label="Authorization Policy"
+                value={formData.authorizationPolicy}
+                onChange={(value) => setFormData({ ...formData, authorizationPolicy: value })}
+                placeholder="Select an authorization policy (optional)"
+                options={authPolicies}
+                loading={policiesLoading}
+              />
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Rate Limiter Policy
-                </label>
-                <input
-                  type="text"
-                  value={formData.rateLimiterPolicy}
-                  onChange={(e) => setFormData({ ...formData, rateLimiterPolicy: e.target.value })}
-                  placeholder="e.g., standard, strict"
-                  className="block w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-gray-400 focus:ring-1 focus:ring-gray-400 transition-colors"
-                />
-              </div>
+              <PolicySelect
+                label="Rate Limiter Policy"
+                value={formData.rateLimiterPolicy}
+                onChange={(value) => setFormData({ ...formData, rateLimiterPolicy: value })}
+                placeholder="Select a rate limiter policy (optional)"
+                options={rateLimiterPolicies}
+                loading={policiesLoading}
+              />
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  CORS Policy
-                </label>
-                <input
-                  type="text"
-                  value={formData.corsPolicy}
-                  onChange={(e) => setFormData({ ...formData, corsPolicy: e.target.value })}
-                  placeholder="e.g., allow-all, strict"
-                  className="block w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-gray-400 focus:ring-1 focus:ring-gray-400 transition-colors"
-                />
-              </div>
+              <PolicySelect
+                label="CORS Policy"
+                value={formData.corsPolicy}
+                onChange={(value) => setFormData({ ...formData, corsPolicy: value })}
+                placeholder="Select a CORS policy (optional)"
+                options={corsPolicies}
+                loading={policiesLoading}
+              />
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Timeout Policy
-                </label>
-                <input
-                  type="text"
-                  value={formData.timeoutPolicy}
-                  onChange={(e) => setFormData({ ...formData, timeoutPolicy: e.target.value })}
-                  placeholder="e.g., default-timeout"
-                  className="block w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-gray-400 focus:ring-1 focus:ring-gray-400 transition-colors"
-                />
-              </div>
+              <PolicySelect
+                label="Timeout Policy"
+                value={formData.timeoutPolicy}
+                onChange={(value) => setFormData({ ...formData, timeoutPolicy: value })}
+                placeholder="Select a timeout policy (optional)"
+                options={timeoutPolicies}
+                loading={policiesLoading}
+              />
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Retry Policy
-                </label>
-                <input
-                  type="text"
-                  value={formData.retryPolicy}
-                  onChange={(e) => setFormData({ ...formData, retryPolicy: e.target.value })}
-                  placeholder="e.g., api-retry-policy"
-                  className="block w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-gray-400 focus:ring-1 focus:ring-gray-400 transition-colors"
-                />
-              </div>
+              <PolicySelect
+                label="Retry Policy"
+                value={formData.retryPolicy}
+                onChange={(value) => setFormData({ ...formData, retryPolicy: value })}
+                placeholder="Select a retry policy (optional)"
+                options={retryPolicies}
+                loading={policiesLoading}
+              />
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -562,18 +563,11 @@ const RouteEdit: React.FC = () => {
             </div>
 
             <div className="pt-5 border-t border-gray-100">
-              <div className="flex items-center">
-                <input
-                  id="httpsRedirect"
-                  type="checkbox"
-                  checked={formData.httpsRedirect}
-                  onChange={(e) => setFormData({ ...formData, httpsRedirect: e.target.checked })}
-                  className="h-4 w-4 text-gray-900 focus:ring-gray-900 border-gray-300 rounded"
-                />
-                <label htmlFor="httpsRedirect" className="ml-2 block text-sm text-gray-700">
-                  Redirect HTTP to HTTPS
-                </label>
-              </div>
+              <Checkbox
+                checked={formData.httpsRedirect}
+                onChange={(checked) => setFormData({ ...formData, httpsRedirect: checked })}
+                label="Redirect HTTP to HTTPS"
+              />
             </div>
               </div>
             )}
@@ -582,28 +576,22 @@ const RouteEdit: React.FC = () => {
             {activeTab === 'transforms' && (
               <div className="space-y-5">
             <div className="grid grid-cols-3 gap-3">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Transform Type
-                </label>
-                <select
+              <FormField label="Transform Type">
+                <Select
                   value={transformType}
-                  onChange={(e) => setTransformType(e.target.value)}
-                  className="block w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-gray-400 focus:ring-1 focus:ring-gray-400 transition-colors"
-                >
-                  <option value="RequestHeader">Request Header</option>
-                  <option value="ResponseHeader">Response Header</option>
-                  <option value="PathPrefix">Add Path Prefix</option>
-                  <option value="PathRemovePrefix">Remove Path Prefix</option>
-                  <option value="QueryParameter">Query Parameter</option>
-                </select>
-              </div>
+                  onChange={setTransformType}
+                  options={[
+                    { value: 'RequestHeader', label: 'Request Header' },
+                    { value: 'ResponseHeader', label: 'Response Header' },
+                    { value: 'PathPrefix', label: 'Add Path Prefix' },
+                    { value: 'PathRemovePrefix', label: 'Remove Path Prefix' },
+                    { value: 'QueryParameter', label: 'Query Parameter' },
+                  ]}
+                />
+              </FormField>
 
               {(transformType === 'RequestHeader' || transformType === 'ResponseHeader' || transformType === 'QueryParameter') && (
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    {transformType === 'QueryParameter' ? 'Parameter Name' : 'Header Name'}
-                  </label>
+                <FormField label={transformType === 'QueryParameter' ? 'Parameter Name' : 'Header Name'}>
                   <input
                     type="text"
                     value={transformKey}
@@ -611,13 +599,10 @@ const RouteEdit: React.FC = () => {
                     placeholder={transformType === 'QueryParameter' ? 'e.g., api-version' : 'e.g., X-Custom-Header'}
                     className="block w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-gray-400 focus:ring-1 focus:ring-gray-400 transition-colors"
                   />
-                </div>
+                </FormField>
               )}
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  {transformType === 'PathPrefix' || transformType === 'PathRemovePrefix' ? 'Path' : 'Value'}
-                </label>
+              <FormField label={transformType === 'PathPrefix' || transformType === 'PathRemovePrefix' ? 'Path' : 'Value'}>
                 <input
                   type="text"
                   value={transformValue}
@@ -626,8 +611,14 @@ const RouteEdit: React.FC = () => {
                   placeholder={transformType === 'PathPrefix' ? '/api/v1' : transformType === 'PathRemovePrefix' ? '/old-prefix' : 'value'}
                   className="block w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-gray-400 focus:ring-1 focus:ring-gray-400 transition-colors"
                 />
-              </div>
+              </FormField>
             </div>
+
+            {transformError && (
+              <Alert type="error" className="col-span-full">
+                {transformError}
+              </Alert>
+            )}
 
             <div>
               <button
@@ -642,30 +633,30 @@ const RouteEdit: React.FC = () => {
 
             {formData.transforms.length > 0 && (
               <div className="mt-6 pt-6 border-t border-gray-200">
-                <h3 className="text-sm font-medium text-gray-900 mb-4">Configured Transforms</h3>
+                <h3 className="text-sm font-medium text-gray-900 mb-3">Configured Transforms</h3>
                 <div className="space-y-2">
                   {formData.transforms.map((transform, index) => (
                     <div
                       key={index}
-                      className="flex items-center justify-between p-4 bg-gray-50 border border-gray-100 rounded-lg hover:border-gray-200 transition-colors"
+                      className="flex items-center justify-between px-3 py-2.5 bg-white border border-gray-200 rounded-lg hover:border-gray-300 transition-colors"
                     >
-                      <div className="flex items-center space-x-3">
-                        <div className="w-10 h-10 bg-indigo-50 rounded-lg flex items-center justify-center flex-shrink-0">
-                          <svg className="h-5 w-5 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                          <svg className="h-4 w-4 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
                           </svg>
                         </div>
-                        <div>
-                          <p className="text-sm font-medium text-gray-900">{getTransformDisplay(transform)}</p>
-                          <p className="text-xs text-gray-500 mt-0.5">Transform #{index + 1}</p>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm text-gray-900">{getTransformDisplay(transform)}</p>
+                          <p className="text-xs text-gray-500">Transform #{index + 1}</p>
                         </div>
                       </div>
                       <button
                         type="button"
                         onClick={() => removeTransform(index)}
-                        className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                        className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors flex-shrink-0"
                       >
-                        <XMarkIcon className="h-5 w-5" />
+                        <XMarkIcon className="h-4 w-4" />
                       </button>
                     </div>
                   ))}
@@ -681,14 +672,14 @@ const RouteEdit: React.FC = () => {
         <div className="flex justify-end gap-3 pt-2">
           <Link
             to="/routes"
-            className="px-5 py-2.5 border border-gray-200 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors"
+            className="btn-secondary"
           >
             Cancel
           </Link>
           <button
             type="submit"
             disabled={saving}
-            className="inline-flex items-center px-5 py-2.5 border border-transparent rounded-lg text-sm font-medium text-white bg-black hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {saving ? (
               <>
