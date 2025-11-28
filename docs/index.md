@@ -1,17 +1,20 @@
 ---
 layout: default
-title: Sail Documentation
+title: Sail
+description: Modern API Gateway built on YARP
 ---
 
-<div style="text-align: center; margin: 2rem 0;">
-  <h1 style="font-size: 3rem; margin-bottom: 1rem;">⛵ Sail</h1>
-  <p style="font-size: 1.5rem; color: #666; margin-bottom: 2rem;">Modern API Gateway built on YARP</p>
-  <div>
-    <a href="https://github.com/lqlive/sail" class="btn" style="display: inline-block; margin: 0.5rem;">View on GitHub</a>
-    <a href="articles/getting-started.html" class="btn" style="display: inline-block; margin: 0.5rem;">Get Started</a>
-    <a href="articles/architecture.html" class="btn" style="display: inline-block; margin: 0.5rem;">Architecture</a>
+<div class="hero fade-in">
+  <h1>⛵ Sail</h1>
+  <p class="tagline">Modern API Gateway built on YARP</p>
+  <div class="hero-buttons">
+    <a href="https://github.com/lqlive/sail" class="btn" target="_blank">View on GitHub</a>
+    <a href="{{ '/articles/getting-started' | relative_url }}" class="btn btn-outline">Get Started</a>
+    <a href="{{ '/articles/architecture' | relative_url }}" class="btn btn-outline">Architecture</a>
   </div>
 </div>
+
+---
 
 Welcome to the documentation for **Sail**! Sail is a modern, high-performance API Gateway built on top of [YARP (Yet Another Reverse Proxy)](https://microsoft.github.io/reverse-proxy/). It provides dynamic configuration management with a web-based admin interface, enabling real-time updates to routes, clusters, and policies without restart.
 
@@ -28,9 +31,9 @@ Sail was created to address the need for a flexible, production-ready API Gatewa
 
 ## Key Features
 
-<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin: 2rem 0;">
+<div class="feature-grid">
 
-<div class="feature-box">
+<div class="feature-box fade-in">
   <h3>🚀 Dynamic Configuration</h3>
   <ul>
     <li>Real-time updates without gateway restarts</li>
@@ -40,7 +43,7 @@ Sail was created to address the need for a flexible, production-ready API Gatewa
   </ul>
 </div>
 
-<div class="feature-box">
+<div class="feature-box fade-in">
   <h3>🎨 Web-Based Administration</h3>
   <ul>
     <li>Modern React 18 UI with TypeScript</li>
@@ -50,7 +53,7 @@ Sail was created to address the need for a flexible, production-ready API Gatewa
   </ul>
 </div>
 
-<div class="feature-box">
+<div class="feature-box fade-in">
   <h3>🔀 Advanced Routing</h3>
   <ul>
     <li>Path-based routing with pattern matching</li>
@@ -61,7 +64,7 @@ Sail was created to address the need for a flexible, production-ready API Gatewa
   </ul>
 </div>
 
-<div class="feature-box">
+<div class="feature-box fade-in">
   <h3>🔒 Security & Authentication</h3>
   <ul>
     <li>JWT Bearer token authentication</li>
@@ -72,7 +75,7 @@ Sail was created to address the need for a flexible, production-ready API Gatewa
   </ul>
 </div>
 
-<div class="feature-box">
+<div class="feature-box fade-in">
   <h3>⚡ Traffic Control</h3>
   <ul>
     <li>CORS policy management</li>
@@ -83,7 +86,7 @@ Sail was created to address the need for a flexible, production-ready API Gatewa
   </ul>
 </div>
 
-<div class="feature-box">
+<div class="feature-box fade-in">
   <h3>🔍 Service Discovery</h3>
   <ul>
     <li>Integration with service discovery systems</li>
@@ -202,10 +205,9 @@ sail/
 
 ## Next Steps
 
-- Learn about [Configuration](articles/configuration.md) to understand routes, clusters, and policies
-- Explore [Authentication](articles/authentication.md) setup for JWT and OpenID Connect
-- Read about [Rate Limiting](articles/rate-limiting.md) and traffic control
-- Check out [Deployment](articles/deployment.md) guides for production environments
+- Learn about [Configuration]({{ '/articles/getting-started' | relative_url }}) to understand routes, clusters, and policies
+- Explore [Architecture]({{ '/articles/architecture' | relative_url }}) for detailed design information
+- Check out the [GitHub repository](https://github.com/lqlive/sail) for source code
 
 ## Contributing
 
@@ -230,7 +232,3 @@ Security issues and bugs should be reported privately via [GitHub Security Advis
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](https://github.com/lqlive/sail/blob/main/LICENSE) file for details.
-
----
-
-*Built with ❤️ using .NET and YARP*
