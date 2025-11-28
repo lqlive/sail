@@ -37,16 +37,14 @@ public class OpenIdConnectAuthenticationOptionsProvider
 
         var newSchemeNames = configurations.Keys.ToHashSet();
 
-        // Remove obsolete schemes and policies
         foreach (var schemeName in currentSchemes.Except(newSchemeNames))
         {
             _schemeProvider.RemoveScheme(schemeName);
             _optionsCache.TryRemove(schemeName);
             _authorizationPolicyProvider.RemovePolicy(schemeName);
-            _logger.LogInformation("Removed OpenIdConnect scheme and authorization policy: {SchemeName}", schemeName);
+            Log.RemovedScheme(_logger, schemeName);
         }
 
-        // Update schemes and ensure authorization policies
         foreach (var (name, config) in configurations)
         {
             if (!currentSchemes.Contains(name))
@@ -56,12 +54,12 @@ public class OpenIdConnectAuthenticationOptionsProvider
                     name,
                     typeof(OpenIdConnectHandler)
                 ));
-                _logger.LogInformation("Added OpenIdConnect scheme: {SchemeName}", name);
+                Log.AddedScheme(_logger, name);
             }
             else
             {
                 _optionsCache.TryRemove(name);
-                _logger.LogInformation("Updated OpenIdConnect scheme: {SchemeName}", name);
+                Log.UpdatedScheme(_logger, name);
             }
 
             var options = new OpenIdConnectOptions
@@ -98,7 +96,49 @@ public class OpenIdConnectAuthenticationOptionsProvider
 
         }
 
-        _logger.LogInformation("OpenIdConnect schemes updated. Total: {Count}", configurations.Count);
+        Log.SchemesUpdated(_logger, configurations.Count);
+    }
+
+    private static class Log
+    {
+        private static readonly Action<ILogger, string, Exception?> _removedScheme = LoggerMessage.Define<string>(
+            LogLevel.Information,
+            new EventId(1, nameof(RemovedScheme)),
+            "Removed OpenIdConnect scheme and authorization policy: {SchemeName}");
+
+        private static readonly Action<ILogger, string, Exception?> _addedScheme = LoggerMessage.Define<string>(
+            LogLevel.Information,
+            new EventId(2, nameof(AddedScheme)),
+            "Added OpenIdConnect scheme: {SchemeName}");
+
+        private static readonly Action<ILogger, string, Exception?> _updatedScheme = LoggerMessage.Define<string>(
+            LogLevel.Information,
+            new EventId(3, nameof(UpdatedScheme)),
+            "Updated OpenIdConnect scheme: {SchemeName}");
+
+        private static readonly Action<ILogger, int, Exception?> _schemesUpdated = LoggerMessage.Define<int>(
+            LogLevel.Information,
+            new EventId(4, nameof(SchemesUpdated)),
+            "OpenIdConnect schemes updated. Total: {Count}");
+
+        public static void RemovedScheme(ILogger logger, string schemeName)
+        {
+            _removedScheme(logger, schemeName, null);
+        }
+
+        public static void AddedScheme(ILogger logger, string schemeName)
+        {
+            _addedScheme(logger, schemeName, null);
+        }
+
+        public static void UpdatedScheme(ILogger logger, string schemeName)
+        {
+            _updatedScheme(logger, schemeName, null);
+        }
+
+        public static void SchemesUpdated(ILogger logger, int count)
+        {
+            _schemesUpdated(logger, count, null);
+        }
     }
 }
-

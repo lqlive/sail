@@ -72,9 +72,7 @@ public class HttpsRedirectionMiddleware
         var port = _httpsPort.Value;
         if (port == PortNotFound)
         {
-            _logger.LogWarning(
-                "Failed to determine HTTPS port for route {RouteId}. HTTPS redirection disabled.",
-                reverseProxyFeature?.Route.Config.RouteId);
+            Log.FailedToDetermineHttpsPort(_logger, reverseProxyFeature?.Route.Config.RouteId);
             return _next(context);
         }
 
@@ -99,10 +97,7 @@ public class HttpsRedirectionMiddleware
         context.Response.StatusCode = _statusCode;
         context.Response.Headers.Location = redirectUrl;
 
-        _logger.LogInformation(
-            "Redirecting to HTTPS. Route: {RouteId}, URL: {RedirectUrl}",
-            reverseProxyFeature?.Route.Config.RouteId,
-            redirectUrl);
+        Log.RedirectingToHttps(_logger, reverseProxyFeature?.Route.Config.RouteId, redirectUrl);
 
         return Task.CompletedTask;
     }
@@ -113,13 +108,13 @@ public class HttpsRedirectionMiddleware
         if (nullablePort.HasValue)
         {
             var port = nullablePort.Value;
-            _logger.LogDebug("HTTPS port {Port} loaded from configuration.", port);
+            Log.HttpsPortLoadedFromConfiguration(_logger, port);
             return port;
         }
 
         if (_serverAddressesFeature == null)
         {
-            _logger.LogWarning("Failed to determine HTTPS port. IServerAddressesFeature is not available.");
+            Log.ServerAddressesFeatureNotAvailable(_logger);
             return PortNotFound;
         }
 
@@ -144,15 +139,77 @@ public class HttpsRedirectionMiddleware
         if (nullablePort.HasValue)
         {
             var port = nullablePort.Value;
-            _logger.LogDebug("HTTPS port {Port} discovered from server addresses.", port);
+            Log.HttpsPortDiscoveredFromServerAddresses(_logger, port);
             return port;
         }
 
-        _logger.LogWarning("Failed to determine HTTPS port.");
+        Log.FailedToDetermineHttpsPortGeneral(_logger);
         return PortNotFound;
 
         int? GetIntConfigValue(string name) =>
             int.TryParse(_config[name], NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out var value) ? value : null;
     }
-}
 
+    private static class Log
+    {
+        private static readonly Action<ILogger, string?, Exception?> _failedToDetermineHttpsPort = LoggerMessage.Define<string?>(
+            LogLevel.Warning,
+            new EventId(1, nameof(FailedToDetermineHttpsPort)),
+            "Failed to determine HTTPS port for route {RouteId}. HTTPS redirection disabled.");
+
+        private static readonly Action<ILogger, string?, string, Exception?> _redirectingToHttps = LoggerMessage.Define<string?, string>(
+            LogLevel.Information,
+            new EventId(2, nameof(RedirectingToHttps)),
+            "Redirecting to HTTPS. Route: {RouteId}, URL: {RedirectUrl}");
+
+        private static readonly Action<ILogger, int, Exception?> _httpsPortLoadedFromConfiguration = LoggerMessage.Define<int>(
+            LogLevel.Debug,
+            new EventId(3, nameof(HttpsPortLoadedFromConfiguration)),
+            "HTTPS port {Port} loaded from configuration.");
+
+        private static readonly Action<ILogger, Exception?> _serverAddressesFeatureNotAvailable = LoggerMessage.Define(
+            LogLevel.Warning,
+            new EventId(4, nameof(ServerAddressesFeatureNotAvailable)),
+            "Failed to determine HTTPS port. IServerAddressesFeature is not available.");
+
+        private static readonly Action<ILogger, int, Exception?> _httpsPortDiscoveredFromServerAddresses = LoggerMessage.Define<int>(
+            LogLevel.Debug,
+            new EventId(5, nameof(HttpsPortDiscoveredFromServerAddresses)),
+            "HTTPS port {Port} discovered from server addresses.");
+
+        private static readonly Action<ILogger, Exception?> _failedToDetermineHttpsPortGeneral = LoggerMessage.Define(
+            LogLevel.Warning,
+            new EventId(6, nameof(FailedToDetermineHttpsPortGeneral)),
+            "Failed to determine HTTPS port.");
+
+        public static void FailedToDetermineHttpsPort(ILogger logger, string? routeId)
+        {
+            _failedToDetermineHttpsPort(logger, routeId, null);
+        }
+
+        public static void RedirectingToHttps(ILogger logger, string? routeId, string redirectUrl)
+        {
+            _redirectingToHttps(logger, routeId, redirectUrl, null);
+        }
+
+        public static void HttpsPortLoadedFromConfiguration(ILogger logger, int port)
+        {
+            _httpsPortLoadedFromConfiguration(logger, port, null);
+        }
+
+        public static void ServerAddressesFeatureNotAvailable(ILogger logger)
+        {
+            _serverAddressesFeatureNotAvailable(logger, null);
+        }
+
+        public static void HttpsPortDiscoveredFromServerAddresses(ILogger logger, int port)
+        {
+            _httpsPortDiscoveredFromServerAddresses(logger, port, null);
+        }
+
+        public static void FailedToDetermineHttpsPortGeneral(ILogger logger)
+        {
+            _failedToDetermineHttpsPortGeneral(logger, null);
+        }
+    }
+}

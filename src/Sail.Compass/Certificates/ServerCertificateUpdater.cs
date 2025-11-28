@@ -28,8 +28,8 @@ internal sealed class ServerCertificateUpdater : IHostedService, IDisposable
         var subscription = _certificateStream
             .Subscribe(
                 async certificates => await UpdateCertificates(certificates),
-                ex => _logger.LogError(ex, "Error in certificate stream"),
-                () => _logger.LogInformation("Certificate stream completed"));
+                ex => Log.CertificateStreamError(_logger, ex),
+                () => Log.CertificateStreamCompleted(_logger));
 
         _subscriptions.Add(subscription);
 
@@ -46,18 +46,61 @@ internal sealed class ServerCertificateUpdater : IHostedService, IDisposable
     {
         try
         {
-            _logger.LogInformation("Updating certificates, count: {Count}", certificates.Count);
+            Log.UpdatingCertificates(_logger, certificates.Count);
             await _certificateSelector.UpdateAsync(certificates, CancellationToken.None);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to update certificates");
+            Log.UpdateCertificatesFailed(_logger, ex);
         }
     }
 
     public void Dispose()
     {
         _subscriptions?.Dispose();
+    }
+
+    private static class Log
+    {
+        private static readonly Action<ILogger, Exception?> _certificateStreamError = LoggerMessage.Define(
+            LogLevel.Error,
+            new EventId(1, nameof(CertificateStreamError)),
+            "Error in certificate stream");
+
+        private static readonly Action<ILogger, Exception?> _certificateStreamCompleted = LoggerMessage.Define(
+            LogLevel.Information,
+            new EventId(2, nameof(CertificateStreamCompleted)),
+            "Certificate stream completed");
+
+        private static readonly Action<ILogger, int, Exception?> _updatingCertificates = LoggerMessage.Define<int>(
+            LogLevel.Information,
+            new EventId(3, nameof(UpdatingCertificates)),
+            "Updating certificates, count: {Count}");
+
+        private static readonly Action<ILogger, Exception?> _updateCertificatesFailed = LoggerMessage.Define(
+            LogLevel.Error,
+            new EventId(4, nameof(UpdateCertificatesFailed)),
+            "Failed to update certificates");
+
+        public static void CertificateStreamError(ILogger logger, Exception exception)
+        {
+            _certificateStreamError(logger, exception);
+        }
+
+        public static void CertificateStreamCompleted(ILogger logger)
+        {
+            _certificateStreamCompleted(logger, null);
+        }
+
+        public static void UpdatingCertificates(ILogger logger, int count)
+        {
+            _updatingCertificates(logger, count, null);
+        }
+
+        public static void UpdateCertificatesFailed(ILogger logger, Exception exception)
+        {
+            _updateCertificatesFailed(logger, exception);
+        }
     }
 }
 

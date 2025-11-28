@@ -37,7 +37,7 @@ public class RetryMiddleware
 
         if (policy is null)
         {
-            _logger.LogWarning("Retry policy not found: {PolicyName}", policyName);
+            Log.RetryPolicyNotFound(_logger, policyName!);
             return _next(context);
         }
 
@@ -79,9 +79,7 @@ public class RetryMiddleware
 
         if (healthyDestinations.Count == 0)
         {
-            _logger.LogWarning(
-                "No healthy destinations available for retry. Route: {RouteId}",
-                reverseProxyFeature.Route.Config.RouteId);
+            Log.NoHealthyDestinations(_logger, reverseProxyFeature.Route.Config.RouteId);
             return;
         }
 
@@ -106,5 +104,27 @@ public class RetryMiddleware
             throw new RetryableHttpException(statusCode);
         }
     }
-}
 
+    private static class Log
+    {
+        private static readonly Action<ILogger, string, Exception?> _retryPolicyNotFound = LoggerMessage.Define<string>(
+            LogLevel.Warning,
+            new EventId(1, nameof(RetryPolicyNotFound)),
+            "Retry policy not found: {PolicyName}");
+
+        private static readonly Action<ILogger, string, Exception?> _noHealthyDestinations = LoggerMessage.Define<string>(
+            LogLevel.Warning,
+            new EventId(2, nameof(NoHealthyDestinations)),
+            "No healthy destinations available for retry. Route: {RouteId}");
+
+        public static void RetryPolicyNotFound(ILogger logger, string policyName)
+        {
+            _retryPolicyNotFound(logger, policyName, null);
+        }
+
+        public static void NoHealthyDestinations(ILogger logger, string routeId)
+        {
+            _noHealthyDestinations(logger, routeId, null);
+        }
+    }
+}

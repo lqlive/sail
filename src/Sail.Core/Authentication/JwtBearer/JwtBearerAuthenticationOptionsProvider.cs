@@ -42,7 +42,7 @@ public class JwtBearerAuthenticationOptionsProvider
             _schemeProvider.RemoveScheme(schemeName);
             _optionsCache.TryRemove(schemeName);
             _authorizationPolicyProvider.RemovePolicy(schemeName);
-            _logger.LogInformation("Removed JWT Bearer scheme and authorization policy: {SchemeName}", schemeName);
+            Log.RemovedScheme(_logger, schemeName);
         }
 
         foreach (var (name, config) in configurations)
@@ -54,12 +54,12 @@ public class JwtBearerAuthenticationOptionsProvider
                     name,
                     typeof(JwtBearerHandler)
                 ));
-                _logger.LogInformation("Added JWT Bearer scheme: {SchemeName}", name);
+                Log.AddedScheme(_logger, name);
             }
             else
             {
                 _optionsCache.TryRemove(name);
-                _logger.LogInformation("Updated JWT Bearer scheme: {SchemeName}", name);
+                Log.UpdatedScheme(_logger, name);
             }
 
             var options = new JwtBearerOptions
@@ -87,7 +87,49 @@ public class JwtBearerAuthenticationOptionsProvider
             _authorizationPolicyProvider.AddOrUpdatePolicy(name, name);
         }
 
-        _logger.LogInformation("JWT Bearer schemes updated. Total: {Count}", configurations.Count);
+        Log.SchemesUpdated(_logger, configurations.Count);
+    }
+
+    private static class Log
+    {
+        private static readonly Action<ILogger, string, Exception?> _removedScheme = LoggerMessage.Define<string>(
+            LogLevel.Information,
+            new EventId(1, nameof(RemovedScheme)),
+            "Removed JWT Bearer scheme and authorization policy: {SchemeName}");
+
+        private static readonly Action<ILogger, string, Exception?> _addedScheme = LoggerMessage.Define<string>(
+            LogLevel.Information,
+            new EventId(2, nameof(AddedScheme)),
+            "Added JWT Bearer scheme: {SchemeName}");
+
+        private static readonly Action<ILogger, string, Exception?> _updatedScheme = LoggerMessage.Define<string>(
+            LogLevel.Information,
+            new EventId(3, nameof(UpdatedScheme)),
+            "Updated JWT Bearer scheme: {SchemeName}");
+
+        private static readonly Action<ILogger, int, Exception?> _schemesUpdated = LoggerMessage.Define<int>(
+            LogLevel.Information,
+            new EventId(4, nameof(SchemesUpdated)),
+            "JWT Bearer schemes updated. Total: {Count}");
+
+        public static void RemovedScheme(ILogger logger, string schemeName)
+        {
+            _removedScheme(logger, schemeName, null);
+        }
+
+        public static void AddedScheme(ILogger logger, string schemeName)
+        {
+            _addedScheme(logger, schemeName, null);
+        }
+
+        public static void UpdatedScheme(ILogger logger, string schemeName)
+        {
+            _updatedScheme(logger, schemeName, null);
+        }
+
+        public static void SchemesUpdated(ILogger logger, int count)
+        {
+            _schemesUpdated(logger, count, null);
+        }
     }
 }
-

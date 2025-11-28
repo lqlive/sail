@@ -27,19 +27,19 @@ internal sealed class AuthenticationPolicyUpdater : IDisposable
         var subscription = policyStream
             .Subscribe(
                 async policies => await UpdateAuthenticationPolicies(policies),
-                ex => _logger.LogError(ex, "Error in authentication policy stream"),
-                () => _logger.LogInformation("Authentication policy stream completed"));
+                ex => Log.AuthenticationPolicyStreamError(_logger, ex),
+                () => Log.AuthenticationPolicyStreamCompleted(_logger));
 
         _subscriptions.Add(subscription);
         
-        _logger.LogInformation("AuthenticationPolicyUpdater initialized and subscribed to policy stream");
+        Log.AuthenticationPolicyUpdaterInitialized(_logger);
     }
 
     private async Task UpdateAuthenticationPolicies(IReadOnlyList<AuthenticationPolicyConfig> policies)
     {
         try
         {
-            _logger.LogInformation("Updating authentication policies, count: {Count}", policies.Count);
+            Log.UpdatingAuthenticationPolicies(_logger, policies.Count);
 
             var jwtBearerConfigs = policies
                 .Where(p => p.Type == AuthenticationSchemeType.JwtBearer && p.JwtBearer != null)
@@ -54,13 +54,66 @@ internal sealed class AuthenticationPolicyUpdater : IDisposable
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to update authentication policies");
+            Log.UpdateAuthenticationPoliciesFailed(_logger, ex);
         }
     }
 
     public void Dispose()
     {
         _subscriptions?.Dispose();
+    }
+
+    private static class Log
+    {
+        private static readonly Action<ILogger, Exception?> _authenticationPolicyStreamError = LoggerMessage.Define(
+            LogLevel.Error,
+            new EventId(1, nameof(AuthenticationPolicyStreamError)),
+            "Error in authentication policy stream");
+
+        private static readonly Action<ILogger, Exception?> _authenticationPolicyStreamCompleted = LoggerMessage.Define(
+            LogLevel.Information,
+            new EventId(2, nameof(AuthenticationPolicyStreamCompleted)),
+            "Authentication policy stream completed");
+
+        private static readonly Action<ILogger, Exception?> _authenticationPolicyUpdaterInitialized = LoggerMessage.Define(
+            LogLevel.Information,
+            new EventId(3, nameof(AuthenticationPolicyUpdaterInitialized)),
+            "AuthenticationPolicyUpdater initialized and subscribed to policy stream");
+
+        private static readonly Action<ILogger, int, Exception?> _updatingAuthenticationPolicies = LoggerMessage.Define<int>(
+            LogLevel.Information,
+            new EventId(4, nameof(UpdatingAuthenticationPolicies)),
+            "Updating authentication policies, count: {Count}");
+
+        private static readonly Action<ILogger, Exception?> _updateAuthenticationPoliciesFailed = LoggerMessage.Define(
+            LogLevel.Error,
+            new EventId(5, nameof(UpdateAuthenticationPoliciesFailed)),
+            "Failed to update authentication policies");
+
+        public static void AuthenticationPolicyStreamError(ILogger logger, Exception exception)
+        {
+            _authenticationPolicyStreamError(logger, exception);
+        }
+
+        public static void AuthenticationPolicyStreamCompleted(ILogger logger)
+        {
+            _authenticationPolicyStreamCompleted(logger, null);
+        }
+
+        public static void AuthenticationPolicyUpdaterInitialized(ILogger logger)
+        {
+            _authenticationPolicyUpdaterInitialized(logger, null);
+        }
+
+        public static void UpdatingAuthenticationPolicies(ILogger logger, int count)
+        {
+            _updatingAuthenticationPolicies(logger, count, null);
+        }
+
+        public static void UpdateAuthenticationPoliciesFailed(ILogger logger, Exception exception)
+        {
+            _updateAuthenticationPoliciesFailed(logger, exception);
+        }
     }
 }
 
