@@ -1,5 +1,6 @@
 using FluentValidation;
 using Sail.Cluster.Models;
+using Sail.Cluster.Errors;
 
 namespace Sail.Cluster.Validators;
 
@@ -10,7 +11,7 @@ public class PassiveHealthCheckRequestValidator : AbstractValidator<PassiveHealt
         RuleFor(x => x.ReactivationPeriod)
             .GreaterThan(TimeSpan.Zero)
             .When(x => x.ReactivationPeriod.HasValue)
-            .WithMessage("Passive health check reactivation period must be greater than zero");
+            .WithMessage(PassiveHealthCheckErrors.ReactivationPeriodInvalid.Description)
+            .WithErrorCode(PassiveHealthCheckErrors.ReactivationPeriodInvalid.Code);
     }
 }
-

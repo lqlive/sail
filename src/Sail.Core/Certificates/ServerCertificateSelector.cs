@@ -28,8 +28,7 @@ public class ServerCertificateSelector(
 
     public X509Certificate2 GetCertificate(ConnectionContext connectionContext, string domainName)
     {
-        _logger.LogDebug("ConnectionId: '{ConnectionId}', SNI hostname: '{HostName}'",
-            connectionContext?.ConnectionId, domainName);
+        Log.CertificateRequested(_logger, connectionContext?.ConnectionId, domainName);
 
         if (string.IsNullOrEmpty(domainName))
         {
@@ -39,7 +38,7 @@ public class ServerCertificateSelector(
         var certificates = _certificates;
         if (certificates.TryGetValue(domainName, out var certificate))
         {
-            _logger.LogDebug("Exact match found for hostname: '{HostName}'", domainName);
+            Log.ExactMatchFound(_logger, domainName);
             return certificate;
         }
 
@@ -53,15 +52,13 @@ public class ServerCertificateSelector(
             {
                 if (MemoryExtensions.Equals(domainSpan, kvp.Key.AsSpan(), StringComparison.OrdinalIgnoreCase))
                 {
-                    _logger.LogDebug("Wildcard match found for hostname: '{HostName}' (*.{Domain})",
-                        domainName, kvp.Key);
+                    Log.WildcardMatchFound(_logger, domainName, kvp.Key);
                     return kvp.Value;
                 }
             }
         }
 
-        _logger.LogWarning("No certificate found for hostname: '{HostName}', using default certificate",
-            domainName);
+        Log.NoCertificateFound(_logger, domainName);
         return GetDefaultCertificate();
     }
 
@@ -83,20 +80,20 @@ public class ServerCertificateSelector(
                     var domain = config.HostName.AsSpan(2).ToString();
                     if (newWildcardCertificates.TryAdd(domain, cert))
                     {
-                        _logger.LogInformation("Loaded wildcard certificate for domain: *.{Domain}", domain);
+                        Log.LoadedWildcardCertificate(_logger, domain);
                     }
                 }
                 else
                 {
                     if (newCertificates.TryAdd(config.HostName, cert))
                     {
-                        _logger.LogInformation("Loaded certificate for hostname: {HostName}", config.HostName);
+                        Log.LoadedCertificate(_logger, config.HostName);
                     }
                 }
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Failed to load certificate for hostname: {HostName}", config.HostName);
+                Log.FailedToLoadCertificate(_logger, config.HostName, ex);
             }
         }
 
@@ -108,13 +105,12 @@ public class ServerCertificateSelector(
 
         if (!changed)
         {
-            _logger.LogDebug("Certificates unchanged, skipping update");
+            Log.CertificatesUnchanged(_logger);
             DisposeUnusedCertificates(loadedCerts);
             return Task.CompletedTask;
         }
 
-        _logger.LogInformation("Certificates changed. Applying new bindings for {ExactCount} exact names, {WildcardCount} wildcard names",
-            newCertificates.Count, newWildcardCertificates.Count);
+        Log.CertificatesChanged(_logger, newCertificates.Count, newWildcardCertificates.Count);
 
         _certificates = newCertificates;
         _wildcardCertificates = newWildcardCertificates;
@@ -144,12 +140,12 @@ public class ServerCertificateSelector(
         try
         {
             _defaultCertificate = LoadCertificateFromPemFile(_options.DefaultPath, _options.DefaultKeyPath);
-            _logger.LogInformation("Loaded default certificate from: {Path}", _options.DefaultPath);
+            Log.LoadedDefaultCertificate(_logger, _options.DefaultPath);
             return _defaultCertificate;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to load default certificate from: {Path}", _options.DefaultPath);
+            Log.FailedToLoadDefaultCertificate(_logger, _options.DefaultPath, ex);
             throw;
         }
     }
@@ -217,8 +213,130 @@ public class ServerCertificateSelector(
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(ex, "Error disposing certificate with thumbprint: {Thumbprint}",
-                certificate.Thumbprint);
+            Log.ErrorDisposingCertificate(_logger, certificate.Thumbprint, ex);
+        }
+    }
+
+    private static class Log
+    {
+        private static readonly Action<ILogger, string?, string?, Exception?> _certificateRequested = LoggerMessage.Define<string?, string?>(
+            LogLevel.Debug,
+            new EventId(1, nameof(CertificateRequested)),
+            "ConnectionId: '{ConnectionId}', SNI hostname: '{HostName}'");
+
+        private static readonly Action<ILogger, string, Exception?> _exactMatchFound = LoggerMessage.Define<string>(
+            LogLevel.Debug,
+            new EventId(2, nameof(ExactMatchFound)),
+            "Exact match found for hostname: '{HostName}'");
+
+        private static readonly Action<ILogger, string, string, Exception?> _wildcardMatchFound = LoggerMessage.Define<string, string>(
+            LogLevel.Debug,
+            new EventId(3, nameof(WildcardMatchFound)),
+            "Wildcard match found for hostname: '{HostName}' (*.{Domain})");
+
+        private static readonly Action<ILogger, string, Exception?> _noCertificateFound = LoggerMessage.Define<string>(
+            LogLevel.Warning,
+            new EventId(4, nameof(NoCertificateFound)),
+            "No certificate found for hostname: '{HostName}', using default certificate");
+
+        private static readonly Action<ILogger, string, Exception?> _loadedWildcardCertificate = LoggerMessage.Define<string>(
+            LogLevel.Information,
+            new EventId(5, nameof(LoadedWildcardCertificate)),
+            "Loaded wildcard certificate for domain: *.{Domain}");
+
+        private static readonly Action<ILogger, string, Exception?> _loadedCertificate = LoggerMessage.Define<string>(
+            LogLevel.Information,
+            new EventId(6, nameof(LoadedCertificate)),
+            "Loaded certificate for hostname: {HostName}");
+
+        private static readonly Action<ILogger, string, Exception?> _failedToLoadCertificate = LoggerMessage.Define<string>(
+            LogLevel.Error,
+            new EventId(7, nameof(FailedToLoadCertificate)),
+            "Failed to load certificate for hostname: {HostName}");
+
+        private static readonly Action<ILogger, Exception?> _certificatesUnchanged = LoggerMessage.Define(
+            LogLevel.Debug,
+            new EventId(8, nameof(CertificatesUnchanged)),
+            "Certificates unchanged, skipping update");
+
+        private static readonly Action<ILogger, int, int, Exception?> _certificatesChanged = LoggerMessage.Define<int, int>(
+            LogLevel.Information,
+            new EventId(9, nameof(CertificatesChanged)),
+            "Certificates changed. Applying new bindings for {ExactCount} exact names, {WildcardCount} wildcard names");
+
+        private static readonly Action<ILogger, string, Exception?> _loadedDefaultCertificate = LoggerMessage.Define<string>(
+            LogLevel.Information,
+            new EventId(10, nameof(LoadedDefaultCertificate)),
+            "Loaded default certificate from: {Path}");
+
+        private static readonly Action<ILogger, string, Exception?> _failedToLoadDefaultCertificate = LoggerMessage.Define<string>(
+            LogLevel.Error,
+            new EventId(11, nameof(FailedToLoadDefaultCertificate)),
+            "Failed to load default certificate from: {Path}");
+
+        private static readonly Action<ILogger, string, Exception?> _errorDisposingCertificate = LoggerMessage.Define<string>(
+            LogLevel.Warning,
+            new EventId(12, nameof(ErrorDisposingCertificate)),
+            "Error disposing certificate with thumbprint: {Thumbprint}");
+
+        public static void CertificateRequested(ILogger logger, string? connectionId, string? hostName)
+        {
+            _certificateRequested(logger, connectionId, hostName, null);
+        }
+
+        public static void ExactMatchFound(ILogger logger, string hostName)
+        {
+            _exactMatchFound(logger, hostName, null);
+        }
+
+        public static void WildcardMatchFound(ILogger logger, string hostName, string domain)
+        {
+            _wildcardMatchFound(logger, hostName, domain, null);
+        }
+
+        public static void NoCertificateFound(ILogger logger, string hostName)
+        {
+            _noCertificateFound(logger, hostName, null);
+        }
+
+        public static void LoadedWildcardCertificate(ILogger logger, string domain)
+        {
+            _loadedWildcardCertificate(logger, domain, null);
+        }
+
+        public static void LoadedCertificate(ILogger logger, string hostName)
+        {
+            _loadedCertificate(logger, hostName, null);
+        }
+
+        public static void FailedToLoadCertificate(ILogger logger, string hostName, Exception exception)
+        {
+            _failedToLoadCertificate(logger, hostName, exception);
+        }
+
+        public static void CertificatesUnchanged(ILogger logger)
+        {
+            _certificatesUnchanged(logger, null);
+        }
+
+        public static void CertificatesChanged(ILogger logger, int exactCount, int wildcardCount)
+        {
+            _certificatesChanged(logger, exactCount, wildcardCount, null);
+        }
+
+        public static void LoadedDefaultCertificate(ILogger logger, string path)
+        {
+            _loadedDefaultCertificate(logger, path, null);
+        }
+
+        public static void FailedToLoadDefaultCertificate(ILogger logger, string path, Exception exception)
+        {
+            _failedToLoadDefaultCertificate(logger, path, exception);
+        }
+
+        public static void ErrorDisposingCertificate(ILogger logger, string thumbprint, Exception exception)
+        {
+            _errorDisposingCertificate(logger, thumbprint, exception);
         }
     }
 }

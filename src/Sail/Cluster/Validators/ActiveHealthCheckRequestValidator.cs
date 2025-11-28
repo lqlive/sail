@@ -1,5 +1,6 @@
 using FluentValidation;
 using Sail.Cluster.Models;
+using Sail.Cluster.Errors;
 
 namespace Sail.Cluster.Validators;
 
@@ -10,17 +11,19 @@ public class ActiveHealthCheckRequestValidator : AbstractValidator<ActiveHealthC
         RuleFor(x => x.Interval)
             .GreaterThan(TimeSpan.Zero)
             .When(x => x.Interval.HasValue)
-            .WithMessage("Active health check interval must be greater than zero");
+            .WithMessage(ActiveHealthCheckErrors.IntervalInvalid.Description)
+            .WithErrorCode(ActiveHealthCheckErrors.IntervalInvalid.Code);
 
         RuleFor(x => x.Timeout)
             .GreaterThan(TimeSpan.Zero)
             .When(x => x.Timeout.HasValue)
-            .WithMessage("Active health check timeout must be greater than zero");
+            .WithMessage(ActiveHealthCheckErrors.TimeoutInvalid.Description)
+            .WithErrorCode(ActiveHealthCheckErrors.TimeoutInvalid.Code);
 
         RuleFor(x => x.Path)
             .Must(path => string.IsNullOrEmpty(path) || path.StartsWith('/'))
             .When(x => !string.IsNullOrEmpty(x.Path))
-            .WithMessage("Active health check path must start with '/'");
+            .WithMessage(ActiveHealthCheckErrors.PathInvalid.Description)
+            .WithErrorCode(ActiveHealthCheckErrors.PathInvalid.Code);
     }
 }
-

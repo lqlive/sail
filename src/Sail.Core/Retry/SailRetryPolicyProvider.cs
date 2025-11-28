@@ -24,11 +24,11 @@ public class SailRetryPolicyProvider : IRetryPolicyProvider
 
         if (_policies.TryGetValue(key, out var policy))
         {
-            _logger.LogDebug("Retry policy found: {PolicyName}", key);
+            Log.PolicyFound(_logger, key);
             return policy;
         }
 
-        _logger.LogWarning("Retry policy not found: {PolicyName}", key);
+        Log.PolicyNotFound(_logger, key);
         return null;
     }
 
@@ -45,21 +45,20 @@ public class SailRetryPolicyProvider : IRetryPolicyProvider
 
                 if (newPolicies.TryAdd(config.Name, policy))
                 {
-                    _logger.LogInformation("Loaded retry policy: {PolicyName}, MaxRetryAttempts: {MaxRetryAttempts}, BackoffType: {BackoffType}",
-                        config.Name, config.MaxRetryAttempts, config.UseExponentialBackoff ? "Exponential" : "Linear");
+                    Log.LoadedPolicy(_logger, config.Name, config.MaxRetryAttempts, config.UseExponentialBackoff);
                 }
                 else
                 {
-                    _logger.LogWarning("Duplicate retry policy name: {PolicyName}", config.Name);
+                    Log.DuplicatePolicyName(_logger, config.Name);
                 }
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Failed to load retry policy: {PolicyName}", config.Name);
+                Log.FailedToLoadPolicy(_logger, config.Name, ex);
             }
         }
 
-        _logger.LogInformation("Retry policies changed. Applying {Count} policies", newPolicies.Count);
+        Log.PoliciesChanged(_logger, newPolicies.Count);
         _policies = newPolicies;
 
         return Task.CompletedTask;
@@ -75,8 +74,7 @@ public class SailRetryPolicyProvider : IRetryPolicyProvider
             ShouldHandle = new PredicateBuilder().Handle<HttpRequestException>(),
             OnRetry = args =>
             {
-                _logger.LogDebug("Retry attempt {AttemptNumber} after {Delay}ms",
-                    args.AttemptNumber + 1, args.RetryDelay.TotalMilliseconds);
+                Log.RetryAttempt(_logger, args.AttemptNumber + 1, args.RetryDelay.TotalMilliseconds);
 
                 if (args.Context.Properties.TryGetValue(RetryKeys.OnRetryCallback, out var callback))
                 {
@@ -88,5 +86,78 @@ public class SailRetryPolicyProvider : IRetryPolicyProvider
         };
 
         return new ResiliencePipelineBuilder().AddRetry(retryStrategyOptions).Build();
+    }
+
+    private static class Log
+    {
+        private static readonly Action<ILogger, string, Exception?> _policyFound = LoggerMessage.Define<string>(
+            LogLevel.Debug,
+            new EventId(1, nameof(PolicyFound)),
+            "Retry policy found: {PolicyName}");
+
+        private static readonly Action<ILogger, string, Exception?> _policyNotFound = LoggerMessage.Define<string>(
+            LogLevel.Warning,
+            new EventId(2, nameof(PolicyNotFound)),
+            "Retry policy not found: {PolicyName}");
+
+        private static readonly Action<ILogger, string, int, bool, Exception?> _loadedPolicy = LoggerMessage.Define<string, int, bool>(
+            LogLevel.Information,
+            new EventId(3, nameof(LoadedPolicy)),
+            "Loaded retry policy: {PolicyName}, MaxRetryAttempts: {MaxRetryAttempts}, BackoffType: {BackoffType}");
+
+        private static readonly Action<ILogger, string, Exception?> _duplicatePolicyName = LoggerMessage.Define<string>(
+            LogLevel.Warning,
+            new EventId(4, nameof(DuplicatePolicyName)),
+            "Duplicate retry policy name: {PolicyName}");
+
+        private static readonly Action<ILogger, string, Exception?> _failedToLoadPolicy = LoggerMessage.Define<string>(
+            LogLevel.Error,
+            new EventId(5, nameof(FailedToLoadPolicy)),
+            "Failed to load retry policy: {PolicyName}");
+
+        private static readonly Action<ILogger, int, Exception?> _policiesChanged = LoggerMessage.Define<int>(
+            LogLevel.Information,
+            new EventId(6, nameof(PoliciesChanged)),
+            "Retry policies changed. Applying {Count} policies");
+
+        private static readonly Action<ILogger, int, double, Exception?> _retryAttempt = LoggerMessage.Define<int, double>(
+            LogLevel.Debug,
+            new EventId(7, nameof(RetryAttempt)),
+            "Retry attempt {AttemptNumber} after {Delay}ms");
+
+        public static void PolicyFound(ILogger logger, string policyName)
+        {
+            _policyFound(logger, policyName, null);
+        }
+
+        public static void PolicyNotFound(ILogger logger, string policyName)
+        {
+            _policyNotFound(logger, policyName, null);
+        }
+
+        public static void LoadedPolicy(ILogger logger, string policyName, int maxRetryAttempts, bool useExponentialBackoff)
+        {
+            _loadedPolicy(logger, policyName, maxRetryAttempts, useExponentialBackoff, null);
+        }
+
+        public static void DuplicatePolicyName(ILogger logger, string policyName)
+        {
+            _duplicatePolicyName(logger, policyName, null);
+        }
+
+        public static void FailedToLoadPolicy(ILogger logger, string policyName, Exception exception)
+        {
+            _failedToLoadPolicy(logger, policyName, exception);
+        }
+
+        public static void PoliciesChanged(ILogger logger, int count)
+        {
+            _policiesChanged(logger, count, null);
+        }
+
+        public static void RetryAttempt(ILogger logger, int attemptNumber, double delay)
+        {
+            _retryAttempt(logger, attemptNumber, delay, null);
+        }
     }
 }

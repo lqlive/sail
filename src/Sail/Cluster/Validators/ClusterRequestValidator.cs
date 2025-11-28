@@ -1,5 +1,6 @@
 using FluentValidation;
 using Sail.Cluster.Models;
+using Sail.Cluster.Errors;
 
 namespace Sail.Cluster.Validators;
 
@@ -9,24 +10,30 @@ public class ClusterRequestValidator : AbstractValidator<ClusterRequest>
     {
         RuleFor(x => x.Name)
             .NotEmpty()
-            .WithMessage("Cluster name is required")
+            .WithMessage(ClusterErrors.NameRequired.Description)
+            .WithErrorCode(ClusterErrors.NameRequired.Code)
             .MaximumLength(200)
-            .WithMessage("Cluster name must not exceed 200 characters");
+            .WithMessage(ClusterErrors.NameTooLong.Description)
+            .WithErrorCode(ClusterErrors.NameTooLong.Code);
 
         RuleFor(x => x.ServiceName)
             .NotEmpty()
-            .WithMessage("Service name is required")
+            .WithMessage(ClusterErrors.ServiceNameRequired.Description)
+            .WithErrorCode(ClusterErrors.ServiceNameRequired.Code)
             .MaximumLength(200)
-            .WithMessage("Service name must not exceed 200 characters");
+            .WithMessage(ClusterErrors.ServiceNameTooLong.Description)
+            .WithErrorCode(ClusterErrors.ServiceNameTooLong.Code);
 
         RuleFor(x => x.ServiceDiscoveryType)
             .IsInEnum()
             .When(x => x.ServiceDiscoveryType.HasValue)
-            .WithMessage("Invalid service discovery type");
+            .WithMessage(ClusterErrors.ServiceDiscoveryTypeInvalid.Description)
+            .WithErrorCode(ClusterErrors.ServiceDiscoveryTypeInvalid.Code);
 
         RuleFor(x => x.LoadBalancingPolicy)
             .NotEmpty()
-            .WithMessage("Load balancing policy is required");
+            .WithMessage(ClusterErrors.LoadBalancingPolicyRequired.Description)
+            .WithErrorCode(ClusterErrors.LoadBalancingPolicyRequired.Code);
 
         RuleFor(x => x.HealthCheck)
             .SetValidator(new HealthCheckRequestValidator())
@@ -38,12 +45,13 @@ public class ClusterRequestValidator : AbstractValidator<ClusterRequest>
 
         RuleFor(x => x.Destinations)
             .NotNull()
-            .WithMessage("Destinations are required")
+            .WithMessage(ClusterErrors.DestinationsRequired.Description)
+            .WithErrorCode(ClusterErrors.DestinationsRequired.Code)
             .Must(destinations => destinations.Any())
-            .WithMessage("At least one destination must be provided");
+            .WithMessage(ClusterErrors.DestinationsEmpty.Description)
+            .WithErrorCode(ClusterErrors.DestinationsEmpty.Code);
 
         RuleForEach(x => x.Destinations)
             .SetValidator(new DestinationRequestValidator());
     }
 }
-

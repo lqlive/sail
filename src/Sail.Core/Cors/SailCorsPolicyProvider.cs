@@ -26,11 +26,11 @@ public class SailCorsPolicyProvider : ICorsPolicyProvider
 
         if (_policies.TryGetValue(policyName, out var policy))
         {
-            _logger.LogDebug("CORS policy found: {PolicyName}", policyName);
+            Log.PolicyFound(_logger, policyName);
             return Task.FromResult<CorsPolicy?>(policy);
         }
 
-        _logger.LogWarning("CORS policy not found: {PolicyName}", policyName);
+        Log.PolicyNotFound(_logger, policyName);
         return Task.FromResult<CorsPolicy?>(null);
     }
 
@@ -45,16 +45,16 @@ public class SailCorsPolicyProvider : ICorsPolicyProvider
                 var corsPolicy = BuildCorsPolicy(config);
                 if (newPolicies.TryAdd(config.Name, corsPolicy))
                 {
-                    _logger.LogInformation("Loaded CORS policy: {PolicyName}", config.Name);
+                    Log.LoadedPolicy(_logger, config.Name);
                 }
                 else
                 {
-                    _logger.LogWarning("Duplicate CORS policy name: {PolicyName}", config.Name);
+                    Log.DuplicatePolicyName(_logger, config.Name);
                 }
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Failed to build CORS policy: {PolicyName}", config.Name);
+                Log.FailedToBuildPolicy(_logger, config.Name, ex);
             }
         }
 
@@ -63,11 +63,11 @@ public class SailCorsPolicyProvider : ICorsPolicyProvider
 
         if (!changed)
         {
-            _logger.LogDebug("CORS policies unchanged, skipping update");
+            Log.PoliciesUnchanged(_logger);
             return Task.CompletedTask;
         }
 
-        _logger.LogInformation("CORS policies changed. Applying {Count} policies", newPolicies.Count);
+        Log.PoliciesChanged(_logger, newPolicies.Count);
         _policies = newPolicies;
 
         return Task.CompletedTask;
@@ -158,5 +158,77 @@ public class SailCorsPolicyProvider : ICorsPolicyProvider
             builder.WithExposedHeaders([.. exposeHeaders]);
         }
     }
-}
 
+    private static class Log
+    {
+        private static readonly Action<ILogger, string, Exception?> _policyFound = LoggerMessage.Define<string>(
+            LogLevel.Debug,
+            new EventId(1, nameof(PolicyFound)),
+            "CORS policy found: {PolicyName}");
+
+        private static readonly Action<ILogger, string, Exception?> _policyNotFound = LoggerMessage.Define<string>(
+            LogLevel.Warning,
+            new EventId(2, nameof(PolicyNotFound)),
+            "CORS policy not found: {PolicyName}");
+
+        private static readonly Action<ILogger, string, Exception?> _loadedPolicy = LoggerMessage.Define<string>(
+            LogLevel.Information,
+            new EventId(3, nameof(LoadedPolicy)),
+            "Loaded CORS policy: {PolicyName}");
+
+        private static readonly Action<ILogger, string, Exception?> _duplicatePolicyName = LoggerMessage.Define<string>(
+            LogLevel.Warning,
+            new EventId(4, nameof(DuplicatePolicyName)),
+            "Duplicate CORS policy name: {PolicyName}");
+
+        private static readonly Action<ILogger, string, Exception?> _failedToBuildPolicy = LoggerMessage.Define<string>(
+            LogLevel.Error,
+            new EventId(5, nameof(FailedToBuildPolicy)),
+            "Failed to build CORS policy: {PolicyName}");
+
+        private static readonly Action<ILogger, Exception?> _policiesUnchanged = LoggerMessage.Define(
+            LogLevel.Debug,
+            new EventId(6, nameof(PoliciesUnchanged)),
+            "CORS policies unchanged, skipping update");
+
+        private static readonly Action<ILogger, int, Exception?> _policiesChanged = LoggerMessage.Define<int>(
+            LogLevel.Information,
+            new EventId(7, nameof(PoliciesChanged)),
+            "CORS policies changed. Applying {Count} policies");
+
+        public static void PolicyFound(ILogger logger, string policyName)
+        {
+            _policyFound(logger, policyName, null);
+        }
+
+        public static void PolicyNotFound(ILogger logger, string policyName)
+        {
+            _policyNotFound(logger, policyName, null);
+        }
+
+        public static void LoadedPolicy(ILogger logger, string policyName)
+        {
+            _loadedPolicy(logger, policyName, null);
+        }
+
+        public static void DuplicatePolicyName(ILogger logger, string policyName)
+        {
+            _duplicatePolicyName(logger, policyName, null);
+        }
+
+        public static void FailedToBuildPolicy(ILogger logger, string policyName, Exception exception)
+        {
+            _failedToBuildPolicy(logger, policyName, exception);
+        }
+
+        public static void PoliciesUnchanged(ILogger logger)
+        {
+            _policiesUnchanged(logger, null);
+        }
+
+        public static void PoliciesChanged(ILogger logger, int count)
+        {
+            _policiesChanged(logger, count, null);
+        }
+    }
+}

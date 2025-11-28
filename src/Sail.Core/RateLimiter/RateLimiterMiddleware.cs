@@ -28,29 +28,27 @@ public class RateLimiterMiddleware
 
     public Task Invoke(HttpContext context)
     {
-        _logger.LogInformation("RateLimiterMiddleware invoked for path: {Path}", context.Request.Path);
+        Log.MiddlewareInvoked(_logger, context.Request.Path.Value);
 
         var endpoint = context.GetEndpoint();
-        _logger.LogInformation("Endpoint: {Endpoint}", endpoint?.DisplayName ?? "null");
+        Log.EndpointDetected(_logger, endpoint?.DisplayName);
 
         if (endpoint?.Metadata.GetMetadata<DisableRateLimitingAttribute>() is not null)
         {
-            _logger.LogInformation("Rate limiting disabled for this endpoint");
+            Log.RateLimitingDisabled(_logger);
             return _next(context);
         }
 
         var reverseProxyFeature = context.Features.Get<IReverseProxyFeature>();
-        _logger.LogInformation("IReverseProxyFeature found: {Found}, Route: {Route}",
-            reverseProxyFeature != null,
-            reverseProxyFeature?.Route?.Config?.RouteId ?? "null");
+        Log.ReverseProxyFeatureDetected(_logger, reverseProxyFeature != null, reverseProxyFeature?.Route?.Config?.RouteId);
 
         if (reverseProxyFeature?.Route.Config.Metadata?.ContainsKey("RateLimiterPolicy") == true)
         {
-            _logger.LogInformation("RateLimiterPolicy found in metadata");
+            Log.PolicyFoundInMetadata(_logger);
             return InvokeInternal(context);
         }
 
-        _logger.LogInformation("No rate limiter policy found, skipping");
+        Log.NoPolicyFound(_logger);
         return _next(context);
     }
 
@@ -65,7 +63,7 @@ public class RateLimiterMiddleware
             return;
         }
 
-        _logger.LogDebug("Using rate limiter policy from route metadata: {PolicyName}", policyName);
+        Log.UsingPolicy(_logger, policyName);
         await ApplyRateLimitAsync(context, policyName);
     }
 
@@ -75,7 +73,7 @@ public class RateLimiterMiddleware
 
         if (policy is null)
         {
-            _logger.LogWarning("Rate limiting policy not found: {PolicyName}", policyName);
+            Log.PolicyNotFound(_logger, policyName);
             await _next(context);
             return;
         }
@@ -89,12 +87,12 @@ public class RateLimiterMiddleware
 
             if (lease.IsAcquired)
             {
-                _logger.LogDebug("Rate limit lease acquired for policy: {PolicyName}", policyName);
+                Log.LeaseAcquired(_logger, policyName);
                 await _next(context);
             }
             else
             {
-                _logger.LogWarning("Rate limit exceeded for policy: {PolicyName}", policyName);
+                Log.RateLimitExceeded(_logger, policyName);
                 context.Response.StatusCode = _rejectionStatusCode;
 
                 if (lease.TryGetMetadata(MetadataName.RetryAfter, out var retryAfter))
@@ -107,7 +105,7 @@ public class RateLimiterMiddleware
         }
         catch (OperationCanceledException) when (context.RequestAborted.IsCancellationRequested)
         {
-            _logger.LogDebug("Request canceled while acquiring rate limit lease");
+            Log.RequestCanceled(_logger);
         }
         finally
         {
@@ -128,11 +126,132 @@ public class RateLimiterMiddleware
                 QueueLimit = policy.QueueLimit
             };
 
-            _logger.LogInformation(
-                "Created rate limiter for policy: {PolicyName}, PermitLimit: {PermitLimit}, Window: {Window}s, QueueLimit: {QueueLimit}",
-                policy.Name, policy.PermitLimit, policy.Window, policy.QueueLimit);
+            Log.CreatedLimiter(_logger, policy.Name, policy.PermitLimit, policy.Window, policy.QueueLimit);
 
             return new SlidingWindowRateLimiter(options);
         });
+    }
+
+    private static class Log
+    {
+        private static readonly Action<ILogger, string?, Exception?> _middlewareInvoked = LoggerMessage.Define<string?>(
+            LogLevel.Information,
+            new EventId(1, nameof(MiddlewareInvoked)),
+            "RateLimiterMiddleware invoked for path: {Path}");
+
+        private static readonly Action<ILogger, string?, Exception?> _endpointDetected = LoggerMessage.Define<string?>(
+            LogLevel.Information,
+            new EventId(2, nameof(EndpointDetected)),
+            "Endpoint: {Endpoint}");
+
+        private static readonly Action<ILogger, Exception?> _rateLimitingDisabled = LoggerMessage.Define(
+            LogLevel.Information,
+            new EventId(3, nameof(RateLimitingDisabled)),
+            "Rate limiting disabled for this endpoint");
+
+        private static readonly Action<ILogger, bool, string?, Exception?> _reverseProxyFeatureDetected = LoggerMessage.Define<bool, string?>(
+            LogLevel.Information,
+            new EventId(4, nameof(ReverseProxyFeatureDetected)),
+            "IReverseProxyFeature found: {Found}, Route: {Route}");
+
+        private static readonly Action<ILogger, Exception?> _policyFoundInMetadata = LoggerMessage.Define(
+            LogLevel.Information,
+            new EventId(5, nameof(PolicyFoundInMetadata)),
+            "RateLimiterPolicy found in metadata");
+
+        private static readonly Action<ILogger, Exception?> _noPolicyFound = LoggerMessage.Define(
+            LogLevel.Information,
+            new EventId(6, nameof(NoPolicyFound)),
+            "No rate limiter policy found, skipping");
+
+        private static readonly Action<ILogger, string, Exception?> _usingPolicy = LoggerMessage.Define<string>(
+            LogLevel.Debug,
+            new EventId(7, nameof(UsingPolicy)),
+            "Using rate limiter policy from route metadata: {PolicyName}");
+
+        private static readonly Action<ILogger, string, Exception?> _policyNotFound = LoggerMessage.Define<string>(
+            LogLevel.Warning,
+            new EventId(8, nameof(PolicyNotFound)),
+            "Rate limiting policy not found: {PolicyName}");
+
+        private static readonly Action<ILogger, string, Exception?> _leaseAcquired = LoggerMessage.Define<string>(
+            LogLevel.Debug,
+            new EventId(9, nameof(LeaseAcquired)),
+            "Rate limit lease acquired for policy: {PolicyName}");
+
+        private static readonly Action<ILogger, string, Exception?> _rateLimitExceeded = LoggerMessage.Define<string>(
+            LogLevel.Warning,
+            new EventId(10, nameof(RateLimitExceeded)),
+            "Rate limit exceeded for policy: {PolicyName}");
+
+        private static readonly Action<ILogger, Exception?> _requestCanceled = LoggerMessage.Define(
+            LogLevel.Debug,
+            new EventId(11, nameof(RequestCanceled)),
+            "Request canceled while acquiring rate limit lease");
+
+        private static readonly Action<ILogger, string, int, int, int, Exception?> _createdLimiter = LoggerMessage.Define<string, int, int, int>(
+            LogLevel.Information,
+            new EventId(12, nameof(CreatedLimiter)),
+            "Created rate limiter for policy: {PolicyName}, PermitLimit: {PermitLimit}, Window: {Window}s, QueueLimit: {QueueLimit}");
+
+        public static void MiddlewareInvoked(ILogger logger, string? path)
+        {
+            _middlewareInvoked(logger, path, null);
+        }
+
+        public static void EndpointDetected(ILogger logger, string? endpoint)
+        {
+            _endpointDetected(logger, endpoint ?? "null", null);
+        }
+
+        public static void RateLimitingDisabled(ILogger logger)
+        {
+            _rateLimitingDisabled(logger, null);
+        }
+
+        public static void ReverseProxyFeatureDetected(ILogger logger, bool found, string? route)
+        {
+            _reverseProxyFeatureDetected(logger, found, route ?? "null", null);
+        }
+
+        public static void PolicyFoundInMetadata(ILogger logger)
+        {
+            _policyFoundInMetadata(logger, null);
+        }
+
+        public static void NoPolicyFound(ILogger logger)
+        {
+            _noPolicyFound(logger, null);
+        }
+
+        public static void UsingPolicy(ILogger logger, string policyName)
+        {
+            _usingPolicy(logger, policyName, null);
+        }
+
+        public static void PolicyNotFound(ILogger logger, string policyName)
+        {
+            _policyNotFound(logger, policyName, null);
+        }
+
+        public static void LeaseAcquired(ILogger logger, string policyName)
+        {
+            _leaseAcquired(logger, policyName, null);
+        }
+
+        public static void RateLimitExceeded(ILogger logger, string policyName)
+        {
+            _rateLimitExceeded(logger, policyName, null);
+        }
+
+        public static void RequestCanceled(ILogger logger)
+        {
+            _requestCanceled(logger, null);
+        }
+
+        public static void CreatedLimiter(ILogger logger, string policyName, int permitLimit, int window, int queueLimit)
+        {
+            _createdLimiter(logger, policyName, permitLimit, window, queueLimit, null);
+        }
     }
 }

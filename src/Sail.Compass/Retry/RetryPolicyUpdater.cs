@@ -22,30 +22,83 @@ internal sealed class RetryPolicyUpdater : IDisposable
         var subscription = retryPolicyStream
             .Subscribe(
                 async policies => await UpdateRetryPolicies(policies),
-                ex => _logger.LogError(ex, "Error in Retry policy stream"),
-                () => _logger.LogInformation("Retry policy stream completed"));
+                ex => Log.RetryPolicyStreamError(_logger, ex),
+                () => Log.RetryPolicyStreamCompleted(_logger));
 
         _subscriptions.Add(subscription);
         
-        _logger.LogInformation("RetryPolicyUpdater initialized and subscribed to policy stream");
+        Log.RetryPolicyUpdaterInitialized(_logger);
     }
 
     private async Task UpdateRetryPolicies(IReadOnlyList<RetryPolicyConfig> policies)
     {
         try
         {
-            _logger.LogInformation("Updating Retry policies, count: {Count}", policies.Count);
+            Log.UpdatingRetryPolicies(_logger, policies.Count);
             await _retryPolicyProvider.UpdateAsync(policies, CancellationToken.None);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to update Retry policies");
+            Log.UpdateRetryPoliciesFailed(_logger, ex);
         }
     }
 
     public void Dispose()
     {
         _subscriptions?.Dispose();
+    }
+
+    private static class Log
+    {
+        private static readonly Action<ILogger, Exception?> _retryPolicyStreamError = LoggerMessage.Define(
+            LogLevel.Error,
+            new EventId(1, nameof(RetryPolicyStreamError)),
+            "Error in Retry policy stream");
+
+        private static readonly Action<ILogger, Exception?> _retryPolicyStreamCompleted = LoggerMessage.Define(
+            LogLevel.Information,
+            new EventId(2, nameof(RetryPolicyStreamCompleted)),
+            "Retry policy stream completed");
+
+        private static readonly Action<ILogger, Exception?> _retryPolicyUpdaterInitialized = LoggerMessage.Define(
+            LogLevel.Information,
+            new EventId(3, nameof(RetryPolicyUpdaterInitialized)),
+            "RetryPolicyUpdater initialized and subscribed to policy stream");
+
+        private static readonly Action<ILogger, int, Exception?> _updatingRetryPolicies = LoggerMessage.Define<int>(
+            LogLevel.Information,
+            new EventId(4, nameof(UpdatingRetryPolicies)),
+            "Updating Retry policies, count: {Count}");
+
+        private static readonly Action<ILogger, Exception?> _updateRetryPoliciesFailed = LoggerMessage.Define(
+            LogLevel.Error,
+            new EventId(5, nameof(UpdateRetryPoliciesFailed)),
+            "Failed to update Retry policies");
+
+        public static void RetryPolicyStreamError(ILogger logger, Exception exception)
+        {
+            _retryPolicyStreamError(logger, exception);
+        }
+
+        public static void RetryPolicyStreamCompleted(ILogger logger)
+        {
+            _retryPolicyStreamCompleted(logger, null);
+        }
+
+        public static void RetryPolicyUpdaterInitialized(ILogger logger)
+        {
+            _retryPolicyUpdaterInitialized(logger, null);
+        }
+
+        public static void UpdatingRetryPolicies(ILogger logger, int count)
+        {
+            _updatingRetryPolicies(logger, count, null);
+        }
+
+        public static void UpdateRetryPoliciesFailed(ILogger logger, Exception exception)
+        {
+            _updateRetryPoliciesFailed(logger, exception);
+        }
     }
 }
 

@@ -1,6 +1,7 @@
 using FluentValidation;
 using Sail.Core.Entities;
 using Sail.AuthenticationPolicy.Models;
+using Sail.AuthenticationPolicy.Errors;
 
 namespace Sail.AuthenticationPolicy.Validators;
 
@@ -10,32 +11,37 @@ public class AuthenticationPolicyRequestValidator : AbstractValidator<Authentica
     {
         RuleFor(x => x.Name)
             .NotEmpty()
-            .WithMessage("Authentication policy name is required")
+            .WithMessage(AuthenticationPolicyErrors.NameRequired.Description)
+            .WithErrorCode(AuthenticationPolicyErrors.NameRequired.Code)
             .MaximumLength(200)
-            .WithMessage("Authentication policy name must not exceed 200 characters");
+            .WithMessage(AuthenticationPolicyErrors.NameTooLong.Description)
+            .WithErrorCode(AuthenticationPolicyErrors.NameTooLong.Code);
 
         RuleFor(x => x.Type)
             .IsInEnum()
-            .WithMessage("Invalid authentication scheme type");
+            .WithMessage(AuthenticationPolicyErrors.TypeInvalid.Description)
+            .WithErrorCode(AuthenticationPolicyErrors.TypeInvalid.Code);
 
         RuleFor(x => x.JwtBearer)
             .NotNull()
             .When(x => x.Type == AuthenticationSchemeType.JwtBearer)
-            .WithMessage("JWT Bearer configuration is required when type is JwtBearer")
+            .WithMessage(AuthenticationPolicyErrors.JwtBearerConfigRequired.Description)
+            .WithErrorCode(AuthenticationPolicyErrors.JwtBearerConfigRequired.Code)
             .SetValidator(new JwtBearerConfigRequestValidator()!)
             .When(x => x.JwtBearer != null);
 
         RuleFor(x => x.OpenIdConnect)
             .NotNull()
             .When(x => x.Type == AuthenticationSchemeType.OpenIdConnect)
-            .WithMessage("OpenID Connect configuration is required when type is OpenIdConnect")
+            .WithMessage(AuthenticationPolicyErrors.OpenIdConnectConfigRequired.Description)
+            .WithErrorCode(AuthenticationPolicyErrors.OpenIdConnectConfigRequired.Code)
             .SetValidator(new OpenIdConnectConfigRequestValidator()!)
             .When(x => x.OpenIdConnect != null);
 
         RuleFor(x => x.Description)
             .MaximumLength(500)
             .When(x => !string.IsNullOrEmpty(x.Description))
-            .WithMessage("Description must not exceed 500 characters");
+            .WithMessage(AuthenticationPolicyErrors.DescriptionTooLong.Description)
+            .WithErrorCode(AuthenticationPolicyErrors.DescriptionTooLong.Code);
     }
 }
-
