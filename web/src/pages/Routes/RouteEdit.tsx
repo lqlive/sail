@@ -7,6 +7,7 @@ import { PolicySelect } from '../../components/PolicySelect';
 import { Select } from '../../components/Select';
 import { FormField } from '../../components/FormField';
 import { Checkbox } from '../../components/Checkbox';
+import { Alert } from '../../components/Alert';
 import { usePolicyOptions } from '../../hooks/usePolicyOptions';
 import { ClusterService } from '../../services/clusterService';
 
@@ -39,6 +40,7 @@ const RouteEdit: React.FC = () => {
   const [transformType, setTransformType] = useState('RequestHeader');
   const [transformKey, setTransformKey] = useState('');
   const [transformValue, setTransformValue] = useState('');
+  const [transformError, setTransformError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -170,29 +172,45 @@ const RouteEdit: React.FC = () => {
   };
 
   const addTransform = () => {
+    setTransformError(null);
     const newTransform: Record<string, string> = {};
     
     switch (transformType) {
       case 'RequestHeader':
-        if (!transformKey || !transformValue) return;
+        if (!transformKey || !transformValue) {
+          setTransformError('Please enter both header name and value');
+          return;
+        }
         newTransform['RequestHeader'] = transformKey;
         newTransform['Set'] = transformValue;
         break;
       case 'ResponseHeader':
-        if (!transformKey || !transformValue) return;
+        if (!transformKey || !transformValue) {
+          setTransformError('Please enter both header name and value');
+          return;
+        }
         newTransform['ResponseHeader'] = transformKey;
         newTransform['Set'] = transformValue;
         break;
       case 'PathPrefix':
-        if (!transformValue) return;
+        if (!transformValue) {
+          setTransformError('Please enter a path prefix');
+          return;
+        }
         newTransform['PathPrefix'] = transformValue;
         break;
       case 'PathRemovePrefix':
-        if (!transformValue) return;
+        if (!transformValue) {
+          setTransformError('Please enter a path prefix to remove');
+          return;
+        }
         newTransform['PathRemovePrefix'] = transformValue;
         break;
       case 'QueryParameter':
-        if (!transformKey || !transformValue) return;
+        if (!transformKey || !transformValue) {
+          setTransformError('Please enter both parameter name and value');
+          return;
+        }
         newTransform['QueryParameter'] = transformKey;
         newTransform['Set'] = transformValue;
         break;
@@ -595,6 +613,12 @@ const RouteEdit: React.FC = () => {
                 />
               </FormField>
             </div>
+
+            {transformError && (
+              <Alert type="error" className="col-span-full">
+                {transformError}
+              </Alert>
+            )}
 
             <div>
               <button
