@@ -845,14 +845,14 @@ const MiddlewareEdit: React.FC = () => {
         <div className="flex justify-end gap-3 pt-2">
           <Link
             to="/middlewares"
-            className="px-5 py-2.5 border border-gray-200 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors"
+            className="btn-secondary"
           >
             Cancel
           </Link>
           <button
             type="submit"
             disabled={saving}
-            className="inline-flex items-center px-5 py-2.5 border border-transparent rounded-lg text-sm font-medium text-white bg-black hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {saving ? (
               <>

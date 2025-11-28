@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { ChevronLeftIcon, CheckIcon, PlusIcon, XMarkIcon, KeyIcon, LockClosedIcon } from '@heroicons/react/24/outline';
+import { Checkbox } from '../../components/Checkbox';
 import type { AuthenticationSchemeType } from '../../types';
 import { AuthenticationPolicyService } from '../../services/authenticationPolicyService';
 
@@ -344,18 +345,11 @@ const AuthenticationPolicyEdit: React.FC = () => {
               )}
             </div>
 
-            <div className="flex items-center">
-              <input
-                type="checkbox"
-                id="enabled"
-                checked={formData.enabled}
-                onChange={(e) => setFormData(prev => ({ ...prev, enabled: e.target.checked }))}
-                className="h-4 w-4 text-gray-900 border-gray-300 rounded focus:ring-gray-400"
-              />
-              <label htmlFor="enabled" className="ml-2 text-sm text-gray-700">
-                Enable this policy
-              </label>
-            </div>
+            <Checkbox
+              checked={formData.enabled}
+              onChange={(checked) => setFormData(prev => ({ ...prev, enabled: checked }))}
+              label="Enable this policy"
+            />
           </div>
         </div>
 
@@ -501,78 +495,36 @@ const AuthenticationPolicyEdit: React.FC = () => {
                   Validation Options
                 </label>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  <div className="flex items-center">
-                    <input
-                      type="checkbox"
-                      id="jwtRequireHttpsMetadata"
-                      checked={formData.jwtRequireHttpsMetadata}
-                      onChange={(e) => setFormData(prev => ({ ...prev, jwtRequireHttpsMetadata: e.target.checked }))}
-                      className="h-4 w-4 text-gray-900 border-gray-300 rounded focus:ring-gray-400"
-                    />
-                    <label htmlFor="jwtRequireHttpsMetadata" className="ml-2 text-sm text-gray-700">
-                      Require HTTPS metadata
-                    </label>
-                  </div>
-                  <div className="flex items-center">
-                    <input
-                      type="checkbox"
-                      id="jwtSaveToken"
-                      checked={formData.jwtSaveToken}
-                      onChange={(e) => setFormData(prev => ({ ...prev, jwtSaveToken: e.target.checked }))}
-                      className="h-4 w-4 text-gray-900 border-gray-300 rounded focus:ring-gray-400"
-                    />
-                    <label htmlFor="jwtSaveToken" className="ml-2 text-sm text-gray-700">
-                      Save token
-                    </label>
-                  </div>
-                  <div className="flex items-center">
-                    <input
-                      type="checkbox"
-                      id="jwtValidateIssuer"
-                      checked={formData.jwtValidateIssuer}
-                      onChange={(e) => setFormData(prev => ({ ...prev, jwtValidateIssuer: e.target.checked }))}
-                      className="h-4 w-4 text-gray-900 border-gray-300 rounded focus:ring-gray-400"
-                    />
-                    <label htmlFor="jwtValidateIssuer" className="ml-2 text-sm text-gray-700">
-                      Validate issuer
-                    </label>
-                  </div>
-                  <div className="flex items-center">
-                    <input
-                      type="checkbox"
-                      id="jwtValidateAudience"
-                      checked={formData.jwtValidateAudience}
-                      onChange={(e) => setFormData(prev => ({ ...prev, jwtValidateAudience: e.target.checked }))}
-                      className="h-4 w-4 text-gray-900 border-gray-300 rounded focus:ring-gray-400"
-                    />
-                    <label htmlFor="jwtValidateAudience" className="ml-2 text-sm text-gray-700">
-                      Validate audience
-                    </label>
-                  </div>
-                  <div className="flex items-center">
-                    <input
-                      type="checkbox"
-                      id="jwtValidateLifetime"
-                      checked={formData.jwtValidateLifetime}
-                      onChange={(e) => setFormData(prev => ({ ...prev, jwtValidateLifetime: e.target.checked }))}
-                      className="h-4 w-4 text-gray-900 border-gray-300 rounded focus:ring-gray-400"
-                    />
-                    <label htmlFor="jwtValidateLifetime" className="ml-2 text-sm text-gray-700">
-                      Validate lifetime
-                    </label>
-                  </div>
-                  <div className="flex items-center">
-                    <input
-                      type="checkbox"
-                      id="jwtValidateIssuerSigningKey"
-                      checked={formData.jwtValidateIssuerSigningKey}
-                      onChange={(e) => setFormData(prev => ({ ...prev, jwtValidateIssuerSigningKey: e.target.checked }))}
-                      className="h-4 w-4 text-gray-900 border-gray-300 rounded focus:ring-gray-400"
-                    />
-                    <label htmlFor="jwtValidateIssuerSigningKey" className="ml-2 text-sm text-gray-700">
-                      Validate signing key
-                    </label>
-                  </div>
+                  <Checkbox
+                    checked={formData.jwtRequireHttpsMetadata}
+                    onChange={(checked) => setFormData(prev => ({ ...prev, jwtRequireHttpsMetadata: checked }))}
+                    label="Require HTTPS metadata"
+                  />
+                  <Checkbox
+                    checked={formData.jwtSaveToken}
+                    onChange={(checked) => setFormData(prev => ({ ...prev, jwtSaveToken: checked }))}
+                    label="Save token"
+                  />
+                  <Checkbox
+                    checked={formData.jwtValidateIssuer}
+                    onChange={(checked) => setFormData(prev => ({ ...prev, jwtValidateIssuer: checked }))}
+                    label="Validate issuer"
+                  />
+                  <Checkbox
+                    checked={formData.jwtValidateAudience}
+                    onChange={(checked) => setFormData(prev => ({ ...prev, jwtValidateAudience: checked }))}
+                    label="Validate audience"
+                  />
+                  <Checkbox
+                    checked={formData.jwtValidateLifetime}
+                    onChange={(checked) => setFormData(prev => ({ ...prev, jwtValidateLifetime: checked }))}
+                    label="Validate lifetime"
+                  />
+                  <Checkbox
+                    checked={formData.jwtValidateIssuerSigningKey}
+                    onChange={(checked) => setFormData(prev => ({ ...prev, jwtValidateIssuerSigningKey: checked }))}
+                    label="Validate signing key"
+                  />
                 </div>
               </div>
             </div>
@@ -713,41 +665,22 @@ const AuthenticationPolicyEdit: React.FC = () => {
                   Additional Options
                 </label>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  <div className="flex items-center">
-                    <input
-                      type="checkbox"
-                      id="oidcRequireHttpsMetadata"
-                      checked={formData.oidcRequireHttpsMetadata}
-                      onChange={(e) => setFormData(prev => ({ ...prev, oidcRequireHttpsMetadata: e.target.checked }))}
-                      className="h-4 w-4 text-gray-900 border-gray-300 rounded focus:ring-gray-400"
-                    />
-                    <label htmlFor="oidcRequireHttpsMetadata" className="ml-2 text-sm text-gray-700">
-                      Require HTTPS metadata
-                    </label>
-                  </div>
-                  <div className="flex items-center">
-                    <input
-                      type="checkbox"
-                      id="oidcSaveTokens"
-                      checked={formData.oidcSaveTokens}
-                      onChange={(e) => setFormData(prev => ({ ...prev, oidcSaveTokens: e.target.checked }))}
-                      className="h-4 w-4 text-gray-900 border-gray-300 rounded focus:ring-gray-400"
-                    />
-                    <label htmlFor="oidcSaveTokens" className="ml-2 text-sm text-gray-700">
-                      Save tokens
-                    </label>
-                  </div>
-                  <div className="flex items-center md:col-span-2">
-                    <input
-                      type="checkbox"
-                      id="oidcGetClaimsFromUserInfoEndpoint"
+                  <Checkbox
+                    checked={formData.oidcRequireHttpsMetadata}
+                    onChange={(checked) => setFormData(prev => ({ ...prev, oidcRequireHttpsMetadata: checked }))}
+                    label="Require HTTPS metadata"
+                  />
+                  <Checkbox
+                    checked={formData.oidcSaveTokens}
+                    onChange={(checked) => setFormData(prev => ({ ...prev, oidcSaveTokens: checked }))}
+                    label="Save tokens"
+                  />
+                  <div className="md:col-span-2">
+                    <Checkbox
                       checked={formData.oidcGetClaimsFromUserInfoEndpoint}
-                      onChange={(e) => setFormData(prev => ({ ...prev, oidcGetClaimsFromUserInfoEndpoint: e.target.checked }))}
-                      className="h-4 w-4 text-gray-900 border-gray-300 rounded focus:ring-gray-400"
+                      onChange={(checked) => setFormData(prev => ({ ...prev, oidcGetClaimsFromUserInfoEndpoint: checked }))}
+                      label="Get claims from user info endpoint"
                     />
-                    <label htmlFor="oidcGetClaimsFromUserInfoEndpoint" className="ml-2 text-sm text-gray-700">
-                      Get claims from user info endpoint
-                    </label>
                   </div>
                 </div>
               </div>
@@ -759,14 +692,14 @@ const AuthenticationPolicyEdit: React.FC = () => {
         <div className="flex justify-end gap-3 pt-2">
           <Link
             to="/authentication-policies"
-            className="px-5 py-2.5 border border-gray-200 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors"
+            className="btn-secondary"
           >
             Cancel
           </Link>
           <button
             type="submit"
             disabled={saving}
-            className="inline-flex items-center px-5 py-2.5 border border-transparent rounded-lg text-sm font-medium text-white bg-black hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {saving ? (
               <>

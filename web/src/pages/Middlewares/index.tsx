@@ -71,7 +71,7 @@ const Middlewares: React.FC = () => {
           </div>
           <Link 
             to="/middlewares/new" 
-            className="inline-flex items-center px-4 py-2 bg-black text-white text-sm font-medium rounded-lg hover:bg-gray-800 transition-colors"
+            className="btn-primary"
           >
             <PlusIcon className="h-4 w-4 mr-2" />
             Create Middleware
@@ -170,7 +170,7 @@ const Middlewares: React.FC = () => {
           <p className="text-sm text-gray-500 mb-4">Get started by creating your first middleware</p>
           <Link
             to="/middlewares/new"
-            className="inline-flex items-center px-4 py-2 bg-black text-white text-sm font-medium rounded-lg hover:bg-gray-800 transition-colors"
+            className="btn-primary"
           >
             <PlusIcon className="h-4 w-4 mr-2" />
             Create Middleware

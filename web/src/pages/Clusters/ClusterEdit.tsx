@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { ChevronLeftIcon, PlusIcon, XMarkIcon, CheckIcon } from '@heroicons/react/24/outline';
+import { Select } from '../../components/Select';
+import { FormField } from '../../components/FormField';
+import { Alert } from '../../components/Alert';
+import { Checkbox } from '../../components/Checkbox';
 import type { Destination } from '../../types';
 import { ClusterService } from '../../services/clusterService';
 
@@ -243,22 +247,22 @@ const ClusterEdit: React.FC = () => {
               />
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Load Balancing Policy
-              </label>
-              <select
+            <FormField
+              label="Load Balancing Policy"
+              hint="Algorithm used to distribute requests across destinations"
+            >
+              <Select
                 value={formData.loadBalancingPolicy}
-                onChange={(e) => setFormData({ ...formData, loadBalancingPolicy: e.target.value })}
-                className="block w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-gray-400 focus:ring-1 focus:ring-gray-400 transition-colors"
-              >
-                <option value="RoundRobin">Round Robin</option>
-                <option value="LeastRequests">Least Requests</option>
-                <option value="Random">Random</option>
-                <option value="PowerOfTwoChoices">Power Of Two Choices</option>
-              </select>
-              <p className="mt-1 text-xs text-gray-500">Algorithm used to distribute requests across destinations</p>
-            </div>
+                onChange={(value) => setFormData({ ...formData, loadBalancingPolicy: value })}
+                options={[
+                  { value: 'RoundRobin', label: 'Round Robin', description: 'Distribute requests evenly across all destinations' },
+                  { value: 'LeastRequests', label: 'Least Requests', description: 'Route to destination with fewest active requests' },
+                  { value: 'Random', label: 'Random', description: 'Randomly select a destination' },
+                  { value: 'PowerOfTwoChoices', label: 'Power Of Two Choices', description: 'Pick two random, choose least loaded' },
+                ]}
+                placeholder="Select load balancing policy"
+              />
+            </FormField>
           </div>
         </div>
 
@@ -266,15 +270,11 @@ const ClusterEdit: React.FC = () => {
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-base font-semibold text-gray-900">Service Discovery</h2>
-            <label className="flex items-center cursor-pointer">
-              <input
-                type="checkbox"
-                checked={formData.useServiceDiscovery}
-                onChange={(e) => setFormData({ ...formData, useServiceDiscovery: e.target.checked })}
-                className="h-3.5 w-3.5 text-gray-900 focus:ring-gray-900 border-gray-300 rounded"
-              />
-              <span className="ml-2 text-xs text-gray-700">Enable</span>
-            </label>
+            <Checkbox
+              checked={formData.useServiceDiscovery}
+              onChange={(checked) => setFormData({ ...formData, useServiceDiscovery: checked })}
+              label="Enable"
+            />
           </div>
 
           <div className="space-y-5">
@@ -294,27 +294,27 @@ const ClusterEdit: React.FC = () => {
                 />
                 <p className="mt-1 text-xs text-gray-500">Service name to discover</p>
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Discovery Type</label>
-                <select
+              <FormField
+                label="Discovery Type"
+                hint="Service discovery provider"
+              >
+                <Select
                   value={formData.serviceDiscoveryType}
-                  onChange={(e) => setFormData({ ...formData, serviceDiscoveryType: e.target.value as 'Consul' | 'Dns' })}
+                  onChange={(value) => setFormData({ ...formData, serviceDiscoveryType: value as 'Consul' | 'Dns' })}
                   disabled={!formData.useServiceDiscovery}
-                  className="block w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-gray-400 focus:ring-1 focus:ring-gray-400 transition-colors disabled:bg-gray-50 disabled:text-gray-500 disabled:cursor-not-allowed"
-                >
-                  <option value="Consul">Consul</option>
-                  <option value="Dns">DNS</option>
-                </select>
-                <p className="mt-1 text-xs text-gray-500">Service discovery provider</p>
-              </div>
+                  options={[
+                    { value: 'Consul', label: 'Consul', description: 'HashiCorp Consul service discovery' },
+                    { value: 'Dns', label: 'DNS', description: 'DNS-based service discovery' },
+                  ]}
+                  placeholder="Select discovery type"
+                />
+              </FormField>
             </div>
             {formData.useServiceDiscovery && (
-              <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                <p className="text-xs text-blue-700">
-                  🔍 When service discovery is enabled, destinations will be automatically discovered from {formData.serviceDiscoveryType}. 
-                  Manual destinations below will be ignored.
-                </p>
-              </div>
+              <Alert type="info">
+                When service discovery is enabled, destinations will be automatically discovered from <strong>{formData.serviceDiscoveryType}</strong>. 
+                Manual destinations below will be ignored.
+              </Alert>
             )}
           </div>
         </div>
@@ -399,15 +399,11 @@ const ClusterEdit: React.FC = () => {
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-sm font-semibold text-gray-900">Health Check Configuration</h2>
-            <label className="flex items-center cursor-pointer">
-              <input
-                type="checkbox"
-                checked={formData.healthCheckEnabled}
-                onChange={(e) => setFormData({ ...formData, healthCheckEnabled: e.target.checked })}
-                className="h-3.5 w-3.5 text-gray-900 focus:ring-gray-900 border-gray-300 rounded"
-              />
-              <span className="ml-2 text-xs text-gray-700">Enable</span>
-            </label>
+            <Checkbox
+              checked={formData.healthCheckEnabled}
+              onChange={(checked) => setFormData({ ...formData, healthCheckEnabled: checked })}
+              label="Enable"
+            />
           </div>
 
           <div className="space-y-5">
@@ -515,43 +511,40 @@ const ClusterEdit: React.FC = () => {
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-sm font-semibold text-gray-900">Session Affinity</h2>
-            <label className="flex items-center cursor-pointer">
-              <input
-                type="checkbox"
-                checked={formData.sessionAffinityEnabled}
-                onChange={(e) => setFormData({ ...formData, sessionAffinityEnabled: e.target.checked })}
-                className="h-3.5 w-3.5 text-gray-900 focus:ring-gray-900 border-gray-300 rounded"
-              />
-              <span className="ml-2 text-xs text-gray-700">Enable</span>
-            </label>
+            <Checkbox
+              checked={formData.sessionAffinityEnabled}
+              onChange={(checked) => setFormData({ ...formData, sessionAffinityEnabled: checked })}
+              label="Enable"
+            />
           </div>
 
           <div className="space-y-5">
             <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Affinity Policy</label>
-                <select
+              <FormField label="Affinity Policy">
+                <Select
                   value={formData.sessionAffinityPolicy}
-                  onChange={(e) => setFormData({ ...formData, sessionAffinityPolicy: e.target.value })}
+                  onChange={(value) => setFormData({ ...formData, sessionAffinityPolicy: value })}
                   disabled={!formData.sessionAffinityEnabled}
-                  className="block w-full px-2.5 py-1.5 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-gray-900 focus:border-gray-900 disabled:bg-gray-50 disabled:text-gray-500 disabled:cursor-not-allowed"
-                >
-                  <option value="Cookie">Cookie</option>
-                  <option value="CustomHeader">Custom Header</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Failure Policy</label>
-                <select
+                  options={[
+                    { value: 'Cookie', label: 'Cookie', description: 'Use cookies for session affinity' },
+                    { value: 'CustomHeader', label: 'Custom Header', description: 'Use custom header for affinity' },
+                  ]}
+                  placeholder="Select affinity policy"
+                />
+              </FormField>
+              
+              <FormField label="Failure Policy">
+                <Select
                   value={formData.sessionAffinityFailurePolicy}
-                  onChange={(e) => setFormData({ ...formData, sessionAffinityFailurePolicy: e.target.value })}
+                  onChange={(value) => setFormData({ ...formData, sessionAffinityFailurePolicy: value })}
                   disabled={!formData.sessionAffinityEnabled}
-                  className="block w-full px-2.5 py-1.5 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-gray-900 focus:border-gray-900 disabled:bg-gray-50 disabled:text-gray-500 disabled:cursor-not-allowed"
-                >
-                  <option value="Redistribute">Redistribute</option>
-                  <option value="Return503Error">Return 503 Error</option>
-                </select>
-              </div>
+                  options={[
+                    { value: 'Redistribute', label: 'Redistribute', description: 'Route to another destination' },
+                    { value: 'Return503Error', label: 'Return 503 Error', description: 'Return service unavailable' },
+                  ]}
+                  placeholder="Select failure policy"
+                />
+              </FormField>
             </div>
             <p className="text-xs text-gray-500">Route requests from the same client to the same destination</p>
           </div>
@@ -561,18 +554,18 @@ const ClusterEdit: React.FC = () => {
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <h2 className="text-base font-semibold text-gray-900 mb-6">HTTP Client Configuration</h2>
           <div className="grid grid-cols-3 gap-3">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">HTTP Version</label>
-              <select
+            <FormField label="HTTP Version">
+              <Select
                 value={formData.httpVersion}
-                onChange={(e) => setFormData({ ...formData, httpVersion: e.target.value })}
-                className="block w-full px-2.5 py-1.5 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-gray-900 focus:border-gray-900"
-              >
-                <option value="1.0">HTTP/1.0</option>
-                <option value="1.1">HTTP/1.1</option>
-                <option value="2.0">HTTP/2.0</option>
-              </select>
-            </div>
+                onChange={(value) => setFormData({ ...formData, httpVersion: value })}
+                options={[
+                  { value: '1.0', label: 'HTTP/1.0', description: 'Legacy HTTP version' },
+                  { value: '1.1', label: 'HTTP/1.1', description: 'Standard HTTP version' },
+                  { value: '2.0', label: 'HTTP/2.0', description: 'Modern, multiplexed HTTP' },
+                ]}
+                placeholder="Select HTTP version"
+              />
+            </FormField>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Request Timeout (seconds)</label>
               <input
@@ -601,14 +594,14 @@ const ClusterEdit: React.FC = () => {
         <div className="flex justify-end gap-3 pt-2">
           <Link
             to="/clusters"
-            className="px-5 py-2.5 border border-gray-200 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors"
+            className="btn-secondary"
           >
             Cancel
           </Link>
           <button
             type="submit"
             disabled={saving}
-            className="inline-flex items-center px-5 py-2.5 border border-transparent rounded-lg text-sm font-medium text-white bg-black hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {saving ? (
               <>
