@@ -1,0 +1,56 @@
+# GitHub Pages Configuration for Sail
+
+title: Sail Documentation
+description: Modern API Gateway built on YARP with dynamic configuration management
+baseurl: "" # the subpath of your site, e.g. /blog
+url: "https://lqlive.github.io/sail" # update with your GitHub Pages URL
+
+# Build settings
+theme: jekyll-theme-cayman
+markdown: kramdown
+
+# Navigation
+navigation:
+  - title: Home
+    url: /
+  - title: Getting Started
+    url: /articles/getting-started
+  - title: Architecture
+    url: /articles/architecture
+  - title: GitHub
+    url: https://github.com/lqlive/sail
+
+# Exclude from processing
+exclude:
+  - node_modules/
+  - vendor/
+  - Gemfile
+  - Gemfile.lock
+  - README.md
+
+# GitHub metadata
+github:
+  repository_url: https://github.com/lqlive/sail
+  is_project_page: true
+
+# Plugins
+plugins:
+  - jekyll-relative-links
+  - jekyll-optional-front-matter
+  - jekyll-titles-from-headings
+
+# Optional front matter settings
+optional_front_matter:
+  remove_originals: true
+
+# Titles from headings
+titles_from_headings:
+  enabled: true
+  strip_title: true
+  collections: true
+
+# Relative links
+relative_links:
+  enabled: true
+  collections: true
+
