@@ -1,5 +1,7 @@
 ---
-title: Getting Started
+layout: default
+title: Getting Started with Sail
+description: Quick start guide for Sail API Gateway
 ---
 
 # Getting Started with Sail

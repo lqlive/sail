@@ -1,9 +1,17 @@
 ---
-uid: root
+layout: default
 title: Sail Documentation
 ---
 
-# Sail: Modern API Gateway
+<div style="text-align: center; margin: 2rem 0;">
+  <h1 style="font-size: 3rem; margin-bottom: 1rem;">⛵ Sail</h1>
+  <p style="font-size: 1.5rem; color: #666; margin-bottom: 2rem;">Modern API Gateway built on YARP</p>
+  <div>
+    <a href="https://github.com/lqlive/sail" class="btn" style="display: inline-block; margin: 0.5rem;">View on GitHub</a>
+    <a href="articles/getting-started.html" class="btn" style="display: inline-block; margin: 0.5rem;">Get Started</a>
+    <a href="articles/architecture.html" class="btn" style="display: inline-block; margin: 0.5rem;">Architecture</a>
+  </div>
+</div>
 
 Welcome to the documentation for **Sail**! Sail is a modern, high-performance API Gateway built on top of [YARP (Yet Another Reverse Proxy)](https://microsoft.github.io/reverse-proxy/). It provides dynamic configuration management with a web-based admin interface, enabling real-time updates to routes, clusters, and policies without restart.
 
@@ -20,43 +28,71 @@ Sail was created to address the need for a flexible, production-ready API Gatewa
 
 ## Key Features
 
-### Dynamic Configuration Management
-- Real-time updates without gateway restarts
-- MongoDB-backed persistent storage
-- gRPC-based configuration distribution
-- Change Streams for instant synchronization
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin: 2rem 0;">
 
-### Web-Based Administration
-- Modern React 18 UI with TypeScript
-- Visual route and cluster management
-- Policy configuration interface
-- Real-time monitoring and status updates
+<div class="feature-box">
+  <h3>🚀 Dynamic Configuration</h3>
+  <ul>
+    <li>Real-time updates without gateway restarts</li>
+    <li>MongoDB-backed persistent storage</li>
+    <li>gRPC-based configuration distribution</li>
+    <li>Change Streams for instant synchronization</li>
+  </ul>
+</div>
 
-### Advanced Routing
-- Path-based routing with pattern matching
-- Header-based routing
-- Host-based routing
-- Query parameter routing
-- Priority-based route selection
+<div class="feature-box">
+  <h3>🎨 Web-Based Administration</h3>
+  <ul>
+    <li>Modern React 18 UI with TypeScript</li>
+    <li>Visual route and cluster management</li>
+    <li>Policy configuration interface</li>
+    <li>Real-time monitoring and status updates</li>
+  </ul>
+</div>
 
-### Security & Authentication
-- JWT Bearer token authentication
-- OpenID Connect integration
-- Dynamic authentication policies
-- TLS/HTTPS with SNI support
-- Certificate management API
+<div class="feature-box">
+  <h3>🔀 Advanced Routing</h3>
+  <ul>
+    <li>Path-based routing with pattern matching</li>
+    <li>Header-based routing</li>
+    <li>Host-based routing</li>
+    <li>Query parameter routing</li>
+    <li>Priority-based route selection</li>
+  </ul>
+</div>
 
-### Traffic Control
-- CORS policy management
-- Rate limiting with customizable policies
-- Request/response timeouts
-- Automatic retry with exponential backoff
-- Load balancing strategies
+<div class="feature-box">
+  <h3>🔒 Security & Authentication</h3>
+  <ul>
+    <li>JWT Bearer token authentication</li>
+    <li>OpenID Connect integration</li>
+    <li>Dynamic authentication policies</li>
+    <li>TLS/HTTPS with SNI support</li>
+    <li>Certificate management API</li>
+  </ul>
+</div>
 
-### Service Discovery
-- Integration with service discovery systems
-- Dynamic destination resolution
-- Health check support
+<div class="feature-box">
+  <h3>⚡ Traffic Control</h3>
+  <ul>
+    <li>CORS policy management</li>
+    <li>Rate limiting with customizable policies</li>
+    <li>Request/response timeouts</li>
+    <li>Automatic retry with exponential backoff</li>
+    <li>Load balancing strategies</li>
+  </ul>
+</div>
+
+<div class="feature-box">
+  <h3>🔍 Service Discovery</h3>
+  <ul>
+    <li>Integration with service discovery systems</li>
+    <li>Dynamic destination resolution</li>
+    <li>Health check support</li>
+  </ul>
+</div>
+
+</div>
 
 ## Architecture Overview
 

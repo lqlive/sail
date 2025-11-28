@@ -1,5 +1,7 @@
 ---
-title: Architecture
+layout: default
+title: Sail Architecture
+description: Architecture and design principles of Sail API Gateway
 ---
 
 # Sail Architecture
