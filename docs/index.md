@@ -8,13 +8,11 @@ description: Modern API Gateway built on YARP
   <h1>⛵ Sail</h1>
   <p class="tagline">Modern API Gateway built on YARP</p>
   <div class="hero-buttons">
-    <a href="https://github.com/lqlive/sail" class="btn" target="_blank">View on GitHub</a>
+    <a href="https://github.com/lqlive/sail" class="btn btn-primary" target="_blank">View on GitHub</a>
     <a href="{{ '/articles/getting-started' | relative_url }}" class="btn btn-outline">Get Started</a>
     <a href="{{ '/articles/architecture' | relative_url }}" class="btn btn-outline">Architecture</a>
   </div>
 </div>
-
----
 
 Welcome to the documentation for **Sail**! Sail is a modern, high-performance API Gateway built on top of [YARP (Yet Another Reverse Proxy)](https://microsoft.github.io/reverse-proxy/). It provides dynamic configuration management with a web-based admin interface, enabling real-time updates to routes, clusters, and policies without restart.
 
