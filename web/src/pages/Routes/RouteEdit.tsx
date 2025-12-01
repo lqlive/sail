@@ -40,7 +40,8 @@ const RouteEdit: React.FC = () => {
   const [transformType, setTransformType] = useState('RequestHeader');
   const [transformKey, setTransformKey] = useState('');
   const [transformValue, setTransformValue] = useState('');
-  const [transformError, setTransformError] = useState<string | null>(null);
+  const [transformKeyError, setTransformKeyError] = useState<string | null>(null);
+  const [transformValueError, setTransformValueError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -172,45 +173,50 @@ const RouteEdit: React.FC = () => {
   };
 
   const addTransform = () => {
-    setTransformError(null);
+    setTransformKeyError(null);
+    setTransformValueError(null);
     const newTransform: Record<string, string> = {};
+    let hasError = false;
     
     switch (transformType) {
       case 'RequestHeader':
-        if (!transformKey || !transformValue) {
-          setTransformError('Please enter both header name and value');
-          return;
-        }
-        newTransform['RequestHeader'] = transformKey;
-        newTransform['Set'] = transformValue;
-        break;
       case 'ResponseHeader':
-        if (!transformKey || !transformValue) {
-          setTransformError('Please enter both header name and value');
-          return;
+        if (!transformKey) {
+          setTransformKeyError('Please enter header name');
+          hasError = true;
         }
-        newTransform['ResponseHeader'] = transformKey;
+        if (!transformValue) {
+          setTransformValueError('Please enter header value');
+          hasError = true;
+        }
+        if (hasError) return;
+        newTransform[transformType] = transformKey;
         newTransform['Set'] = transformValue;
         break;
       case 'PathPrefix':
         if (!transformValue) {
-          setTransformError('Please enter a path prefix');
+          setTransformValueError('Please enter a path prefix');
           return;
         }
         newTransform['PathPrefix'] = transformValue;
         break;
       case 'PathRemovePrefix':
         if (!transformValue) {
-          setTransformError('Please enter a path prefix to remove');
+          setTransformValueError('Please enter a path prefix to remove');
           return;
         }
         newTransform['PathRemovePrefix'] = transformValue;
         break;
       case 'QueryParameter':
-        if (!transformKey || !transformValue) {
-          setTransformError('Please enter both parameter name and value');
-          return;
+        if (!transformKey) {
+          setTransformKeyError('Please enter parameter name');
+          hasError = true;
         }
+        if (!transformValue) {
+          setTransformValueError('Please enter parameter value');
+          hasError = true;
+        }
+        if (hasError) return;
         newTransform['QueryParameter'] = transformKey;
         newTransform['Set'] = transformValue;
         break;
@@ -591,34 +597,42 @@ const RouteEdit: React.FC = () => {
               </FormField>
 
               {(transformType === 'RequestHeader' || transformType === 'ResponseHeader' || transformType === 'QueryParameter') && (
-                <FormField label={transformType === 'QueryParameter' ? 'Parameter Name' : 'Header Name'}>
+                <FormField label={transformType === 'QueryParameter' ? 'Parameter Name' : 'Header Name'} error={transformKeyError}>
                   <input
                     type="text"
                     value={transformKey}
-                    onChange={(e) => setTransformKey(e.target.value)}
+                    onChange={(e) => {
+                      setTransformKey(e.target.value);
+                      if (transformKeyError) setTransformKeyError(null);
+                    }}
                     placeholder={transformType === 'QueryParameter' ? 'e.g., api-version' : 'e.g., X-Custom-Header'}
-                    className="block w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-gray-400 focus:ring-1 focus:ring-gray-400 transition-colors"
+                    className={`block w-full px-3 py-2 border rounded-lg text-sm focus:outline-none transition-colors ${
+                      transformKeyError 
+                        ? 'border-red-300 focus:border-red-500 focus:ring-1 focus:ring-red-500' 
+                        : 'border-gray-200 focus:border-gray-400 focus:ring-1 focus:ring-gray-400'
+                    }`}
                   />
                 </FormField>
               )}
 
-              <FormField label={transformType === 'PathPrefix' || transformType === 'PathRemovePrefix' ? 'Path' : 'Value'}>
+              <FormField label={transformType === 'PathPrefix' || transformType === 'PathRemovePrefix' ? 'Path' : 'Value'} error={transformValueError}>
                 <input
                   type="text"
                   value={transformValue}
-                  onChange={(e) => setTransformValue(e.target.value)}
+                  onChange={(e) => {
+                    setTransformValue(e.target.value);
+                    if (transformValueError) setTransformValueError(null);
+                  }}
                   onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addTransform())}
                   placeholder={transformType === 'PathPrefix' ? '/api/v1' : transformType === 'PathRemovePrefix' ? '/old-prefix' : 'value'}
-                  className="block w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-gray-400 focus:ring-1 focus:ring-gray-400 transition-colors"
+                  className={`block w-full px-3 py-2 border rounded-lg text-sm focus:outline-none transition-colors ${
+                    transformValueError 
+                      ? 'border-red-300 focus:border-red-500 focus:ring-1 focus:ring-red-500' 
+                      : 'border-gray-200 focus:border-gray-400 focus:ring-1 focus:ring-gray-400'
+                  }`}
                 />
               </FormField>
             </div>
-
-            {transformError && (
-              <Alert type="error" className="col-span-full">
-                {transformError}
-              </Alert>
-            )}
 
             <div>
               <button
