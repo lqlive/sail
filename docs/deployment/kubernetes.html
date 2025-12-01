@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kubernetes - Sail Documentation</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>body { font-family: 'Inter', sans-serif; }</style>
+</head>
+<body class="bg-gray-50 text-gray-900 antialiased">
+  
+  <header class="fixed top-0 left-0 right-0 h-14 bg-white border-b border-gray-200 z-50">
+    <div class="h-full px-6 flex items-center justify-between">
+      <a href="../index.html" class="flex items-center gap-2">
+        <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M240 35.9l0 348.1-224 0c-8.8 0-16 7.2-16 16 0 61.9 50.1 112 112 112l288 0c61.9 0 112-50.1 112-112 0-8.8-7.2-16-16-16l-208 0 0-48 161.7 0c12.9 0 20.5-14.4 13.2-25L269.2 26.9c-8.9-13-29.2-6.7-29.2 9zM192 320l0-184.2c0-16.1-21-22.1-29.6-8.5L47.3 311.5c-6.7 10.7 1 24.5 13.6 24.5L176 336c8.8 0 16-7.2 16-16z"/></svg>
+        <span class="text-base font-semibold text-gray-900">Sail</span>
+      </a>
+      <a href="https://github.com/lqlive/sail" target="_blank" class="p-2 text-gray-600 hover:text-gray-900">
+        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+      </a>
+    </div>
+  </header>
+
+  <div class="flex pt-14">
+    <aside class="hidden lg:block fixed left-0 top-14 bottom-0 w-64 bg-white border-r border-gray-200 overflow-y-auto">
+      <nav class="p-4">
+        <div class="mb-6">
+          <a href="../index.html" class="block px-3 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md mb-1">📚 Docs</a>
+        </div>
+        <div class="mb-6">
+          <div class="px-3 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">Get Started</div>
+          <a href="../get-started/" class="block px-3 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md mb-1">Getting Started</a>
+        </div>
+        <div class="mb-6">
+          <div class="px-3 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">Fundamentals</div>
+          <a href="../fundamentals/architecture.html" class="block px-3 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md mb-1">Architecture</a>
+          <a href="../fundamentals/configuration.html" class="block px-3 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md mb-1">Configuration</a>
+          <a href="../fundamentals/routing.html" class="block px-3 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md mb-1">Routing</a>
+          <a href="../fundamentals/clusters.html" class="block px-3 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md mb-1">Clusters</a>
+        </div>
+        <div class="mb-6">
+          <div class="px-3 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">Features</div>
+          <a href="../features/authentication.html" class="block px-3 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md mb-1">Authentication</a>
+          <a href="../features/rate-limiting.html" class="block px-3 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md mb-1">Rate Limiting</a>
+          <a href="../features/cors.html" class="block px-3 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md mb-1">CORS</a>
+          <a href="../features/certificates.html" class="block px-3 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md mb-1">Certificates</a>
+        </div>
+        <div class="mb-6">
+          <div class="px-3 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">Deployment</div>
+          <a href="../deployment/docker.html" class="block px-3 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md mb-1">Docker</a>
+          <a href="../deployment/kubernetes.html" class="block px-3 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-md mb-1">Kubernetes</a>
+        </div>
+      </nav>
+    </aside>
+
+    <main class="flex-1 lg:ml-64 lg:mr-64">
+      <div class="max-w-4xl mx-auto px-6 py-8">
+        <h1 class="text-3xl font-semibold text-gray-900 mb-3">Kubernetes Deployment</h1>
+        <p class="text-base text-gray-600 mb-8">Deploy Sail on Kubernetes for production-grade scalability and reliability.</p>
+
+        <section class="mb-8">
+          <h2 class="text-2xl font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-200">Quick Deploy</h2>
+          
+          <div class="bg-gray-900 rounded-lg p-4 mb-4">
+            <code class="text-sm text-gray-100 font-mono">kubectl apply -f https://raw.githubusercontent.com/lqlive/sail/main/k8s/sail.yaml</code>
+          </div>
+        </section>
+
+        <section class="mb-8">
+          <h2 class="text-2xl font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-200">Kubernetes Manifests</h2>
+          
+          <h3 class="text-base font-semibold text-gray-900 mb-3">MongoDB Deployment</h3>
+          <div class="bg-gray-900 rounded-lg p-4 mb-6">
+            <pre class="text-sm text-gray-100 font-mono"><code>apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mongodb
+spec:
+  serviceName: mongodb
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mongodb
+  template:
+    metadata:
+      labels:
+        app: mongodb
+    spec:
+      containers:
+      - name: mongodb
+        image: mongo:latest
+        ports:
+        - containerPort: 27017
+        volumeMounts:
+        - name: mongodb-data
+          mountPath: /data/db
+  volumeClaimTemplates:
+  - metadata:
+      name: mongodb-data
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      resources:
+        requests:
+          storage: 10Gi</code></pre>
+          </div>
+
+          <h3 class="text-base font-semibold text-gray-900 mb-3">Sail Proxy Deployment</h3>
+          <div class="bg-gray-900 rounded-lg p-4 mb-6">
+            <pre class="text-sm text-gray-100 font-mono"><code>apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sail-proxy
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: sail-proxy
+  template:
+    metadata:
+      labels:
+        app: sail-proxy
+    spec:
+      containers:
+      - name: proxy
+        image: sail/proxy:latest
+        ports:
+        - containerPort: 8080
+        - containerPort: 8443
+        env:
+        - name: MongoDB__ConnectionString
+          value: "mongodb://mongodb:27017"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sail-proxy
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 80
+    targetPort: 8080
+    name: http
+  - port: 443
+    targetPort: 8443
+    name: https
+  selector:
+    app: sail-proxy</code></pre>
+          </div>
+        </section>
+
+        <section class="mb-8">
+          <h2 class="text-2xl font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-200">Horizontal Pod Autoscaling</h2>
+          
+          <div class="bg-gray-900 rounded-lg p-4 mb-4">
+            <pre class="text-sm text-gray-100 font-mono"><code>apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: sail-proxy-hpa
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: sail-proxy
+  minReplicas: 3
+  maxReplicas: 10
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70</code></pre>
+          </div>
+        </section>
+
+        <section class="mb-8">
+          <h2 class="text-2xl font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-200">Configuration</h2>
+          <p class="text-sm text-gray-600 mb-4">Store sensitive configuration in Kubernetes Secrets:</p>
+          
+          <div class="bg-gray-900 rounded-lg p-4">
+            <pre class="text-sm text-gray-100 font-mono"><code>apiVersion: v1
+kind: Secret
+metadata:
+  name: sail-config
+type: Opaque
+stringData:
+  mongodb-connection: "mongodb://username:password@mongodb:27017"</code></pre>
+          </div>
+        </section>
+
+        <section class="mb-8">
+          <h2 class="text-2xl font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-200">Ingress Configuration</h2>
+          <p class="text-sm text-gray-600 mb-4">Use an Ingress controller for external access:</p>
+          
+          <div class="bg-gray-900 rounded-lg p-4">
+            <pre class="text-sm text-gray-100 font-mono"><code>apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: sail-ingress
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+spec:
+  ingressClassName: nginx
+  tls:
+  - hosts:
+    - api.example.com
+    secretName: sail-tls
+  rules:
+  - host: api.example.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: sail-proxy
+            port:
+              number: 80</code></pre>
+          </div>
+        </section>
+
+        <section class="mb-8">
+          <h2 class="text-xl font-semibold text-gray-900 mb-4">See also</h2>
+          <div class="grid gap-3">
+            <a href="../deployment/docker.html" class="block p-4 bg-white border border-gray-200 rounded-lg hover:border-gray-300 hover:shadow-sm transition-all">
+              <h3 class="text-sm font-semibold text-gray-900 mb-1">🐳 Docker</h3>
+              <p class="text-xs text-gray-600">Deploy with Docker Compose</p>
+            </a>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <aside class="hidden xl:block fixed right-0 top-14 bottom-0 w-64 overflow-y-auto p-6">
+      <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">On this page</h3>
+      <nav class="space-y-2">
+        <a href="#" class="block text-sm text-gray-600 hover:text-gray-900">Quick Deploy</a>
+        <a href="#" class="block text-sm text-gray-600 hover:text-gray-900">Manifests</a>
+        <a href="#" class="block text-sm text-gray-600 hover:text-gray-900">Autoscaling</a>
+        <a href="#" class="block text-sm text-gray-600 hover:text-gray-900">Ingress</a>
+      </nav>
+    </aside>
+  </div>
+</body>
+</html>
+
