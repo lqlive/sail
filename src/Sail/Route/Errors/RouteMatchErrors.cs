@@ -10,7 +10,7 @@ public static class RouteMatchErrors
 
     public static Error PathInvalid => Error.Validation(
         code: "RouteMatch.PathInvalid",
-        description: "Route path must start with '/'");
+        description: "Route path must start with '/' or a route parameter '{'");
 
     public static Error MethodsContainEmpty => Error.Validation(
         code: "RouteMatch.MethodsContainEmpty",

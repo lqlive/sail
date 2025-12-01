@@ -20,7 +20,7 @@ Content-Type: application/json
     "corsPolicy": "cors",
     "timeoutPolicy": "timeout",
     "timeout": "00:00:01",
-    "maxRequestBodySize": -1,
+    "maxRequestBodySize": 1000,
     "match": {
         "path": "{**catch-all}",
         "hosts": [

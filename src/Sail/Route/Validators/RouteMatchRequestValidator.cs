@@ -12,7 +12,7 @@ public class RouteMatchRequestValidator : AbstractValidator<RouteMatchRequest>
             .NotEmpty()
             .WithMessage(RouteMatchErrors.PathRequired.Description)
             .WithErrorCode(RouteMatchErrors.PathRequired.Code)
-            .Must(path => path.StartsWith('/'))
+            .Must(path => path.StartsWith('/') || path.StartsWith('{'))
             .WithMessage(RouteMatchErrors.PathInvalid.Description)
             .WithErrorCode(RouteMatchErrors.PathInvalid.Code);
 
