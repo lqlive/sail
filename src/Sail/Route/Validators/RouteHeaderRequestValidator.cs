@@ -17,13 +17,7 @@ public class RouteHeaderRequestValidator : AbstractValidator<RouteHeaderRequest>
             .WithErrorCode(RouteHeaderErrors.NameTooLong.Code);
 
         RuleFor(x => x.Values)
-            .NotNull()
-            .WithMessage(RouteHeaderErrors.ValuesRequired.Description)
-            .WithErrorCode(RouteHeaderErrors.ValuesRequired.Code)
-            .Must(values => values.Any())
-            .WithMessage(RouteHeaderErrors.ValuesEmpty.Description)
-            .WithErrorCode(RouteHeaderErrors.ValuesEmpty.Code)
-            .Must(values => values.All(v => !string.IsNullOrWhiteSpace(v)))
+            .Must(values => values == null || values.All(v => !string.IsNullOrWhiteSpace(v)))
             .WithMessage(RouteHeaderErrors.ValuesContainEmpty.Description)
             .WithErrorCode(RouteHeaderErrors.ValuesContainEmpty.Code);
 

@@ -1,9 +1,7 @@
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using Sail.Api.V1;
-using Sail.Core.Entities;
 using Sail.Core.Stores;
-using MiddlewareEntity = Sail.Core.Entities.Middleware;
 
 namespace Sail.Middleware.Grpc;
 
