@@ -6,6 +6,7 @@ import {
   KeyIcon,
   LockClosedIcon,
   FunnelIcon,
+  TrashIcon,
 } from '@heroicons/react/24/outline';
 import type { AuthenticationPolicy, AuthenticationSchemeType } from '../../types';
 import { AuthenticationPolicyService } from '../../services/authenticationPolicyService';
@@ -16,6 +17,8 @@ const AuthenticationPolicies: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState<'all' | AuthenticationSchemeType>('all');
   const [error, setError] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [deleteConfirm, setDeleteConfirm] = useState<{ id: string; name: string } | null>(null);
 
   const loadPolicies = async () => {
     try {
@@ -50,6 +53,20 @@ const AuthenticationPolicies: React.FC = () => {
     }
     return true;
   });
+
+  const handleDelete = async (id: string) => {
+    try {
+      setDeletingId(id);
+      await AuthenticationPolicyService.deleteAuthenticationPolicy(id);
+      await loadPolicies();
+      setDeleteConfirm(null);
+    } catch (err) {
+      console.error('Failed to delete authentication policy:', err);
+      setError('Failed to delete authentication policy');
+    } finally {
+      setDeletingId(null);
+    }
+  };
 
   if (loading) {
     return (
@@ -164,14 +181,28 @@ const AuthenticationPolicies: React.FC = () => {
           </Link>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4 max-w-7xl">
           {filteredPolicies.map((policy) => (
-            <Link
+            <div
               key={policy.id}
-              to={`/authentication-policies/${policy.id}`}
-              className="block bg-white border border-gray-200 rounded-lg p-5 hover:border-gray-300 hover:shadow-sm transition-all"
+              className="bg-white border border-gray-200 rounded-lg hover:border-gray-300 hover:shadow-sm transition-all relative"
             >
-              <div className="flex items-center gap-3 mb-4">
+              <button
+                onClick={(e) => {
+                  e.preventDefault();
+                  setDeleteConfirm({ id: policy.id, name: policy.name });
+                }}
+                className="absolute top-3 right-3 p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-md transition-colors z-10"
+                title="Delete policy"
+              >
+                <TrashIcon className="h-4 w-4" />
+              </button>
+
+              <Link
+                to={`/authentication-policies/${policy.id}`}
+                className="block p-4"
+              >
+              <div className="flex items-center gap-3 mb-3">
                 <div className={`w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 ${
                   policy.type === 'JwtBearer' ? 'bg-blue-50' : 'bg-indigo-50'
                 }`}>
@@ -182,8 +213,8 @@ const AuthenticationPolicies: React.FC = () => {
                   )}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <h3 className="text-base font-medium text-gray-900 truncate">{policy.name}</h3>
-                  <div className="flex items-center gap-2 mt-1">
+                  <h3 className="text-sm font-medium text-gray-900 truncate">{policy.name}</h3>
+                  <div className="flex items-center gap-1.5 mt-1 flex-wrap">
                     <span className={`inline-flex items-center px-2 py-0.5 text-xs font-medium rounded ${
                       policy.type === 'JwtBearer'
                         ? 'bg-blue-50 text-blue-700'
@@ -200,43 +231,87 @@ const AuthenticationPolicies: React.FC = () => {
                 </div>
               </div>
 
-              {policy.description && (
-                <p className="text-sm text-gray-500 mb-4 line-clamp-2">{policy.description}</p>
-              )}
-
               <div className="space-y-2">
                 {policy.jwtBearer && (
                   <>
-                    <div className="flex items-center justify-between py-2 border-b border-gray-100">
-                      <span className="text-sm text-gray-600">Authority</span>
-                      <span className="text-sm font-medium text-gray-900 truncate ml-2">{policy.jwtBearer.authority}</span>
+                    <div className="flex items-center justify-between py-1.5 border-b border-gray-100">
+                      <span className="text-xs text-gray-600">Authority</span>
+                      <span className="text-xs font-medium text-gray-900 truncate ml-2 max-w-[150px]">{policy.jwtBearer.authority}</span>
                     </div>
-                    <div className="flex items-center justify-between py-2 border-b border-gray-100">
-                      <span className="text-sm text-gray-600">Audience</span>
-                      <span className="text-sm font-medium text-gray-900 truncate ml-2">{policy.jwtBearer.audience}</span>
+                    <div className="flex items-center justify-between py-1.5 border-b border-gray-100">
+                      <span className="text-xs text-gray-600">Audience</span>
+                      <span className="text-xs font-medium text-gray-900 truncate ml-2 max-w-[150px]">{policy.jwtBearer.audience}</span>
                     </div>
                   </>
                 )}
 
                 {policy.openIdConnect && (
                   <>
-                    <div className="flex items-center justify-between py-2 border-b border-gray-100">
-                      <span className="text-sm text-gray-600">Authority</span>
-                      <span className="text-sm font-medium text-gray-900 truncate ml-2">{policy.openIdConnect.authority}</span>
+                    <div className="flex items-center justify-between py-1.5 border-b border-gray-100">
+                      <span className="text-xs text-gray-600">Authority</span>
+                      <span className="text-xs font-medium text-gray-900 truncate ml-2 max-w-[150px]">{policy.openIdConnect.authority}</span>
                     </div>
-                    <div className="flex items-center justify-between py-2 border-b border-gray-100">
-                      <span className="text-sm text-gray-600">Client ID</span>
-                      <span className="text-sm font-medium text-gray-900 truncate ml-2">{policy.openIdConnect.clientId}</span>
+                    <div className="flex items-center justify-between py-1.5 border-b border-gray-100">
+                      <span className="text-xs text-gray-600">Client ID</span>
+                      <span className="text-xs font-medium text-gray-900 truncate ml-2 max-w-[150px]">{policy.openIdConnect.clientId}</span>
                     </div>
                   </>
                 )}
 
                 {!policy.jwtBearer && !policy.openIdConnect && (
-                  <div className="text-sm text-gray-400 py-2">No configuration</div>
+                  <div className="text-xs text-gray-400 py-1.5 border-b border-gray-100">No configuration</div>
                 )}
+
+                <div className="pt-3 text-xs text-gray-400">
+                  {policy.updatedAt && new Date(policy.updatedAt).toLocaleDateString('en-US', { 
+                    year: 'numeric', 
+                    month: 'short', 
+                    day: 'numeric' 
+                  })}
+                </div>
               </div>
             </Link>
+            </div>
           ))}
+        </div>
+      )}
+
+      {deleteConfirm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg max-w-md w-full p-6">
+            <h3 className="text-lg font-medium text-gray-900 mb-2">Delete Authentication Policy</h3>
+            <p className="text-sm text-gray-500 mb-6">
+              Are you sure you want to delete <span className="font-medium text-gray-900">"{deleteConfirm.name}"</span>?
+              This action cannot be undone.
+            </p>
+
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => setDeleteConfirm(null)}
+                disabled={deletingId === deleteConfirm.id}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => handleDelete(deleteConfirm.id)}
+                disabled={deletingId === deleteConfirm.id}
+                className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 flex items-center gap-2"
+              >
+                {deletingId === deleteConfirm.id ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                    Deleting...
+                  </>
+                ) : (
+                  <>
+                    <TrashIcon className="h-4 w-4" />
+                    Delete
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

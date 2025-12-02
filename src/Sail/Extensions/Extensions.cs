@@ -13,6 +13,7 @@ public static class Extensions
             .BindConfiguration(DatabaseOptions.Name);
 
         services.TryAddScoped<Route.RouteService>();
+        services.TryAddScoped<Route.Validators.RoutePolicyValidator>();
         services.TryAddScoped<Cluster.ClusterService>();
         services.TryAddScoped<Certificate.CertificateService>();
         services.TryAddScoped<Middleware.MiddlewareService>();

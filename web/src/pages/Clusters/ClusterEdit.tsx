@@ -39,6 +39,7 @@ const ClusterEdit: React.FC = () => {
     address: '',
     host: '',
   });
+  const [destinationAddressError, setDestinationAddressError] = useState<string | null>(null);
 
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -175,27 +176,34 @@ const ClusterEdit: React.FC = () => {
   };
 
   const addDestination = () => {
-    if (newDestination.address) {
-      setDestinations([
-        ...destinations,
-        { 
-          id: `d${Date.now()}`, 
-          address: newDestination.address,
-          host: newDestination.host,
-        }
-      ]);
-      setNewDestination({ address: '', host: '' });
+    setDestinationAddressError(null);
+    
+    if (!newDestination.address || !newDestination.address.trim()) {
+      setDestinationAddressError('Please enter a destination address');
+      return;
     }
+
+    // Basic URL validation
+    try {
+      new URL(newDestination.address);
+    } catch {
+      setDestinationAddressError('Please enter a valid URL (e.g., https://api.example.com:443)');
+      return;
+    }
+
+    setDestinations([
+      ...destinations,
+      { 
+        id: `d${Date.now()}`, 
+        address: newDestination.address,
+        host: newDestination.host || undefined,
+      }
+    ]);
+    setNewDestination({ address: '', host: '' });
   };
 
   const removeDestination = (id: string) => {
     setDestinations(destinations.filter(d => d.id !== id));
-  };
-
-  const updateDestination = (id: string, field: keyof Destination, value: string) => {
-    setDestinations(destinations.map(d => 
-      d.id === id ? { ...d, [field]: value } : d
-    ));
   };
 
   if (loading) {
@@ -321,77 +329,89 @@ const ClusterEdit: React.FC = () => {
 
         {/* Destinations */}
         <div className="bg-white rounded-lg border border-gray-200 p-6">
-          <h2 className="text-base font-semibold text-gray-900 mb-6">
-            Destinations
-            {destinations.length > 0 && (
-              <span className="ml-2 text-xs font-normal text-gray-500">({destinations.length})</span>
-            )}
-            </h2>
-            <div className="space-y-5">
-            {destinations.length > 0 && (
-              <div className="space-y-2">
-                {destinations.map((dest) => (
-                  <div key={dest.id} className="flex gap-2 items-start p-2 border border-gray-200 rounded-md bg-gray-50">
-                    <div className="flex-1 grid grid-cols-2 gap-2">
-                      <div>
-                        <input
-                          type="text"
-                          value={dest.address}
-                          onChange={(e) => updateDestination(dest.id, 'address', e.target.value)}
-                          placeholder="https://example.com/"
-                          className="block w-full px-2.5 py-1.5 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-gray-900 focus:border-gray-900 bg-white"
-                        />
-                      </div>
-                      <div>
-                        <input
-                          type="text"
-                          value={dest.host || ''}
-                          onChange={(e) => updateDestination(dest.id, 'host', e.target.value)}
-                          placeholder="Host header (optional)"
-                          className="block w-full px-2.5 py-1.5 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-gray-900 focus:border-gray-900 bg-white"
-                        />
-                      </div>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => removeDestination(dest.id)}
-                      className="p-1.5 text-gray-400 hover:text-red-600"
-                    >
-                      <XMarkIcon className="h-4 w-4" />
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            <div className="flex gap-2 items-end">
-              <div className="flex-1 grid grid-cols-2 gap-2">
+          <h2 className="text-base font-semibold text-gray-900 mb-6">Destinations</h2>
+          <div className="space-y-5">
+            <div className="grid grid-cols-2 gap-3">
+              <FormField label="Address" error={destinationAddressError || undefined}>
                 <input
                   type="text"
                   value={newDestination.address}
-                  onChange={(e) => setNewDestination({ ...newDestination, address: e.target.value })}
+                  onChange={(e) => {
+                    setNewDestination({ ...newDestination, address: e.target.value });
+                    if (destinationAddressError) setDestinationAddressError(null);
+                  }}
                   placeholder="https://api.example.com:443"
-                  className="block w-full px-2.5 py-1.5 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-gray-900 focus:border-gray-900"
+                  className={`block w-full px-3 py-2 border rounded-lg text-sm focus:outline-none transition-colors ${
+                    destinationAddressError 
+                      ? 'border-red-300 focus:border-red-500 focus:ring-1 focus:ring-red-500' 
+                      : 'border-gray-200 focus:border-gray-400 focus:ring-1 focus:ring-gray-400'
+                  }`}
                   onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addDestination())}
                 />
+              </FormField>
+              <FormField label="Host Header (optional)">
                 <input
                   type="text"
                   value={newDestination.host}
                   onChange={(e) => setNewDestination({ ...newDestination, host: e.target.value })}
-                  placeholder="Host header (optional)"
-                  className="block w-full px-2.5 py-1.5 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-gray-900 focus:border-gray-900"
+                  placeholder="e.g., api.example.com"
+                  className="block w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-gray-400 focus:ring-1 focus:ring-gray-400 transition-colors"
                   onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addDestination())}
                 />
-              </div>
+              </FormField>
+            </div>
+
+            <div>
               <button
                 type="button"
                 onClick={addDestination}
-                className="px-3 py-1.5 border border-gray-300 rounded-md text-xs font-medium text-gray-700 bg-white hover:bg-gray-50 inline-flex items-center"
+                className="inline-flex items-center px-4 py-2 border border-gray-200 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors"
               >
-                <PlusIcon className="h-3.5 w-3.5 mr-1" />
-                Add
+                <PlusIcon className="h-4 w-4 mr-1.5" />
+                Add Destination
               </button>
             </div>
+
+            {destinations.length > 0 && (
+              <div className="mt-6 pt-6 border-t border-gray-200">
+                <h3 className="text-sm font-medium text-gray-900 mb-3">
+                  Configured Destinations ({destinations.length})
+                </h3>
+                <div className="space-y-2">
+                  {destinations.map((dest) => (
+                    <div
+                      key={dest.id}
+                      className="flex items-center justify-between px-3 py-2.5 bg-white border border-gray-200 rounded-lg hover:border-gray-300 transition-colors"
+                    >
+                      <div className="flex items-center gap-2.5 flex-1 min-w-0">
+                        <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                          <svg className="h-4 w-4 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
+                          </svg>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="text-sm font-medium text-gray-900 truncate">{dest.address}</div>
+                          {dest.host && <div className="text-xs text-gray-500 mt-0.5">Host: {dest.host}</div>}
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => removeDestination(dest.id)}
+                        className="ml-3 text-gray-400 hover:text-red-600 transition-colors"
+                      >
+                        <XMarkIcon className="h-4 w-4" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {formData.useServiceDiscovery && destinations.length > 0 && (
+              <Alert type="warning">
+                Service discovery is enabled. These manual destinations will be ignored.
+              </Alert>
+            )}
           </div>
         </div>
 

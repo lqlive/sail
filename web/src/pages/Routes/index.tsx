@@ -295,7 +295,7 @@ const Routes: React.FC = () => {
 
                     {/* HTTPS Redirect */}
                     {route.httpsRedirect && (
-                      <div className="flex items-center justify-between py-1.5">
+                      <div className="flex items-center justify-between py-1.5 border-b border-gray-100">
                         <div className="flex items-center gap-1.5">
                           <svg className="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
@@ -305,6 +305,14 @@ const Routes: React.FC = () => {
                         <CheckCircleIcon className="h-4 w-4 text-green-600" />
                       </div>
                     )}
+
+                    <div className="pt-3 text-xs text-gray-400">
+                      {route.updatedAt && new Date(route.updatedAt).toLocaleDateString('en-US', { 
+                        year: 'numeric', 
+                        month: 'short', 
+                        day: 'numeric' 
+                      })}
+                    </div>
                   </div>
                 </Link>
               </div>

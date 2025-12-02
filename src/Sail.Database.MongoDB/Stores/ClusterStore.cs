@@ -15,9 +15,8 @@ public class ClusterStore(IContext context) : IClusterStore
 
     public async Task<Cluster?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
-    
         return await context.Clusters
-            .SingleAsync(c => c.Id == id, cancellationToken);
+            .SingleOrDefaultAsync(c => c.Id == id, cancellationToken);
     }
 
     public async Task<Cluster> CreateAsync(Cluster cluster, CancellationToken cancellationToken = default)

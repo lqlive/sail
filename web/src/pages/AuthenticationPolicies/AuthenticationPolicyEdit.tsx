@@ -150,22 +150,6 @@ const AuthenticationPolicyEdit: React.FC = () => {
     }
   };
 
-  const handleDelete = async () => {
-    if (!id || !confirm('Are you sure you want to delete this authentication policy? This action cannot be undone.')) {
-      return;
-    }
-
-    try {
-      setSaving(true);
-      setError(null);
-      await AuthenticationPolicyService.deleteAuthenticationPolicy(id);
-      navigate('/authentication-policies');
-    } catch (err) {
-      console.error('Failed to delete authentication policy:', err);
-      setError('Failed to delete authentication policy');
-      setSaving(false);
-    }
-  };
 
   const addValidIssuer = () => {
     if (validIssuerInput.trim() && !formData.jwtValidIssuers.includes(validIssuerInput.trim())) {
@@ -716,25 +700,6 @@ const AuthenticationPolicyEdit: React.FC = () => {
         </div>
       </form>
 
-      {/* Delete section for edit mode */}
-      {isEdit && (
-        <div className="mt-8 pt-8 border-t border-gray-200">
-          <div className="bg-red-50 rounded-lg p-6">
-            <h3 className="text-sm font-semibold text-red-900 mb-2">Delete Authentication Policy</h3>
-            <p className="text-sm text-red-700 mb-4">
-              Once you delete this policy, it cannot be recovered. Please be certain.
-            </p>
-            <button
-              type="button"
-              onClick={handleDelete}
-              disabled={saving}
-              className="px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-            >
-              {saving ? 'Deleting...' : 'Delete Policy'}
-            </button>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

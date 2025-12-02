@@ -55,7 +55,7 @@ internal static class TimeoutPolicyStreamBuilder
 
             configs.Add(new TimeoutPolicyConfig
             {
-                Name = middleware.Name,
+                Name = middleware.MiddlewareId,
                 Seconds = middleware.Timeout.Seconds,
                 TimeoutStatusCode = middleware.Timeout.TimeoutStatusCode
             });

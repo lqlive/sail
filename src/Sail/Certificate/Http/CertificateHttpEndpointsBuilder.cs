@@ -11,8 +11,9 @@ public static class CertificateHttpEndpointsBuilder
         var api = app.MapGroup("api/certificates").HasApiVersion(1.0);
 
         api.MapGet("/", GetItems);
+        api.MapGet("/{id:guid}", GetItem);
         api.MapPost("/", Create);
-        api.MapPatch("/", Update);
+        api.MapPut("/{id:guid}", Update);
         api.MapDelete("/{id:guid}", Delete);
 
         api.MapGet("/{certificateId:guid}/snis", GetSNIs);
@@ -69,6 +70,15 @@ public static class CertificateHttpEndpointsBuilder
     {
         var items = await service.GetAsync(cancellationToken);
         return TypedResults.Ok(items);
+    }
+
+    private static async Task<Results<Ok<CertificateResponse>, NotFound>> GetItem(
+        Certificate.CertificateService service,
+        Guid id,
+        CancellationToken cancellationToken)
+    {
+        var item = await service.GetByIdAsync(id, cancellationToken);
+        return item != null ? TypedResults.Ok(item) : TypedResults.NotFound();
     }
 
     private static async Task<Results<Created, ProblemHttpResult>> Create(Certificate.CertificateService service,
