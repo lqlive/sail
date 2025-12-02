@@ -3,6 +3,7 @@ using Sail.Core.Entities;
 using Sail.Core.Stores;
 using CertificateEntity = Sail.Core.Entities.Certificate;
 using Sail.Certificate.Models;
+using Sail.Certificate.Errors;
 
 namespace Sail.Certificate;
 
@@ -48,7 +49,7 @@ public class CertificateService(ICertificateStore certificateStore)
         var certificate = await certificateStore.GetByIdAsync(id, cancellationToken);
         if (certificate is null)
         {
-            return Error.NotFound(description: "Certificate not found");
+            return CertificateErrors.CertificateNotFound;
         }
 
         certificate.Name = request.Name;
@@ -94,7 +95,7 @@ public class CertificateService(ICertificateStore certificateStore)
         var certificate = await certificateStore.GetByIdAsync(certificateId, cancellationToken);
         if (certificate is null)
         {
-            return Error.NotFound(description: "Certificate not found");
+            return CertificateErrors.CertificateNotFound;
         }
 
         var sni = new SNI
@@ -120,13 +121,13 @@ public class CertificateService(ICertificateStore certificateStore)
         var certificate = await certificateStore.GetByIdAsync(certificateId, cancellationToken);
         if (certificate is null)
         {
-            return Error.NotFound(description: "Certificate not found");
+            return CertificateErrors.CertificateNotFound;
         }
 
         var sni = certificate.SNIs?.SingleOrDefault(s => s.Id == id);
         if (sni is null)
         {
-            return Error.NotFound(description: "SNI not found");
+            return CertificateErrors.SNINotFound;
         }
 
         sni.Name = request.Name;
@@ -144,13 +145,13 @@ public class CertificateService(ICertificateStore certificateStore)
         var certificate = await certificateStore.GetByIdAsync(certificateId, cancellationToken);
         if (certificate is null)
         {
-            return Error.NotFound(description: "Certificate not found");
+            return CertificateErrors.CertificateNotFound;
         }
 
         var sni = certificate.SNIs?.SingleOrDefault(s => s.Id == id);
         if (sni is null)
         {
-            return Error.NotFound(description: "SNI not found");
+            return CertificateErrors.SNINotFound;
         }
 
         certificate.SNIs!.Remove(sni);

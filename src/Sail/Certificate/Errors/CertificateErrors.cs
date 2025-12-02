@@ -19,5 +19,13 @@ public static class CertificateErrors
     public static Error KeyInvalidFormat => Error.Validation(
         code: "Certificate.KeyInvalidFormat",
         description: "Private key must be in valid PEM format (BEGIN PRIVATE KEY...END PRIVATE KEY)");
+
+    public static Error CertificateNotFound => Error.NotFound(
+        code: "Certificate.NotFound",
+        description: "Certificate not found");
+
+    public static Error SNINotFound => Error.NotFound(
+        code: "Certificate.SNINotFound",
+        description: "SNI not found");
 }
 
