@@ -3,7 +3,6 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import {
   ChevronLeftIcon,
   PencilIcon,
-  TrashIcon,
   CheckCircleIcon,
   XCircleIcon,
   QuestionMarkCircleIcon,
@@ -59,22 +58,6 @@ const ClusterDetail: React.FC = () => {
       console.error('Failed to refresh cluster:', err);
     } finally {
       setRefreshing(false);
-    }
-  };
-
-  const handleDelete = async () => {
-    if (!id || !cluster) return;
-
-    if (!window.confirm(`Are you sure you want to delete cluster "${cluster.name}"?`)) {
-      return;
-    }
-
-    try {
-      await ClusterService.deleteCluster(id);
-      navigate('/clusters');
-    } catch (err) {
-      console.error('Failed to delete cluster:', err);
-      alert('Failed to delete cluster');
     }
   };
 
@@ -187,24 +170,17 @@ const ClusterDetail: React.FC = () => {
           <button
             onClick={handleRefresh}
             disabled={refreshing}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 text-sm font-medium text-gray-700 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            title="Refresh"
+            className="inline-flex items-center justify-center w-9 h-9 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
-            <ArrowPathIcon className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
-            Refresh
+            <ArrowPathIcon className={`h-5 w-5 ${refreshing ? 'animate-spin' : ''}`} />
           </button>
           <button
             onClick={() => navigate(`/clusters/${id}/edit`)}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 text-sm font-medium text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+            title="Edit"
+            className="inline-flex items-center justify-center w-9 h-9 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
           >
-            <PencilIcon className="h-4 w-4" />
-            Edit
-          </button>
-          <button
-            onClick={handleDelete}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 text-sm font-medium text-red-600 rounded-lg hover:bg-red-50 transition-colors"
-          >
-            <TrashIcon className="h-4 w-4" />
-            Delete
+            <PencilIcon className="h-5 w-5" />
           </button>
         </div>
       </div>

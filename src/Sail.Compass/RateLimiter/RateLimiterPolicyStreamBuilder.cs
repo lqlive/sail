@@ -55,7 +55,7 @@ internal static class RateLimiterPolicyStreamBuilder
 
             configs.Add(new RateLimiterPolicyConfig
             {
-                Name = middleware.Name,
+                Name = middleware.MiddlewareId,
                 PermitLimit = middleware.RateLimiter.PermitLimit,
                 Window = middleware.RateLimiter.Window,
                 QueueLimit = middleware.RateLimiter.QueueLimit

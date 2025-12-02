@@ -2,6 +2,7 @@ import { apiClient } from './api';
 import type { Certificate, SNI } from '../types';
 
 export interface CreateCertificateRequest {
+  name: string;
   cert: string;
   key: string;
   snis?: Array<{
@@ -11,8 +12,13 @@ export interface CreateCertificateRequest {
 }
 
 export interface UpdateCertificateRequest {
-  cert?: string;
-  key?: string;
+  name: string;
+  cert: string;
+  key: string;
+  snis?: Array<{
+    hostName: string;
+    name: string;
+  }>;
 }
 
 export interface CreateSNIRequest {
@@ -50,7 +56,7 @@ export const CertificateService = {
   },
 
   async updateCertificate(id: string, data: UpdateCertificateRequest): Promise<void> {
-    await apiClient.patch<void>(`/api/certificates/${id}`, data);
+    await apiClient.put<void>(`/api/certificates/${id}`, data);
   },
 
   async deleteCertificate(id: string): Promise<void> {

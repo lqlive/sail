@@ -55,7 +55,7 @@ internal static class RetryPolicyStreamBuilder
 
             configs.Add(new RetryPolicyConfig
             {
-                Name = middleware.Name,
+                Name = middleware.MiddlewareId,
                 MaxRetryAttempts = middleware.Retry.MaxRetryAttempts,
                 RetryStatusCodes = middleware.Retry.RetryStatusCodes.ToArray(),
                 RetryDelayMilliseconds = middleware.Retry.RetryDelayMilliseconds,

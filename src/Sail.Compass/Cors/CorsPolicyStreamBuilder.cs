@@ -55,7 +55,7 @@ internal static class CorsPolicyStreamBuilder
 
             configs.Add(new CorsPolicyConfig
             {
-                Name = middleware.Name,
+                Name = middleware.MiddlewareId,
                 AllowOrigins = middleware.Cors.AllowOrigins.ToList(),
                 AllowMethods = middleware.Cors.AllowMethods.ToList(),
                 AllowHeaders = middleware.Cors.AllowHeaders.ToList(),

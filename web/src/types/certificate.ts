@@ -8,9 +8,10 @@ export interface SNI {
 
 export interface Certificate {
   id: string;
+  name?: string;
   cert?: string;
   key?: string;
-  snis?: SNI[];
+  snIs?: SNI[];
   createdAt: string;
   updatedAt: string;
 }

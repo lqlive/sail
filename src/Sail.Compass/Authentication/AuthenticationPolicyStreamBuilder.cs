@@ -26,7 +26,7 @@ public static class AuthenticationPolicyStreamBuilder
                         break;
 
                     case Observers.EventType.Deleted:
-                        updated.Remove(@event.Value.Name);
+                        updated.Remove(@event.Value.PolicyId);
                         break;
                 }
 
@@ -40,18 +40,18 @@ public static class AuthenticationPolicyStreamBuilder
     {
         if (!policy.Enabled)
         {
-            policies.Remove(policy.Name);
+            policies.Remove(policy.PolicyId);
             return;
         }
 
         var config = CreatePolicyConfig(policy);
         if (config != null)
         {
-            policies[policy.Name] = config;
+            policies[policy.PolicyId] = config;
         }
         else
         {
-            policies.Remove(policy.Name);
+            policies.Remove(policy.PolicyId);
         }
     }
 
@@ -68,7 +68,7 @@ public static class AuthenticationPolicyStreamBuilder
     {
         return new AuthenticationPolicyConfig
         {
-            Name = policy.Name,
+            Name = policy.PolicyId,
             Type = MapAuthenticationSchemeType(policy.Type),
             JwtBearer = new JwtBearerConfiguration
             {
@@ -95,7 +95,7 @@ public static class AuthenticationPolicyStreamBuilder
     {
         return new AuthenticationPolicyConfig
         {
-            Name = policy.Name,
+            Name = policy.PolicyId,
             Type = MapAuthenticationSchemeType(policy.Type),
             OpenIdConnect = new OpenIdConnectConfiguration
             {

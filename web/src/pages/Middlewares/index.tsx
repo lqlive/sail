@@ -8,6 +8,7 @@ import {
   ClockIcon,
   ArrowPathIcon,
   FunnelIcon,
+  TrashIcon,
 } from '@heroicons/react/24/outline';
 import type { Middleware, MiddlewareType } from '../../types';
 import { MiddlewareService } from '../../services/middlewareService';
@@ -18,6 +19,8 @@ const Middlewares: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState<'all' | MiddlewareType>('all');
   const [error, setError] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [deleteConfirm, setDeleteConfirm] = useState<{ id: string; name: string } | null>(null);
 
   const loadMiddlewares = async () => {
     try {
@@ -52,6 +55,20 @@ const Middlewares: React.FC = () => {
     }
     return true;
   });
+
+  const handleDelete = async (id: string) => {
+    try {
+      setDeletingId(id);
+      await MiddlewareService.deleteMiddleware(id);
+      await loadMiddlewares();
+      setDeleteConfirm(null);
+    } catch (err) {
+      console.error('Failed to delete middleware:', err);
+      setError('Failed to delete middleware');
+    } finally {
+      setDeletingId(null);
+    }
+  };
 
   if (loading) {
     return (
@@ -177,14 +194,28 @@ const Middlewares: React.FC = () => {
           </Link>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4 max-w-7xl">
           {filteredMiddlewares.map((middleware) => (
-            <Link
+            <div
               key={middleware.id}
-              to={`/middlewares/${middleware.id}`}
-              className="block bg-white border border-gray-200 rounded-lg p-5 hover:border-gray-300 hover:shadow-sm transition-all"
+              className="bg-white border border-gray-200 rounded-lg hover:border-gray-300 hover:shadow-sm transition-all relative"
             >
-              <div className="flex items-center gap-3 mb-4">
+              <button
+                onClick={(e) => {
+                  e.preventDefault();
+                  setDeleteConfirm({ id: middleware.id, name: middleware.name });
+                }}
+                className="absolute top-3 right-3 p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-md transition-colors z-10"
+                title="Delete middleware"
+              >
+                <TrashIcon className="h-4 w-4" />
+              </button>
+
+              <Link
+                to={`/middlewares/${middleware.id}`}
+                className="block p-4"
+              >
+              <div className="flex items-center gap-3 mb-3">
                 <div className={`w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 ${
                   middleware.type === 'Cors' ? 'bg-blue-50' : 
                   middleware.type === 'RateLimiter' ? 'bg-indigo-50' : 
@@ -201,8 +232,8 @@ const Middlewares: React.FC = () => {
                   )}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <h3 className="text-base font-medium text-gray-900 truncate">{middleware.name}</h3>
-                  <div className="flex items-center gap-2 mt-1">
+                  <h3 className="text-sm font-medium text-gray-900 truncate">{middleware.name}</h3>
+                  <div className="flex items-center gap-1.5 mt-1 flex-wrap">
                     <span className={`inline-flex items-center px-2 py-0.5 text-xs font-medium rounded ${
                       middleware.type === 'Cors'
                         ? 'bg-blue-50 text-blue-700'
@@ -225,57 +256,101 @@ const Middlewares: React.FC = () => {
                 </div>
               </div>
 
-              {middleware.description && (
-                <p className="text-sm text-gray-500 mb-4 line-clamp-2">{middleware.description}</p>
-              )}
-
-              <div className="space-y-3">
+              <div className="space-y-2">
                 {middleware.cors && (
-                  <div className="flex items-center justify-between py-2 border-b border-gray-100">
-                    <div className="flex items-center gap-2">
+                  <div className="flex items-center justify-between py-1.5 border-b border-gray-100">
+                    <div className="flex items-center gap-1.5">
                       <ShieldCheckIcon className="h-4 w-4 text-gray-400" />
-                      <span className="text-sm text-gray-600">CORS Policy</span>
+                      <span className="text-xs text-gray-600">CORS Policy</span>
                     </div>
-                    <span className="text-sm font-medium text-gray-900">{middleware.cors.name}</span>
+                    <span className="text-xs font-medium text-gray-900">{middleware.cors.name}</span>
                   </div>
                 )}
 
                 {middleware.rateLimiter && (
-                  <div className="flex items-center justify-between py-2 border-b border-gray-100">
-                    <div className="flex items-center gap-2">
+                  <div className="flex items-center justify-between py-1.5 border-b border-gray-100">
+                    <div className="flex items-center gap-1.5">
                       <BoltIcon className="h-4 w-4 text-gray-400" />
-                      <span className="text-sm text-gray-600">Rate Limiter</span>
+                      <span className="text-xs text-gray-600">Rate Limiter</span>
                     </div>
-                    <span className="text-sm font-medium text-gray-900">{middleware.rateLimiter.permitLimit}/s</span>
+                    <span className="text-xs font-medium text-gray-900">{middleware.rateLimiter.permitLimit}/s</span>
                   </div>
                 )}
 
                 {middleware.timeout && (
-                  <div className="flex items-center justify-between py-2 border-b border-gray-100">
-                    <div className="flex items-center gap-2">
+                  <div className="flex items-center justify-between py-1.5 border-b border-gray-100">
+                    <div className="flex items-center gap-1.5">
                       <ClockIcon className="h-4 w-4 text-gray-400" />
-                      <span className="text-sm text-gray-600">Timeout</span>
+                      <span className="text-xs text-gray-600">Timeout</span>
                     </div>
-                    <span className="text-sm font-medium text-gray-900">{middleware.timeout.seconds}s</span>
+                    <span className="text-xs font-medium text-gray-900">{middleware.timeout.seconds}s</span>
                   </div>
                 )}
 
                 {middleware.retry && (
-                  <div className="flex items-center justify-between py-2 border-b border-gray-100">
-                    <div className="flex items-center gap-2">
+                  <div className="flex items-center justify-between py-1.5 border-b border-gray-100">
+                    <div className="flex items-center gap-1.5">
                       <ArrowPathIcon className="h-4 w-4 text-gray-400" />
-                      <span className="text-sm text-gray-600">Retry</span>
+                      <span className="text-xs text-gray-600">Retry</span>
                     </div>
-                    <span className="text-sm font-medium text-gray-900">{middleware.retry.maxRetryAttempts} attempts</span>
+                    <span className="text-xs font-medium text-gray-900">{middleware.retry.maxRetryAttempts} attempts</span>
                   </div>
                 )}
 
                 {!middleware.cors && !middleware.rateLimiter && !middleware.timeout && !middleware.retry && (
-                  <div className="text-sm text-gray-400 py-2">No policies configured</div>
+                  <div className="text-xs text-gray-400 py-1.5 border-b border-gray-100">No policies configured</div>
                 )}
+
+                <div className="pt-3 text-xs text-gray-400">
+                  {middleware.updatedAt && new Date(middleware.updatedAt).toLocaleDateString('en-US', { 
+                    year: 'numeric', 
+                    month: 'short', 
+                    day: 'numeric' 
+                  })}
+                </div>
               </div>
             </Link>
+            </div>
           ))}
+        </div>
+      )}
+
+      {deleteConfirm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg max-w-md w-full p-6">
+            <h3 className="text-lg font-medium text-gray-900 mb-2">Delete Middleware</h3>
+            <p className="text-sm text-gray-500 mb-6">
+              Are you sure you want to delete <span className="font-medium text-gray-900">"{deleteConfirm.name}"</span>?
+              This action cannot be undone.
+            </p>
+
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => setDeleteConfirm(null)}
+                disabled={deletingId === deleteConfirm.id}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => handleDelete(deleteConfirm.id)}
+                disabled={deletingId === deleteConfirm.id}
+                className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 flex items-center gap-2"
+              >
+                {deletingId === deleteConfirm.id ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                    Deleting...
+                  </>
+                ) : (
+                  <>
+                    <TrashIcon className="h-4 w-4" />
+                    Delete
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

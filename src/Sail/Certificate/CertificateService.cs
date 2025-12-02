@@ -14,11 +14,18 @@ public class CertificateService(ICertificateStore certificateStore)
         return certificates.Select(MapToCertificate);
     }
 
+    public async Task<CertificateResponse?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
+    {
+        var certificate = await certificateStore.GetByIdAsync(id, cancellationToken);
+        return certificate != null ? MapToCertificate(certificate) : null;
+    }
+
     public async Task<ErrorOr<Created>> CreateAsync(CertificateRequest request,
         CancellationToken cancellationToken = default)
     {
         var certificate = new CertificateEntity
         {
+            Name = request.Name,
             Cert = request.Cert,
             Key = request.Key,
             SNIs = request.SNIs?.Select(s => new SNI
@@ -44,8 +51,19 @@ public class CertificateService(ICertificateStore certificateStore)
             return Error.NotFound(description: "Certificate not found");
         }
 
+        certificate.Name = request.Name;
         certificate.Cert = request.Cert;
         certificate.Key = request.Key;
+        
+        certificate.SNIs = request?.SNIs?.Select(s => new SNI
+        {
+            Id = Guid.NewGuid(),
+            HostName = s.HostName,
+            Name = s.Name,
+            CreatedAt = DateTimeOffset.UtcNow,
+            UpdatedAt = DateTimeOffset.UtcNow
+        }).ToList() ?? [];
+        
         certificate.UpdatedAt = DateTimeOffset.UtcNow;
 
         await certificateStore.UpdateAsync(certificate, cancellationToken);
@@ -147,8 +165,10 @@ public class CertificateService(ICertificateStore certificateStore)
         return new CertificateResponse
         {
             Id = certificate.Id,
+            Name = certificate.Name ?? $"Certificate {certificate.Id.ToString().Substring(0, 8)}",
             Cert = certificate.Cert,
             Key = certificate.Key,
+            SNIs = certificate.SNIs?.Select(MapToSNI),
             CreatedAt = certificate.CreatedAt,
             UpdatedAt = certificate.UpdatedAt
         };

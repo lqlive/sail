@@ -2,11 +2,16 @@ using ErrorOr;
 using Sail.Core.Entities;
 using Sail.Core.Stores;
 using Sail.Route.Models;
+using Sail.Route.Errors;
+using Sail.Route.Validators;
 using RouteEntity = Sail.Core.Entities.Route;
 
 namespace Sail.Route;
 
-public class RouteService(IRouteStore routeStore)
+public class RouteService(
+    IRouteStore routeStore, 
+    IClusterStore clusterStore,
+    RoutePolicyValidator policyValidator)
 {
     public async Task<RouteResponse?> GetAsync(Guid id, CancellationToken cancellationToken = default)
     {
@@ -23,6 +28,23 @@ public class RouteService(IRouteStore routeStore)
 
     public async Task<ErrorOr<Created>> CreateAsync(RouteRequest request, CancellationToken cancellationToken = default)
     {
+        if (!request.ClusterId.HasValue)
+        {
+            return RouteErrors.ClusterRequired;
+        }
+
+        var cluster = await clusterStore.GetByIdAsync(request.ClusterId.Value, cancellationToken);
+        if (cluster is null)
+        {
+            return RouteErrors.ClusterNotFound;
+        }
+
+        var validationErrors = await policyValidator.ValidatePoliciesAsync(request, cancellationToken);
+        if (validationErrors.Count > 0)
+        {
+            return validationErrors;
+        }
+
         var route = CreateRouteFromRequest(request);
         await routeStore.CreateAsync(route, cancellationToken);
         return Result.Created;
@@ -35,6 +57,21 @@ public class RouteService(IRouteStore routeStore)
         if (route is null)
         {
             return Error.NotFound(description: "Route not found");
+        }
+
+        if (request.ClusterId.HasValue)
+        {
+            var cluster = await clusterStore.GetByIdAsync(request.ClusterId.Value, cancellationToken);
+            if (cluster is null)
+            {
+                return RouteErrors.ClusterNotFound;
+            }
+        }
+
+        var validationErrors = await policyValidator.ValidatePoliciesAsync(request, cancellationToken);
+        if (validationErrors.Count > 0)
+        {
+            return validationErrors;
         }
 
         route.Name = request.Name;

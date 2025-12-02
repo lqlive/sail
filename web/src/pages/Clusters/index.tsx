@@ -7,7 +7,8 @@ import {
   ServerStackIcon,
   CloudIcon,
   FunnelIcon,
-  CpuChipIcon
+  CpuChipIcon,
+  TrashIcon
 } from '@heroicons/react/24/outline';
 import type { Cluster } from '../../types';
 import { ClusterService } from '../../services/clusterService';
@@ -17,6 +18,8 @@ const Clusters: React.FC = () => {
   const [clusters, setClusters] = useState<Cluster[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [deleteConfirm, setDeleteConfirm] = useState<{ id: string; name: string } | null>(null);
 
   const loadClusters = async () => {
     try {
@@ -44,6 +47,20 @@ const Clusters: React.FC = () => {
     }, 300);
     return () => clearTimeout(timer);
   }, [searchTerm]);
+
+  const handleDelete = async (id: string) => {
+    try {
+      setDeletingId(id);
+      await ClusterService.deleteCluster(id);
+      await loadClusters();
+      setDeleteConfirm(null);
+    } catch (err) {
+      console.error('Failed to delete cluster:', err);
+      setError('Failed to delete cluster');
+    } finally {
+      setDeletingId(null);
+    }
+  };
 
   if (loading) {
     return (
@@ -130,11 +147,26 @@ const Clusters: React.FC = () => {
             const hasServiceDiscovery = !!(cluster as any).serviceName;
             
             return (
-              <Link
+              <div
                 key={cluster.id}
-                to={`/clusters/${cluster.id}`}
-                className="block bg-white border border-gray-200 rounded-lg p-4 hover:border-gray-300 hover:shadow-sm transition-all"
+                className="bg-white border border-gray-200 rounded-lg hover:border-gray-300 hover:shadow-sm transition-all relative"
               >
+                {/* Delete Button - Top Right Corner */}
+                <button
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setDeleteConfirm({ id: cluster.id, name: cluster.name });
+                  }}
+                  className="absolute top-3 right-3 p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-md transition-colors z-10"
+                  title="Delete cluster"
+                >
+                  <TrashIcon className="h-4 w-4" />
+                </button>
+
+                <Link
+                  to={`/clusters/${cluster.id}`}
+                  className="block p-4"
+                >
                 <div className="flex items-center gap-3 mb-3">
                   <div className="w-10 h-10 bg-purple-50 rounded-lg flex items-center justify-center flex-shrink-0">
                     <ServerStackIcon className="h-5 w-5 text-purple-600" />
@@ -206,12 +238,61 @@ const Clusters: React.FC = () => {
                   )}
 
                   {!hasServiceDiscovery && !healthCheckEnabled && destinationCount === 0 && (
-                    <div className="text-xs text-gray-400 py-1.5">Basic configuration</div>
+                    <div className="text-xs text-gray-400 py-1.5 border-b border-gray-100">Basic configuration</div>
                   )}
+
+                  <div className="pt-3 text-xs text-gray-400">
+                    {cluster.updatedAt && new Date(cluster.updatedAt).toLocaleDateString('en-US', { 
+                      year: 'numeric', 
+                      month: 'short', 
+                      day: 'numeric' 
+                    })}
+                  </div>
                 </div>
-              </Link>
+                </Link>
+              </div>
             );
           })}
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {deleteConfirm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg max-w-md w-full p-6">
+            <h3 className="text-lg font-medium text-gray-900 mb-2">Delete Cluster</h3>
+            <p className="text-sm text-gray-500 mb-6">
+              Are you sure you want to delete <span className="font-medium text-gray-900">"{deleteConfirm.name}"</span>?
+              This action cannot be undone.
+            </p>
+
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => setDeleteConfirm(null)}
+                disabled={deletingId === deleteConfirm.id}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => handleDelete(deleteConfirm.id)}
+                disabled={deletingId === deleteConfirm.id}
+                className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 flex items-center gap-2"
+              >
+                {deletingId === deleteConfirm.id ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                    Deleting...
+                  </>
+                ) : (
+                  <>
+                    <TrashIcon className="h-4 w-4" />
+                    Delete
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

@@ -8,6 +8,10 @@ public class CertificateRequestValidator : AbstractValidator<CertificateRequest>
 {
     public CertificateRequestValidator()
     {
+        RuleFor(x => x.Name)
+            .NotEmpty()
+            .WithMessage("Certificate name is required");
+
         RuleFor(x => x.Cert)
             .NotEmpty()
             .WithMessage(CertificateErrors.CertRequired.Description)

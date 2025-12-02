@@ -30,7 +30,7 @@ export const usePolicyOptions = () => {
       const enabledAuthPolicies = authData
         .filter((p: AuthenticationPolicy) => p.enabled)
         .map((p: AuthenticationPolicy) => ({
-          value: p.name,
+          value: p.id,
           label: p.name,
           type: p.type,
         }));
@@ -44,7 +44,7 @@ export const usePolicyOptions = () => {
       const cors = enabledMiddlewares
         .filter((m: Middleware) => m.type === 'Cors' && m.cors)
         .map((m: Middleware) => ({
-          value: m.cors!.name,
+          value: m.id,
           label: m.cors!.name,
           type: 'CORS',
         }));
@@ -54,7 +54,7 @@ export const usePolicyOptions = () => {
       const rateLimiter = enabledMiddlewares
         .filter((m: Middleware) => m.type === 'RateLimiter' && m.rateLimiter)
         .map((m: Middleware) => ({
-          value: m.rateLimiter!.name,
+          value: m.id,
           label: m.rateLimiter!.name,
           type: 'Rate Limiter',
         }));
@@ -64,7 +64,7 @@ export const usePolicyOptions = () => {
       const timeout = enabledMiddlewares
         .filter((m: Middleware) => m.type === 'Timeout' && m.timeout)
         .map((m: Middleware) => ({
-          value: m.timeout!.name,
+          value: m.id,
           label: m.timeout!.name,
           type: 'Timeout',
         }));
@@ -74,7 +74,7 @@ export const usePolicyOptions = () => {
       const retry = enabledMiddlewares
         .filter((m: Middleware) => m.type === 'Retry' && m.retry)
         .map((m: Middleware) => ({
-          value: m.retry!.name,
+          value: m.id,
           label: m.retry!.name,
           type: 'Retry',
         }));
