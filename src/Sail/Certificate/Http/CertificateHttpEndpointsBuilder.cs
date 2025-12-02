@@ -12,13 +12,17 @@ public static class CertificateHttpEndpointsBuilder
 
         api.MapGet("/", GetItems);
         api.MapGet("/{id:guid}", GetItem);
-        api.MapPost("/", Create);
-        api.MapPut("/{id:guid}", Update);
+        api.MapPost("/", Create)
+            .AddRequestValidation<CertificateRequest>();
+        api.MapPut("/{id:guid}", Update)
+            .AddRequestValidation<CertificateRequest>();
         api.MapDelete("/{id:guid}", Delete);
 
         api.MapGet("/{certificateId:guid}/snis", GetSNIs);
-        api.MapPost("/{certificateId:guid}/snis", CreateSNI);
-        api.MapPost("/{certificateId:guid}/snis/{id:guid}", UpdateSNI);
+        api.MapPost("/{certificateId:guid}/snis", CreateSNI)
+            .AddRequestValidation<SNIRequest>();
+        api.MapPost("/{certificateId:guid}/snis/{id:guid}", UpdateSNI)
+            .AddRequestValidation<SNIRequest>();
         api.MapDelete("/{certificateId:guid}/snis/{id:guid}", DeleteSNI);
         return api;
     }

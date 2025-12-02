@@ -14,7 +14,8 @@ public static class RouteHttpEndpointsBuilder
         api.MapGet("/{id:guid}", Get);
         api.MapPost("/", Create)
             .AddRequestValidation<RouteRequest>();
-        api.MapPut("/{id:guid}", Update);
+        api.MapPut("/{id:guid}", Update)
+            .AddRequestValidation<RouteRequest>();
         api.MapDelete("/{id:guid}", Delete);
         return api;
     }

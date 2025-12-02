@@ -1,18 +1,30 @@
-// API configuration file
-// Use relative path so Vite proxy handles the routing
 export const API_BASE_URL = '';
-
-// OAuth base URL for external redirects (needs full URL)
-// This can be overridden by environment variables
 export const OAUTH_BASE_URL = (import.meta as any).env?.VITE_OAUTH_BASE_URL || 'http://localhost:5169';
 
-// API error type
 export interface ApiError {
   type: string;
   title: string;
   status: number;
-  detail: string;
+  detail?: string;
+  errors?: Record<string, string[]>;
 }
+
+export interface ApiErrorEvent {
+  status: number;
+  error: ApiError;
+}
+
+const API_ERROR_EVENT = 'api-error';
+
+export const emitApiError = (event: ApiErrorEvent) => {
+  window.dispatchEvent(new CustomEvent(API_ERROR_EVENT, { detail: event }));
+};
+
+export const onApiError = (callback: (event: ApiErrorEvent) => void) => {
+  const handler = (e: Event) => callback((e as CustomEvent<ApiErrorEvent>).detail);
+  window.addEventListener(API_ERROR_EVENT, handler);
+  return () => window.removeEventListener(API_ERROR_EVENT, handler);
+};
 
 // Generic API response handler
 export class ApiClient {
@@ -46,12 +58,10 @@ export class ApiClient {
       const response = await fetch(url, config);
       
       if (!response.ok) {
-        // Handle error response
         let errorData: ApiError;
         try {
           errorData = await response.json();
         } catch {
-          // If response is not JSON, create a basic error object
           errorData = {
             type: 'error',
             title: 'Request Failed',
@@ -60,7 +70,8 @@ export class ApiClient {
           };
         }
         
-        // Create error with response status attached
+        emitApiError({ status: response.status, error: errorData });
+        
         const error = new Error(errorData.detail || errorData.title || 'API request failed') as any;
         error.response = { status: response.status, data: errorData };
         error.status = response.status;

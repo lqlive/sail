@@ -9,12 +9,10 @@ public class DestinationRequestValidator : AbstractValidator<DestinationRequest>
     public DestinationRequestValidator()
     {
         RuleFor(x => x.Host)
-            .NotEmpty()
-            .WithMessage(DestinationErrors.HostRequired.Description)
-            .WithErrorCode(DestinationErrors.HostRequired.Code)
             .MaximumLength(255)
             .WithMessage(DestinationErrors.HostTooLong.Description)
-            .WithErrorCode(DestinationErrors.HostTooLong.Code);
+            .WithErrorCode(DestinationErrors.HostTooLong.Code)
+            .When(x => !string.IsNullOrEmpty(x.Host));
 
         RuleFor(x => x.Address)
             .NotEmpty()
@@ -24,9 +22,5 @@ public class DestinationRequestValidator : AbstractValidator<DestinationRequest>
             .WithMessage(DestinationErrors.AddressInvalid.Description)
             .WithErrorCode(DestinationErrors.AddressInvalid.Code);
 
-        RuleFor(x => x.Health)
-            .NotEmpty()
-            .WithMessage(DestinationErrors.HealthRequired.Description)
-            .WithErrorCode(DestinationErrors.HealthRequired.Code);
     }
 }

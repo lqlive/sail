@@ -4,7 +4,7 @@ namespace Sail.Cluster.Models;
 
 public record ClusterRequest(
     string Name,
-    string ServiceName,
+    string? ServiceName,
     ServiceDiscoveryType? ServiceDiscoveryType,
     HealthCheckRequest? HealthCheck,
     SessionAffinityRequest? SessionAffinity,
