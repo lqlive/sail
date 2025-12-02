@@ -12,8 +12,10 @@ public static class ClusterHttpEndpointsBuilder
 
         api.MapGet("/", List);
         api.MapGet("/{id:guid}", Get);
-        api.MapPost("/", Create);
-        api.MapPut("/{id:guid}", Update);
+        api.MapPost("/", Create)
+            .AddRequestValidation<ClusterRequest>();
+        api.MapPut("/{id:guid}", Update)
+            .AddRequestValidation<ClusterRequest>();
         api.MapDelete("/{id:guid}", Delete);
         return api;
     }

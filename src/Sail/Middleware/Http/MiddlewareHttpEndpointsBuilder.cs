@@ -13,8 +13,9 @@ public static class MiddlewareHttpEndpointsBuilder
         api.MapGet("/", List);
         api.MapGet("/{id:guid}", Get);
         api.MapPost("/", Create)
-           .AddRequestValidation<MiddlewareRequest>(); ;
-        api.MapPut("/{id:guid}", Update);
+            .AddRequestValidation<MiddlewareRequest>();
+        api.MapPut("/{id:guid}", Update)
+            .AddRequestValidation<MiddlewareRequest>();
         api.MapDelete("/{id:guid}", Delete);
         return api;
     }
@@ -77,5 +78,3 @@ public static class MiddlewareHttpEndpointsBuilder
         );
     }
 }
-
-

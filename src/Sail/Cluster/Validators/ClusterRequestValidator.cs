@@ -20,9 +20,13 @@ public class ClusterRequestValidator : AbstractValidator<ClusterRequest>
             .NotEmpty()
             .WithMessage(ClusterErrors.ServiceNameRequired.Description)
             .WithErrorCode(ClusterErrors.ServiceNameRequired.Code)
+            .When(x => x.ServiceDiscoveryType.HasValue);
+
+        RuleFor(x => x.ServiceName)
             .MaximumLength(200)
             .WithMessage(ClusterErrors.ServiceNameTooLong.Description)
-            .WithErrorCode(ClusterErrors.ServiceNameTooLong.Code);
+            .WithErrorCode(ClusterErrors.ServiceNameTooLong.Code)
+            .When(x => !string.IsNullOrEmpty(x.ServiceName));
 
         RuleFor(x => x.ServiceDiscoveryType)
             .IsInEnum()

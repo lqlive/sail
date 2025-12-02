@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Layout from './components/Layout/Layout';
 import Dashboard from './pages/Dashboard';
@@ -15,9 +15,25 @@ import MiddlewareEdit from './pages/Middlewares/MiddlewareEdit';
 import AuthenticationPoliciesPage from './pages/AuthenticationPolicies';
 import AuthenticationPolicyEdit from './pages/AuthenticationPolicies/AuthenticationPolicyEdit';
 import Settings from './pages/Settings';
+import { NotificationProvider, useNotification } from './contexts/NotificationContext';
+import { onApiError } from './services/api';
 import './App.css';
 
 const AppContent: React.FC = () => {
+  const { showValidationErrors, showError } = useNotification();
+
+  useEffect(() => {
+    const unsubscribe = onApiError(({ status, error }) => {
+      if (status === 422 && error.errors) {
+        showValidationErrors(error.errors);
+      } else if (status >= 400 && status < 500) {
+        showError(error.title || 'Request Failed', error.detail || 'An unexpected error occurred');
+      }
+    });
+
+    return unsubscribe;
+  }, [showValidationErrors, showError]);
+
   return (
     <Router>
       <Layout>
@@ -48,7 +64,11 @@ const AppContent: React.FC = () => {
 };
 
 const App: React.FC = () => {
-  return <AppContent />;
+  return (
+    <NotificationProvider>
+      <AppContent />
+    </NotificationProvider>
+  );
 };
 
 export default App; 

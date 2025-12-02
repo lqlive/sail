@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { ChevronLeftIcon, PlusIcon, XMarkIcon, CheckIcon } from '@heroicons/react/24/outline';
-import type { Route, Cluster } from '../../types';
+import type { Cluster } from '../../types';
 import { RouteService } from '../../services/routeService';
 import { PolicySelect } from '../../components/PolicySelect';
 import { Select } from '../../components/Select';
 import { FormField } from '../../components/FormField';
 import { Checkbox } from '../../components/Checkbox';
-import { Alert } from '../../components/Alert';
 import { usePolicyOptions } from '../../hooks/usePolicyOptions';
 import { ClusterService } from '../../services/clusterService';
 

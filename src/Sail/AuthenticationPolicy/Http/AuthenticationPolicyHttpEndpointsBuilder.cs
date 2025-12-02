@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Sail.AuthenticationPolicy.Models;
+using Sail.Extensions;
 
 namespace Sail.AuthenticationPolicy.Http;
 
@@ -13,8 +14,10 @@ public static class AuthenticationPolicyHttpEndpointsBuilder
 
         group.MapGet("/", GetAuthenticationPolicies);
         group.MapGet("/{id:guid}", GetAuthenticationPolicy);
-        group.MapPost("/", CreateAuthenticationPolicy);
-        group.MapPut("/{id:guid}", UpdateAuthenticationPolicy);
+        group.MapPost("/", CreateAuthenticationPolicy)
+            .AddRequestValidation<AuthenticationPolicyRequest>();
+        group.MapPut("/{id:guid}", UpdateAuthenticationPolicy)
+            .AddRequestValidation<AuthenticationPolicyRequest>();
         group.MapDelete("/{id:guid}", DeleteAuthenticationPolicy);
 
         return group;

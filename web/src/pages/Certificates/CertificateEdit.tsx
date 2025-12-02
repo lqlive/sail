@@ -4,11 +4,13 @@ import { ArrowLeftIcon, PlusIcon, TrashIcon, XMarkIcon } from '@heroicons/react/
 import type { SNI } from '../../types';
 import { CertificateService, CreateCertificateRequest, CreateSNIRequest } from '../../services/certificateService';
 import { FormField } from '../../components/FormField';
+import { useNotification } from '../../contexts/NotificationContext';
 
 const CertificateEdit: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const isEditMode = !!id;
+  const { showNotification } = useNotification();
 
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -67,6 +69,7 @@ const CertificateEdit: React.FC = () => {
         await CertificateService.createCertificate(formData);
       }
       
+      showNotification('success', `Certificate ${isEditMode ? 'updated' : 'created'} successfully`);
       navigate('/certificates');
     } catch (err) {
       console.error('Failed to save certificate:', err);
