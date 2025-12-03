@@ -75,12 +75,14 @@ public class RouteService(
         }
 
         route.Name = request.Name;
+        route.Enabled = request.Enabled;
         route.ClusterId = request.ClusterId;
         route.Match = CreateRouteMatchFromRequest(request.Match);
         route.AuthorizationPolicy = request.AuthorizationPolicy;
         route.RateLimiterPolicy = request.RateLimiterPolicy;
         route.CorsPolicy = request.CorsPolicy;
         route.TimeoutPolicy = request.TimeoutPolicy;
+        route.RetryPolicy = request.RetryPolicy;
         route.Timeout = request.Timeout;
         route.MaxRequestBodySize = request.MaxRequestBodySize;
         route.HttpsRedirect = request.HttpsRedirect;
@@ -102,6 +104,7 @@ public class RouteService(
         var route = new RouteEntity
         {
             Name = request.Name,
+            Enabled = request.Enabled,
             ClusterId = request.ClusterId,
             Match = CreateRouteMatchFromRequest(request.Match),
             Order = request.Order,
@@ -109,6 +112,7 @@ public class RouteService(
             RateLimiterPolicy = request.RateLimiterPolicy,
             CorsPolicy = request.CorsPolicy,
             TimeoutPolicy = request.TimeoutPolicy,
+            RetryPolicy = request.RetryPolicy,
             Timeout = request.Timeout,
             MaxRequestBodySize = request.MaxRequestBodySize,
             HttpsRedirect = request.HttpsRedirect,
@@ -158,6 +162,7 @@ public class RouteService(
             Id = route.Id,
             ClusterId = route.ClusterId,
             Name = route.Name,
+            Enabled = route.Enabled ?? true,
             Match = new RouteMatchResponse
             {
                 Path = route.Match.Path,
@@ -184,6 +189,7 @@ public class RouteService(
             RateLimiterPolicy = route.RateLimiterPolicy,
             CorsPolicy = route.CorsPolicy,
             TimeoutPolicy = route.TimeoutPolicy,
+            RetryPolicy = route.RetryPolicy,
             Timeout = route.Timeout,
             MaxRequestBodySize = route.MaxRequestBodySize,
             HttpsRedirect = route.HttpsRedirect,

@@ -167,7 +167,9 @@ const Certificates: React.FC = () => {
                     </div>
                     <div className="flex-1 min-w-0">
                       <h3 className="text-sm font-medium text-gray-900 truncate">{cert.name || `Certificate ${cert.id.substring(0, 8)}`}</h3>
-                      <p className="text-xs text-gray-500 mt-0.5">ID: {cert.id.substring(0, 8)}...</p>
+                      <div className="flex items-center gap-1.5 mt-1">
+                        <span className="text-xs text-green-600 font-medium">● Configured</span>
+                      </div>
                     </div>
                   </div>
 

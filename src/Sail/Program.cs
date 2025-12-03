@@ -14,6 +14,7 @@ using Sail.Middleware.Grpc;
 using Sail.Middleware.Http;
 using Sail.AuthenticationPolicy.Grpc;
 using Sail.AuthenticationPolicy.Http;
+using Sail.Statistics.Http;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -46,6 +47,7 @@ endpoint.MapClusterApiV1();
 endpoint.MapCertificateApiV1();
 endpoint.MapMiddlewareApiV1();
 endpoint.MapAuthenticationPolicyApi();
+endpoint.MapStatisticsApiV1();
 
 app.UseDefaultOpenApi();
 app.MapGrpcService<RouteGrpcService>();

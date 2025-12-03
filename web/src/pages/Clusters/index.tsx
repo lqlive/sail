@@ -173,12 +173,17 @@ const Clusters: React.FC = () => {
                   </div>
                   <div className="flex-1 min-w-0">
                     <h3 className="text-sm font-medium text-gray-900 truncate">{cluster.name}</h3>
-                    <div className="flex items-center gap-1.5 mt-1">
+                    <div className="flex items-center gap-1.5 mt-1 flex-wrap">
                       {hasServiceDiscovery && (
                         <span className="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded bg-blue-50 text-blue-700">
                           <CloudIcon className="h-3 w-3 mr-0.5" />
                           Service Discovery
                         </span>
+                      )}
+                      {cluster.enabled ? (
+                        <span className="text-xs text-green-600 font-medium">● Enabled</span>
+                      ) : (
+                        <span className="text-xs text-gray-400">○ Disabled</span>
                       )}
                     </div>
                   </div>

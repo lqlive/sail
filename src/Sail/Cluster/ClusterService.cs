@@ -39,6 +39,7 @@ public class ClusterService(IClusterStore clusterStore)
         }
 
         cluster.Name = request.Name;
+        cluster.Enabled = request.Enabled;
         cluster.ServiceName = request.ServiceName;
         cluster.ServiceDiscoveryType = request.ServiceDiscoveryType;
         cluster.LoadBalancingPolicy = request.LoadBalancingPolicy;
@@ -62,6 +63,7 @@ public class ClusterService(IClusterStore clusterStore)
         var cluster = new ClusterEntity
         {
             Name = request.Name,
+            Enabled = request.Enabled,
             LoadBalancingPolicy = request.LoadBalancingPolicy,
             ServiceName = request.ServiceName,
             ServiceDiscoveryType = request.ServiceDiscoveryType,
@@ -134,6 +136,7 @@ public class ClusterService(IClusterStore clusterStore)
         {
             Id = cluster.Id,
             Name = cluster.Name,
+            Enabled = cluster.Enabled ?? true,
             ServiceName = cluster.ServiceName,
             ServiceDiscoveryType = cluster.ServiceDiscoveryType,
             LoadBalancingPolicy = cluster.LoadBalancingPolicy,

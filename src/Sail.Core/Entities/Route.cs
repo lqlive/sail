@@ -5,12 +5,14 @@ public class Route
     public Guid Id { get; set; }
     public Guid? ClusterId { get; set; }
     public string Name { get; set; } = string.Empty;
+    public bool? Enabled { get; set; } = true;
     public RouteMatch Match { get; set; } = new();
     public int Order { get; set; }
     public string? AuthorizationPolicy { get; set; }
     public string? RateLimiterPolicy { get; set; }
     public string? CorsPolicy { get; set; }
     public string? TimeoutPolicy { get; set; }
+    public string? RetryPolicy { get; set; }
     public TimeSpan? Timeout { get; set; }
     public long? MaxRequestBodySize { get; set; }
     public bool? HttpsRedirect { get; set; }
