@@ -15,23 +15,6 @@ public class SailRetryPolicyProvider : IRetryPolicyProvider
         _logger = logger;
     }
 
-    public RetryPipelineWrapper? GetPolicy(string key)
-    {
-        if (string.IsNullOrEmpty(key))
-        {
-            return null;
-        }
-
-        if (_policies.TryGetValue(key, out var policy))
-        {
-            Log.PolicyFound(_logger, key);
-            return policy;
-        }
-
-        Log.PolicyNotFound(_logger, key);
-        return null;
-    }
-
     public Task UpdateAsync(IReadOnlyList<RetryPolicyConfig> configs, CancellationToken cancellationToken)
     {
         var newPolicies = new Dictionary<string, RetryPipelineWrapper>(StringComparer.OrdinalIgnoreCase);
@@ -86,6 +69,22 @@ public class SailRetryPolicyProvider : IRetryPolicyProvider
         };
 
         return new ResiliencePipelineBuilder().AddRetry(retryStrategyOptions).Build();
+    }
+    public RetryPipelineWrapper? GetPolicy(string key)
+    {
+        if (string.IsNullOrEmpty(key))
+        {
+            return null;
+        }
+
+        if (_policies.TryGetValue(key, out var policy))
+        {
+            Log.PolicyFound(_logger, key);
+            return policy;
+        }
+
+        Log.PolicyNotFound(_logger, key);
+        return null;
     }
 
     private static class Log

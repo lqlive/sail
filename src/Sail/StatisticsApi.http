@@ -1,0 +1,18 @@
+@baseUrl = http://localhost:8100
+@apiVersion = 1.0‘
+
+### Get All Statistics
+GET {{baseUrl}}/api/statistics?api-version=1.0
+
+### Get Resource Statistics
+GET {{baseUrl}}/api/statistics/resources?api-version=1.0
+
+### Get Recent Routes
+GET {{baseUrl}}/api/statistics/recent/routes?api-version=1.0
+
+### Get Recent Clusters
+GET {{baseUrl}}/api/statistics/recent/clusters?api-version=1.0
+
+### Get Recent Certificates
+GET {{baseUrl}}/api/statistics/recent/certificates?api-version=1.0
+

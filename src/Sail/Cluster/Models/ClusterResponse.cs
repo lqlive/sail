@@ -6,6 +6,7 @@ public record ClusterResponse
 {
     public Guid Id { get; init; }
     public string? Name { get; init; }
+    public bool Enabled { get; init; }
     public string? ServiceName { get; init; }
     public ServiceDiscoveryType? ServiceDiscoveryType { get; init; }
     public string? LoadBalancingPolicy { get; init; }

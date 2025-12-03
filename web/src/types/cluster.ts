@@ -26,6 +26,7 @@ export interface ServiceDiscovery {
 export interface Cluster {
   id: string;
   name: string;
+  enabled: boolean;
   serviceName?: string;
   serviceDiscoveryType?: ServiceDiscoveryType;
   loadBalancingPolicy?: string;

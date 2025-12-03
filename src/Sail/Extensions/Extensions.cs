@@ -18,6 +18,7 @@ public static class Extensions
         services.TryAddScoped<Certificate.CertificateService>();
         services.TryAddScoped<Middleware.MiddlewareService>();
         services.TryAddScoped<AuthenticationPolicy.AuthenticationPolicyService>();
+        services.TryAddScoped<Statistics.StatisticsService>();
 
         services.AddValidatorsFromAssemblyContaining<Program>();
 

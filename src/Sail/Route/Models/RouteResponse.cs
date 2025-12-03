@@ -5,12 +5,14 @@ public record RouteResponse
     public Guid Id { get; init; }
     public Guid? ClusterId { get; init; }
     public string Name { get; init; }
+    public bool Enabled { get; init; }
     public RouteMatchResponse Match { get; init; }
     public int Order { get; init; }
     public string? AuthorizationPolicy { get; init; }
     public string? RateLimiterPolicy { get; init; }
     public string? CorsPolicy { get; init; }
     public string? TimeoutPolicy { get; init; }
+    public string? RetryPolicy { get; init; }
     public TimeSpan? Timeout { get; init; }
     public long? MaxRequestBodySize { get; init; }
     public bool? HttpsRedirect { get; init; }

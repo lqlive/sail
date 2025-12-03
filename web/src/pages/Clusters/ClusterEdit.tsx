@@ -15,6 +15,7 @@ const ClusterEdit: React.FC = () => {
 
   const [formData, setFormData] = useState({
     name: '',
+    enabled: true,
     useServiceDiscovery: false,
     serviceName: '',
     serviceDiscoveryType: 'Consul' as 'Consul' | 'Dns',
@@ -76,6 +77,7 @@ const ClusterEdit: React.FC = () => {
       
       setFormData({
         name: cluster.name || '',
+        enabled: cluster.enabled !== false,
         useServiceDiscovery: !!(cluster as any).serviceName,
         serviceName: (cluster as any).serviceName || '',
         serviceDiscoveryType: (cluster as any).serviceDiscoveryType || 'Consul',
@@ -121,6 +123,7 @@ const ClusterEdit: React.FC = () => {
 
       const clusterData: any = {
         name: formData.name,
+        enabled: formData.enabled,
         loadBalancingPolicy: formData.loadBalancingPolicy || undefined,
         serviceName: formData.useServiceDiscovery ? formData.serviceName : undefined,
         serviceDiscoveryType: formData.useServiceDiscovery ? (formData.serviceDiscoveryType === 'Consul' ? 1 : 2) : undefined,
@@ -254,6 +257,12 @@ const ClusterEdit: React.FC = () => {
                 required
               />
             </div>
+
+            <Checkbox
+              checked={formData.enabled}
+              onChange={(checked) => setFormData({ ...formData, enabled: checked })}
+              label="Enable this cluster immediately"
+            />
 
             <FormField
               label="Load Balancing Policy"

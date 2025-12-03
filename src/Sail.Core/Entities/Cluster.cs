@@ -4,6 +4,7 @@ public class Cluster
 {
     public Guid Id { get; set; }
     public string? Name { get; set; }
+    public bool? Enabled { get; set; } = true;
     public string? ServiceName { get; set; }
     public ServiceDiscoveryType? ServiceDiscoveryType { get; set; }
     public string? LoadBalancingPolicy { get; set; }
