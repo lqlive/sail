@@ -4,7 +4,6 @@ import {
   MagnifyingGlassIcon,
   PlusIcon,
   CheckCircleIcon,
-  XCircleIcon,
   TrashIcon,
 } from '@heroicons/react/24/outline';
 import type { Route } from '../../types';
@@ -198,20 +197,14 @@ const Routes: React.FC = () => {
                     <div className="flex-1 min-w-0">
                       <h3 className="text-sm font-medium text-gray-900 truncate">{route.name}</h3>
                       <div className="flex items-center gap-1.5 mt-1 flex-wrap">
-                        {route.enabled ? (
-                          <span className="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded bg-green-50 text-green-700">
-                            <CheckCircleIcon className="h-3 w-3 mr-0.5" />
-                            Active
-                          </span>
-                        ) : (
-                          <span className="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded bg-gray-100 text-gray-600">
-                            <XCircleIcon className="h-3 w-3 mr-0.5" />
-                            Inactive
-                          </span>
-                        )}
                         <span className="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded bg-gray-100 text-gray-600">
                           #{route.order}
                         </span>
+                        {route.enabled ? (
+                          <span className="text-xs text-green-600 font-medium">● Enabled</span>
+                        ) : (
+                          <span className="text-xs text-gray-400">○ Disabled</span>
+                        )}
                       </div>
                     </div>
                   </div>
