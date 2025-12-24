@@ -4,7 +4,7 @@
 [![MIT License](https://img.shields.io/github/license/lqlive/sail?color=%230b0&style=flat-square)](LICENSE)
 [![.NET](https://img.shields.io/badge/.NET-9.0-purple.svg)](https://dotnet.microsoft.com/)
 
-Sail is a modern, high-performance API Gateway built on top of [YARP (Yet Another Reverse Proxy)](https://microsoft.github.io/reverse-proxy/). It provides dynamic configuration management with a web-based admin interface, enabling real-time updates to routes, clusters, and policies without restart.
+Sail is a modern, high-performance API Gateway built on top of [YARP (Yet Another Reverse Proxy)](https://github.com/dotnet/yarp). It provides dynamic configuration management with a web-based admin interface, enabling real-time updates to routes, clusters, and policies without restart.
 
 ## Get started
 
