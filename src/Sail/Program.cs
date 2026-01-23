@@ -1,20 +1,26 @@
-using Sail.Core.Entities;
-using Sail.Core.Management;
-using Sail.Extensions;
-using ServiceDefaults;
-using Sail.Database.MongoDB.Management;
 using System.Text.Json.Serialization;
-using Sail.Route.Grpc;
-using Sail.Route.Http;
-using Sail.Cluster.Grpc;
-using Sail.Cluster.Http;
-using Sail.Certificate.Grpc;
-using Sail.Certificate.Http;
-using Sail.Middleware.Grpc;
-using Sail.Middleware.Http;
+
+using MongoDB.Driver;
+using MongoDB.EntityFrameworkCore;
+using MongoDB.EntityFrameworkCore.Metadata;
+
 using Sail.AuthenticationPolicy.Grpc;
 using Sail.AuthenticationPolicy.Http;
+using Sail.Certificate.Grpc;
+using Sail.Certificate.Http;
+using Sail.Cluster.Grpc;
+using Sail.Cluster.Http;
+using Sail.Core.Entities;
+using Sail.Core.Management;
+using Sail.Database.MongoDB.Management;
+using Sail.Extensions;
+using Sail.Middleware.Grpc;
+using Sail.Middleware.Http;
+using Sail.Route.Grpc;
+using Sail.Route.Http;
 using Sail.Statistics.Http;
+
+using ServiceDefaults;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -37,7 +43,18 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<IContext>();
-    await context.Database.EnsureCreatedAsync();
+    var collectionOptions = new CreateCollectionOptions
+    {
+        ChangeStreamPreAndPostImagesOptions = new ChangeStreamPreAndPostImagesOptions
+        {
+            Enabled = true
+        }
+    };
+    var options = new MongoDatabaseCreationOptions()
+    {
+        CreateCollectionOptions = collectionOptions
+    };
+    await context.Database.EnsureCreatedAsync(options);
 }
 
 var endpoint = app.NewVersionedApi();

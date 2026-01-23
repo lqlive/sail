@@ -263,4 +263,3 @@ internal sealed class ProxyConfigProvider : IProxyConfigProvider, IDisposable
         }
     }
 }
-

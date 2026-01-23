@@ -2,7 +2,6 @@ using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using Sail.Api.V1;
 using Sail.Core.Stores;
-using AuthenticationPolicyEntity = Sail.Core.Entities.AuthenticationPolicy;
 
 namespace Sail.AuthenticationPolicy.Grpc;
 
