@@ -21,7 +21,7 @@ public static class MiddlewareHttpEndpointsBuilder
     }
 
     private static async Task<Results<Ok<MiddlewareResponse>, NotFound>> Get(
-        Middleware.MiddlewareService service,
+        MiddlewareService service,
         Guid id,
         CancellationToken cancellationToken)
     {
@@ -30,7 +30,7 @@ public static class MiddlewareHttpEndpointsBuilder
     }
 
     private static async Task<Ok<IEnumerable<MiddlewareResponse>>> List(
-        Middleware.MiddlewareService service,
+        MiddlewareService service,
         string? keywords,
         CancellationToken cancellationToken)
     {
@@ -39,7 +39,7 @@ public static class MiddlewareHttpEndpointsBuilder
     }
 
     private static async Task<Results<Created, ProblemHttpResult>> Create(
-        Middleware.MiddlewareService service,
+        MiddlewareService service,
         MiddlewareRequest request,
         CancellationToken cancellationToken)
     {
@@ -52,7 +52,7 @@ public static class MiddlewareHttpEndpointsBuilder
     }
 
     private static async Task<Results<Ok, ProblemHttpResult>> Update(
-        Middleware.MiddlewareService service,
+        MiddlewareService service,
         Guid id,
         MiddlewareRequest request,
         CancellationToken cancellationToken)
@@ -66,7 +66,7 @@ public static class MiddlewareHttpEndpointsBuilder
     }
 
     private static async Task<Results<Ok, ProblemHttpResult>> Delete(
-        Middleware.MiddlewareService service,
+        MiddlewareService service,
         Guid id,
         CancellationToken cancellationToken)
     {
