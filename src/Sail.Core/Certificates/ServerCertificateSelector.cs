@@ -21,7 +21,6 @@ public class ServerCertificateSelector(
         new Dictionary<string, X509Certificate2>(StringComparer.OrdinalIgnoreCase);
 
     private X509Certificate2? _defaultCertificate;
-
     public IReadOnlyDictionary<string, X509Certificate2> Certificates => _certificates;
 
     public IReadOnlyDictionary<string, X509Certificate2> WildcardCertificates => _wildcardCertificates;

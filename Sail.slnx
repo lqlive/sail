@@ -12,6 +12,7 @@
   </Folder>
   <Folder Name="/src/">
     <Project Path="src/Sail.Database.MongoDB/Sail.Database.MongoDB.csproj" />
+    <Project Path="src/Sail.Kubernetes.Controller/Sail.Kubernetes.Controller.csproj" Id="189c2523-d41f-487f-8571-9d6e556edc3d" />
     <Project Path="src\Sail.Compass\Sail.Compass.csproj" />
     <Project Path="src\Sail.Core\Sail.Core.csproj" />
     <Project Path="src\Sail.Proxy\Sail.Proxy.csproj" />

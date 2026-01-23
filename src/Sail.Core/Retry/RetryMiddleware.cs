@@ -1,8 +1,8 @@
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Logging;
 using Polly;
 using Sail.Core.Utilities;
 using Yarp.ReverseProxy.Model;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 
 namespace Sail.Core.Retry;
 
