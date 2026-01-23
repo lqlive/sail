@@ -27,7 +27,7 @@ public static class CertificateHttpEndpointsBuilder
         return api;
     }
 
-    private static async Task<Results<Ok<IEnumerable<SNIResponse>>, NotFound>> GetSNIs(Certificate.CertificateService service,
+    private static async Task<Results<Ok<IEnumerable<SNIResponse>>, NotFound>> GetSNIs(CertificateService service,
         Guid certificateId,
         CancellationToken cancellationToken)
     {
@@ -35,7 +35,7 @@ public static class CertificateHttpEndpointsBuilder
         return TypedResults.Ok(items);
     }
 
-    private static async Task<Results<Created, ProblemHttpResult>> CreateSNI(Certificate.CertificateService service,
+    private static async Task<Results<Created, ProblemHttpResult>> CreateSNI(CertificateService service,
         Guid certificateId, SNIRequest request, CancellationToken cancellationToken)
     {
         var result = await service.CreateSNIAsync(certificateId, request, cancellationToken);
@@ -46,7 +46,7 @@ public static class CertificateHttpEndpointsBuilder
         );
     }
 
-    private static async Task<Results<Ok, ProblemHttpResult>> UpdateSNI(Certificate.CertificateService service, Guid certificateId,
+    private static async Task<Results<Ok, ProblemHttpResult>> UpdateSNI(CertificateService service, Guid certificateId,
         Guid id, SNIRequest request, CancellationToken cancellationToken)
     {
         var result = await service.UpdateSNIAsync(certificateId, id, request, cancellationToken);
@@ -57,7 +57,7 @@ public static class CertificateHttpEndpointsBuilder
         );
     }
 
-    private static async Task<Results<Ok, ProblemHttpResult>> DeleteSNI(Certificate.CertificateService service, Guid certificateId,
+    private static async Task<Results<Ok, ProblemHttpResult>> DeleteSNI(CertificateService service, Guid certificateId,
         Guid id, CancellationToken cancellationToken)
     {
         var result = await service.DeleteSNIAsync(certificateId, id, cancellationToken);
@@ -69,7 +69,7 @@ public static class CertificateHttpEndpointsBuilder
     }
 
     private static async Task<Results<Ok<IEnumerable<CertificateResponse>>, NotFound>> GetItems(
-        Certificate.CertificateService service,
+        CertificateService service,
         CancellationToken cancellationToken)
     {
         var items = await service.GetAsync(cancellationToken);
@@ -77,7 +77,7 @@ public static class CertificateHttpEndpointsBuilder
     }
 
     private static async Task<Results<Ok<CertificateResponse>, NotFound>> GetItem(
-        Certificate.CertificateService service,
+        CertificateService service,
         Guid id,
         CancellationToken cancellationToken)
     {
@@ -85,7 +85,7 @@ public static class CertificateHttpEndpointsBuilder
         return item != null ? TypedResults.Ok(item) : TypedResults.NotFound();
     }
 
-    private static async Task<Results<Created, ProblemHttpResult>> Create(Certificate.CertificateService service,
+    private static async Task<Results<Created, ProblemHttpResult>> Create(CertificateService service,
         CertificateRequest request, CancellationToken cancellationToken)
     {
         var result = await service.CreateAsync(request, cancellationToken);
@@ -96,7 +96,7 @@ public static class CertificateHttpEndpointsBuilder
         );
     }
 
-    private static async Task<Results<Ok, ProblemHttpResult>> Update(Certificate.CertificateService service, Guid id,
+    private static async Task<Results<Ok, ProblemHttpResult>> Update(CertificateService service, Guid id,
         CertificateRequest request, CancellationToken cancellationToken)
     {
         var result = await service.UpdateAsync(id, request, cancellationToken);
@@ -106,8 +106,7 @@ public static class CertificateHttpEndpointsBuilder
             errors => errors.HandleErrors()
         );
     }
-
-    private static async Task<Results<Ok, ProblemHttpResult>> Delete(Certificate.CertificateService service, Guid id,
+    private static async Task<Results<Ok, ProblemHttpResult>> Delete(CertificateService service, Guid id,
         CancellationToken cancellationToken)
     {
         var result = await service.DeleteAsync(id, cancellationToken);

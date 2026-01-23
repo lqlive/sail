@@ -24,7 +24,7 @@ public static class AuthenticationPolicyHttpEndpointsBuilder
     }
 
     private static async Task<IResult> GetAuthenticationPolicies(
-        [FromServices] AuthenticationPolicy.AuthenticationPolicyService service,
+        [FromServices] AuthenticationPolicyService service,
         CancellationToken cancellationToken)
     {
         var policies = await service.GetAsync(cancellationToken);
@@ -33,7 +33,7 @@ public static class AuthenticationPolicyHttpEndpointsBuilder
 
     private static async Task<IResult> GetAuthenticationPolicy(
         [FromRoute] Guid id,
-        [FromServices] AuthenticationPolicy.AuthenticationPolicyService service,
+        [FromServices] AuthenticationPolicyService service,
         CancellationToken cancellationToken)
     {
         var policy = await service.GetByIdAsync(id, cancellationToken);
@@ -42,7 +42,7 @@ public static class AuthenticationPolicyHttpEndpointsBuilder
 
     private static async Task<IResult> CreateAuthenticationPolicy(
         [FromBody] AuthenticationPolicyRequest request,
-        [FromServices] AuthenticationPolicy.AuthenticationPolicyService service,
+        [FromServices] AuthenticationPolicyService service,
         CancellationToken cancellationToken)
     {
         var policy = await service.CreateAsync(request, cancellationToken);
@@ -52,7 +52,7 @@ public static class AuthenticationPolicyHttpEndpointsBuilder
     private static async Task<IResult> UpdateAuthenticationPolicy(
         [FromRoute] Guid id,
         [FromBody] AuthenticationPolicyRequest request,
-        [FromServices] AuthenticationPolicy.AuthenticationPolicyService service,
+        [FromServices] AuthenticationPolicyService service,
         CancellationToken cancellationToken)
     {
         try
@@ -68,7 +68,7 @@ public static class AuthenticationPolicyHttpEndpointsBuilder
 
     private static async Task<IResult> DeleteAuthenticationPolicy(
         [FromRoute] Guid id,
-        [FromServices] AuthenticationPolicy.AuthenticationPolicyService service,
+        [FromServices] AuthenticationPolicyService service,
         CancellationToken cancellationToken)
     {
         await service.DeleteAsync(id, cancellationToken);

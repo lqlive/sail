@@ -1,9 +1,7 @@
 using System.Text.Json.Serialization;
-
 using MongoDB.Driver;
 using MongoDB.EntityFrameworkCore;
 using MongoDB.EntityFrameworkCore.Metadata;
-
 using Sail.AuthenticationPolicy.Grpc;
 using Sail.AuthenticationPolicy.Http;
 using Sail.Certificate.Grpc;
