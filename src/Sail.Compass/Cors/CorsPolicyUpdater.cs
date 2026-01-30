@@ -26,7 +26,7 @@ internal sealed class CorsPolicyUpdater : IDisposable
                 () => Log.CorsPolicyStreamCompleted(_logger));
 
         _subscriptions.Add(subscription);
-        
+
         Log.CorsPolicyUpdaterInitialized(_logger);
     }
 
@@ -101,4 +101,3 @@ internal sealed class CorsPolicyUpdater : IDisposable
         }
     }
 }
-
