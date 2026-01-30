@@ -21,27 +21,27 @@ public static class ServiceCollectionExtensions
         services.AddGrpcClient<ClusterService.ClusterServiceClient>((sp, o) =>
         {
             var receiverOptions = sp.GetRequiredService<IOptions<ReceiverOptions>>().Value;
-            o.Address = new Uri("http://localhost:8000");
+            o.Address = receiverOptions.ControllerUrl;
         });
         services.AddGrpcClient<RouteService.RouteServiceClient>((sp, o) =>
         {
             var receiverOptions = sp.GetRequiredService<IOptions<ReceiverOptions>>().Value;
-            o.Address = new Uri("http://localhost:8000");
+            o.Address = receiverOptions.ControllerUrl;
         });
         services.AddGrpcClient<CertificateService.CertificateServiceClient>((sp, o) =>
         {
             var receiverOptions = sp.GetRequiredService<IOptions<ReceiverOptions>>().Value;
-            o.Address = new Uri("http://localhost:8000");
+            o.Address = receiverOptions.ControllerUrl;
         });
         services.AddGrpcClient<MiddlewareService.MiddlewareServiceClient>((sp, o) =>
         {
             var receiverOptions = sp.GetRequiredService<IOptions<ReceiverOptions>>().Value;
-            o.Address = new Uri("http://localhost:8000");
+            o.Address = receiverOptions.ControllerUrl;
         });
         services.AddGrpcClient<AuthenticationPolicyService.AuthenticationPolicyServiceClient>((sp, o) =>
         {
             var receiverOptions = sp.GetRequiredService<IOptions<ReceiverOptions>>().Value;
-            o.Address = new Uri("http://localhost:8000");
+            o.Address = receiverOptions.ControllerUrl;
         });
 
         return services;
