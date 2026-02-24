@@ -7,10 +7,8 @@ public class AuthenticationPolicy
     public AuthenticationSchemeType Type { get; set; }
     public bool Enabled { get; set; } = true;
     public string? Description { get; set; }
-
     public JwtBearerConfig? JwtBearer { get; set; }
     public OpenIdConnectConfig? OpenIdConnect { get; set; }
-
     public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
     public DateTimeOffset UpdatedAt { get; set; } = DateTimeOffset.UtcNow;
 }

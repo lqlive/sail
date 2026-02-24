@@ -151,10 +151,10 @@ public static class ServiceCollectionExtensions
 
     public static void UseCompassUpdaters(this IServiceProvider serviceProvider)
     {
-        _ = serviceProvider.GetService<CorsPolicyUpdater>();
-        _ = serviceProvider.GetService<RateLimiterPolicyUpdater>();
-        _ = serviceProvider.GetService<AuthenticationPolicyUpdater>();
-        _ = serviceProvider.GetService<TimeoutPolicyUpdater>();
-        _ = serviceProvider.GetService<RetryPolicyUpdater>();
+        serviceProvider.GetService<CorsPolicyUpdater>();
+        serviceProvider.GetService<RateLimiterPolicyUpdater>();
+        serviceProvider.GetService<AuthenticationPolicyUpdater>();
+        serviceProvider.GetService<TimeoutPolicyUpdater>();
+        serviceProvider.GetService<RetryPolicyUpdater>();
     }
 }
