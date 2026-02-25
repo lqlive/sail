@@ -12,20 +12,22 @@ import {
 } from '@heroicons/react/24/outline';
 import type { Cluster } from '../../types';
 import { ClusterService } from '../../services/clusterService';
+import { useDebounce } from '../../hooks/useDebounce';
 
 const Clusters: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [clusters, setClusters] = useState<Cluster[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
+  const debouncedSearchTerm = useDebounce(searchTerm);
   const [error, setError] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<{ id: string; name: string } | null>(null);
 
-  const loadClusters = async () => {
+  const loadClusters = async (search: string = '') => {
     try {
       setLoading(true);
       setError(null);
-      const data = await ClusterService.getClusters(searchTerm);
+      const data = await ClusterService.getClusters(search);
       setClusters(data);
     } catch (err) {
       console.error('Failed to load clusters:', err);
@@ -40,19 +42,16 @@ const Clusters: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      if (searchTerm !== '') {
-        loadClusters();
-      }
-    }, 300);
-    return () => clearTimeout(timer);
-  }, [searchTerm]);
+    if (debouncedSearchTerm !== '') {
+      loadClusters(debouncedSearchTerm);
+    }
+  }, [debouncedSearchTerm]);
 
   const handleDelete = async (id: string) => {
     try {
       setDeletingId(id);
       await ClusterService.deleteCluster(id);
-      await loadClusters();
+      await loadClusters(searchTerm);
       setDeleteConfirm(null);
     } catch (err) {
       console.error('Failed to delete cluster:', err);
@@ -116,7 +115,7 @@ const Clusters: React.FC = () => {
           <h3 className="text-sm font-medium text-gray-900 mb-1">Failed to load clusters</h3>
           <p className="text-sm text-gray-500 mb-4">Please check your connection and try again</p>
           <button
-            onClick={loadClusters}
+            onClick={() => loadClusters(searchTerm)}
             className="inline-flex items-center px-4 py-2 bg-white border border-gray-200 text-sm font-medium rounded-lg hover:bg-gray-50 transition-colors"
           >
             Try Again

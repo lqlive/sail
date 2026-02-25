@@ -9,20 +9,22 @@ import {
 } from '@heroicons/react/24/outline';
 import type { Certificate } from '../../types';
 import { CertificateService } from '../../services/certificateService';
+import { useDebounce } from '../../hooks/useDebounce';
 
 const Certificates: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [certificates, setCertificates] = useState<Certificate[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
+  const debouncedSearchTerm = useDebounce(searchTerm);
   const [error, setError] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<{ id: string; name: string } | null>(null);
 
-  const loadCertificates = async () => {
+  const loadCertificates = async (search: string = '') => {
     try {
       setLoading(true);
       setError(null);
-      const data = await CertificateService.getCertificates(searchTerm);
+      const data = await CertificateService.getCertificates(search);
       setCertificates(data);
     } catch (err) {
       console.error('Failed to load certificates:', err);
@@ -37,19 +39,16 @@ const Certificates: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      if (searchTerm !== '') {
-        loadCertificates();
-      }
-    }, 300);
-    return () => clearTimeout(timer);
-  }, [searchTerm]);
+    if (debouncedSearchTerm !== '') {
+      loadCertificates(debouncedSearchTerm);
+    }
+  }, [debouncedSearchTerm]);
 
   const handleDelete = async (id: string) => {
     try {
       setDeletingId(id);
       await CertificateService.deleteCertificate(id);
-      await loadCertificates();
+      await loadCertificates(searchTerm);
       setDeleteConfirm(null);
     } catch (err) {
       console.error('Failed to delete certificate:', err);
@@ -115,7 +114,7 @@ const Certificates: React.FC = () => {
           <h3 className="text-sm font-medium text-gray-900 mb-1">Failed to load certificates</h3>
           <p className="text-sm text-gray-500 mb-4">Please check your connection and try again</p>
           <button
-            onClick={loadCertificates}
+            onClick={() => loadCertificates(searchTerm)}
             className="inline-flex items-center px-4 py-2 bg-white border border-gray-200 text-sm font-medium rounded-lg hover:bg-gray-50 transition-colors"
           >
             Try Again
