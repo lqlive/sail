@@ -8,21 +8,23 @@ import {
 } from '@heroicons/react/24/outline';
 import type { Route } from '../../types';
 import { RouteService } from '../../services/routeService';
+import { useDebounce } from '../../hooks/useDebounce';
 
 const Routes: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [routes, setRoutes] = useState<Route[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
+  const debouncedSearchTerm = useDebounce(searchTerm);
   const [filterStatus, setFilterStatus] = useState<'all' | 'active' | 'inactive'>('all');
   const [error, setError] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<{ id: string; name: string } | null>(null);
 
-  const loadRoutes = async () => {
+  const loadRoutes = async (search: string = '') => {
     try {
       setLoading(true);
       setError(null);
-      const data = await RouteService.getRoutes(searchTerm);
+      const data = await RouteService.getRoutes(search);
       setRoutes(data);
     } catch (err) {
       console.error('Failed to load routes:', err);
@@ -37,19 +39,16 @@ const Routes: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      if (searchTerm !== '') {
-        loadRoutes();
-      }
-    }, 300);
-    return () => clearTimeout(timer);
-  }, [searchTerm]);
+    if (debouncedSearchTerm !== '') {
+      loadRoutes(debouncedSearchTerm);
+    }
+  }, [debouncedSearchTerm]);
 
   const handleDelete = async (id: string) => {
     try {
       setDeletingId(id);
       await RouteService.deleteRoute(id);
-      await loadRoutes();
+      await loadRoutes(searchTerm);
       setDeleteConfirm(null);
     } catch (err) {
       console.error('Failed to delete route:', err);
@@ -132,7 +131,7 @@ const Routes: React.FC = () => {
           <h3 className="text-sm font-medium text-gray-900 mb-1">Failed to load routes</h3>
           <p className="text-sm text-gray-500 mb-4">Please check your connection and try again</p>
           <button
-            onClick={loadRoutes}
+            onClick={() => loadRoutes(searchTerm)}
             className="inline-flex items-center px-4 py-2 bg-white border border-gray-200 text-sm font-medium rounded-lg hover:bg-gray-50 transition-colors"
           >
             Try Again
